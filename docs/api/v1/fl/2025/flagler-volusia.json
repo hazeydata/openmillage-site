@@ -7,7 +7,7 @@
   "body_type": "municipality",
   "body_id": "fl-flagler-volusia-flagler-beach-municipality",
   "nces_leaid": "",
-  "fips": "",
+  "fips": "1222550",
   "levy_component": "operating_total",
   "levy_scope": "municipal",
   "rate_kind": "adopted",

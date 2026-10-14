@@ -3,7 +3,7 @@
 
 ## Data
 - JSON per county: https://hazeydata.github.io/openmillage-site/api/v1/<state>/<year>/<county>.json
-- Fields: state, year, county, taxing_body, body_type, body_id, nces_leaid, levy_component, levy_scope, rate_kind (adopted | aggregate_effective = DOR less-than-countywide levies divided by countywide taxable value), rate, unit (mills = $ per $1,000 taxable value), source_url, sha256, retrieved_at
+- Fields: state, year, county, taxing_body, body_type, body_id, nces_leaid, fips (county 5-digit or Census place 7-digit GEOID), levy_component, levy_scope, rate_kind (adopted | aggregate_effective = DOR less-than-countywide levies divided by countywide taxable value), rate, unit (mills = $ per $1,000 taxable value), source_url, sha256, retrieved_at
 
 ## Rules
 - Rates are never estimated; if a body is missing, it is not yet collected.

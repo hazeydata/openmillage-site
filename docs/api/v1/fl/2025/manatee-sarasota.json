@@ -7,7 +7,7 @@
   "body_type": "municipality",
   "body_id": "fl-manatee-sarasota-longboat-key-municipality",
   "nces_leaid": "",
-  "fips": "",
+  "fips": "1241150",
   "levy_component": "operating_total",
   "levy_scope": "municipal",
   "rate_kind": "adopted",
