@@ -1,0 +1,18 @@
+name: build-site
+on:
+  push:
+    paths: [build.py, "data/**", .github/workflows/build.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: rm -rf docs && DATA_GLOB='data/*.csv' python3 build.py
+      - run: |
+          git config user.name "openmillage-build"
+          git config user.email "actions@users.noreply.github.com"
+          git add docs
+          git diff --cached --quiet || (git commit -m "Rebuild docs/ from data" && git push)
