@@ -1,0 +1,21 @@
+[
+ {
+  "state": "FL",
+  "year": "2025",
+  "county": "Gilchrist/Levy",
+  "taxing_body": "Fanning Springs",
+  "body_type": "municipality",
+  "body_id": "fl-gilchrist-levy-fanning-springs-municipality",
+  "nces_leaid": "",
+  "fips": "",
+  "levy_component": "operating_total",
+  "levy_scope": "municipal",
+  "rate_kind": "adopted",
+  "rate": "3",
+  "unit": "mills",
+  "source_agency": "Florida Office of Economic & Demographic Research (Municipal Ad Valorem Tax Profile; data source FL DOR)",
+  "source_url": "https://edr.state.fl.us/Content/local-government/data/data-a-to-z/advaltxmu.xlsx",
+  "sha256": "5874badb986d1486f506dcf4a20a167cabfdab1ba07b5991607de0a95b6b6ec8",
+  "retrieved_at": "2026-10-14T07:08:54+00:00"
+ }
+]
