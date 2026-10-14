@@ -1,0 +1,9 @@
+# OpenMillage
+> Official US property tax rates (millage) per taxing body, every row linked to a government source with sha256 of the source file. Pilot: Florida 2025.
+
+## Data
+- JSON per county: /api/v1/<state>/<year>/<county>.json
+- Fields: state, year, county, taxing_body, body_type, body_id, nces_leaid, levy_component, levy_scope, rate_kind (adopted | aggregate_effective = DOR less-than-countywide levies divided by countywide taxable value), rate, unit (mills = $ per $1,000 taxable value), source_url, sha256, retrieved_at
+
+## Rules
+- Rates are never estimated; if a body is missing, it is not yet collected.

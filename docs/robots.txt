@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://hazeydata.github.io/openmillage-site/sitemap.xml
