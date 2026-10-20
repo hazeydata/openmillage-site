@@ -112,9 +112,58 @@ for v, why in ((None, "null"), ("<absent>", "missing")):
     pb = os.path.join(tmp, "fb.json"); json.dump(fb, open(pb, "w"))
     try: A.load_ballot(pb); ok(False, f"T2 fact_verified_by {why} fails closed")
     except A.BuildError: ok(True, f"T2 fact_verified_by {why} fails closed")
+# special-district fact gate (fact file keyed county|body_id|levy_component)
+try: A.fact_gate(dist, A.CFG["district_fact_csv"]); ok(True, f"fact gate passes: all {len(dist)} district rows MATCH fact, each with its own https source link")
+except A.BuildError as e: ok(False, f"fact gate passes: {e}")
+import copy
+d2 = copy.deepcopy(dist); d2[0]["rate"] = str(float(d2[0]["rate"]) + 1)
+try: A.fact_gate(d2, A.CFG["district_fact_csv"]); ok(False, "fact gate fails on a rate differing from fact")
+except A.BuildError: ok(True, "fact gate fails on a rate differing from fact")
+d3 = copy.deepcopy(dist); d3[0]["county"] = "Nowhere"
+try: A.fact_gate(d3, A.CFG["district_fact_csv"]); ok(False, "fact gate fails on a row missing from fact")
+except A.BuildError: ok(True, "fact gate fails on a row missing from fact")
+d4 = copy.deepcopy(dist); d4[0]["source_url"] = ""
+try: A.fact_gate(d4, A.CFG["district_fact_csv"]); ok(False, "fact gate fails on a district row without a source link")
+except A.BuildError: ok(True, "fact gate fails on a district row without a source link")
+try: A.fact_gate(dist, os.path.join(tmp, "none.csv")); ok(False, "fact gate fails closed without the fact file")
+except A.BuildError: ok(True, "fact gate fails closed without the fact file")
+# tacd_source_url blank / sha256 mismatch fail the build
+fpath = A.CFG["district_fact_csv"]; frows = list(csv.DictReader(open(fpath, newline="")))
+for mut, why in (("blank", "tacd_source_url blank"), ("sha", "sha256 mismatch")):
+    fr = copy.deepcopy(frows)
+    if mut == "blank": fr[0]["tacd_source_url"] = ""
+    d5 = copy.deepcopy(dist)
+    if mut == "sha": d5[0]["sha256"] = "0" * 64
+    fp = os.path.join(tmp, f"fact_{mut}.csv")
+    with open(fp, "w", newline="") as fh:
+        w = csv.DictWriter(fh, fieldnames=list(frows[0].keys()), lineterminator="\n"); w.writeheader(); w.writerows(fr)
+    try: A.fact_gate(d5, fp); ok(False, f"fact gate fails on {why}")
+    except A.BuildError as e: ok(why.split()[0] in str(e), f"fact gate fails on {why}")
+ok(all(f["tacd_source_url"].startswith("https://floridarevenue.com/") for f in frows) and len(frows) == len(dist), f"fact file: tacd_source_url set on all {len(frows)} rows")
+# footnotes verbatim from fact's file, with DOR citations
+fn = A.footnotes(A.CFG["footnotes_md"])
+for c, fc in A.CFG["footnote_citations"].items():
+    seg = page.split(f"<h3>{html.escape(c)}</h3>")[1].split("</section>")[0]
+    ok(f"&ldquo;{html.escape(fn[fc['n']], quote=True)}&rdquo;" in seg and all(html.escape(A.SRC[f]["url"], quote=True) in seg for f, _ in fc["cites"]), f"footnote {fc['n']} ({c}) verbatim with DOR citation(s)")
+ok("Other counties' TACDs print it in three parts" in fn[3], "Broward footnote says the split comes from other counties")
+# Broward sum: computed from data, not typed
+from decimal import Decimal as Dd
+bro = [r for r in dist if r["county"] == "Broward" and r["body_id"] == "fl-sfwmd-special_district"]
+parts = {}
+for cty in ("Palm Beach", "St. Lucie"):
+    parts[cty] = {r["levy_component"]: Dd(r["rate"]) for r in dist if r["county"] == cty and r["body_id"] == "fl-sfwmd-special_district"}
+ok(len(bro) == 1 and all(sum(p.values()) == Dd(bro[0]["rate"]) and len(p) == 3 for p in parts.values()), f"Broward SFWMD {bro[0]['rate'] if bro else '?'} = sum of the three parts in Palm Beach and St. Lucie ({[str(sum(p.values())) for p in parts.values()]})")
+nums = re.findall(r"\d+\.\d+", fn[3]); comps = parts["Palm Beach"]
+ok(Dd(nums[0]) == Dd(bro[0]["rate"]) and [Dd(x) for x in nums[1:4]] == [comps["operating"], comps["okeechobee_basin"], comps["everglades_construction"]] and Dd(nums[4]) == sum(Dd(x) for x in nums[1:4]), "Broward footnote numbers equal the data and add up")
 # AC4b special-district coverage, computed, missing named
 sdc = [c for c, _ in counties if any(r["county"] == c for r in dist)]; sdm = [c for c, _ in counties if c not in sdc]
 line = re.search(r"<p>Special districts: .*?</p>", page).group(0)
 ok(f"Special districts: {len(sdc)} of 67 counties" in line and all(html.escape(c) in line for c in sdm), f"AC4b special districts {len(sdc)} of 67, {len(sdm)} missing named")
+ok(len(sdc) == len({r["county"] for r in dist} & {c for c, _ in counties}), f"AC4b count equals counties with special-district rows ({len(sdc)})")
+ok(html.escape(A.CFG["tacd_index"]["url"], quote=True) in line, "AC4b count links the DOR TACD index")
+tl = dict(re.findall(r"([A-Z][A-Za-z.\- ]+?) \(<a href='([^']+)'>TACD</a>\)", line))
+ok(sorted(tl) == sorted(sdc) and all(html.unescape(tl[c]) in {r["source_url"] for r in dist if r["county"] == c} for c in sdc), f"AC4b each of the {len(sdc)} counties links its own TACD file")
+# 43/67 links come from the TACD source list
+ok(all(html.unescape(u) == A.SRC_BY_COUNTY[c] for c, u in tl.items()), "AC4b county links come from the TACD source list")
 shutil.rmtree(tmp)
 print("FAILURES", len(FAIL)); sys.exit(1 if FAIL else 0)

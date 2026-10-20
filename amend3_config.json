@@ -42,5 +42,49 @@
   "save you",
   "protect homeowners",
   "may change"
- ]
+ ],
+ "tacd_index": {
+  "agency": "Florida Department of Revenue, 2025 Taxing Authority Code Descriptions (TACD) index",
+  "url": "https://floridarevenue.com/property/dataportal/Pages/default.aspx?path=/property/dataportal/Documents/PTO%20Data%20Portal/TACD%20History/2025%20Taxing%20Authority%20Code%20Descriptions"
+ },
+ "district_fact_csv": "data/ref/fl_special_district_for_implement.csv",
+ "tacd_sources_csv": "data/ref/tacd_sources_2025.csv",
+ "footnotes_md": "data/ref/fl_special_district_footnotes.md",
+ "footnote_citations": {
+  "St. Johns": {
+   "n": 1,
+   "cites": [
+    [
+     "2025 Saint Johns TACD.pdf",
+     "pages 1, 2 and 8"
+    ]
+   ]
+  },
+  "Leon": {
+   "n": 2,
+   "cites": [
+    [
+     "2025 Leon TACD.pdf",
+     "page 1"
+    ]
+   ]
+  },
+  "Broward": {
+   "n": 3,
+   "cites": [
+    [
+     "2025 Broward TACD.xlsx",
+     "Sheet1, column K ('SFWMD')"
+    ],
+    [
+     "2025 Palm Beach TACD.xlsx",
+     "three-part split, Sheet 1"
+    ],
+    [
+     "2025 Saint Lucie TACD.pdf",
+     "three-part split, page 1"
+    ]
+   ]
+  }
+ }
 }

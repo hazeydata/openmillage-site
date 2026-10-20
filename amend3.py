@@ -32,6 +32,51 @@ def load_ballot(path):
 def rows_from(path):
     return [r for r in csv.DictReader(open(path, newline="")) if r["state"] == "FL" and r["year"] == "2025" and r["rate_kind"] == "adopted"]
 
+def district_key(r): return f"{re.sub(r'[^a-z0-9]+', '-', r['county'].lower()).strip('-')}|{r['body_id']}|{r['levy_component']}"
+
+def fact_gate(districts, path):
+    """Fact's special-district verification (key county|body_id|levy_component, since body_id repeats across counties).
+    Fails closed unless every published district row is in fact's file with match=true and the same rate, and has its own
+    https source link (the row's own source_url is the link), and fact's tacd_source_url must be set and point at a file in the TACD
+    source list whose sha256 equals the row's sha256."""
+    if not os.path.exists(path): raise BuildError(f"special-district fact file missing: {path}")
+    from decimal import Decimal
+    fact = {r["row_id"]: r for r in csv.DictReader(open(path, newline=""))}
+    bad = []
+    for r in districts:
+        k = district_key(r); f = fact.get(k)
+        if f is None: bad.append(f"{k}: not in fact file")
+        elif f["match"].strip().lower() != "true": bad.append(f"{k}: fact match={f['match']!r}")
+        elif Decimal(f["rate"]) != Decimal(r["rate"]): bad.append(f"{k}: rate {r['rate']} vs fact {f['rate']}")
+        if not r["source_url"].startswith("https://"): bad.append(f"{k}: no source link")
+        if f is not None:
+            u = f.get("tacd_source_url", "").strip()
+            if not u: bad.append(f"{k}: tacd_source_url blank")
+            elif SRC_SHA.get(u) != r["sha256"]: bad.append(f"{k}: sha256 {r['sha256'][:12]} does not match the TACD source list for {u}")
+    if bad: raise BuildError(f"special-district fact gate: {len(bad)} row(s) fail: " + "; ".join(bad[:5]))
+
+def tacd_sources(path):
+    out = {}
+    for r in csv.DictReader(open(path, newline="")):
+        c = re.sub(r" (County City )?TACD\..*$", "", r["file"])[5:]
+        out[r["file"]] = dict(r, county={"Saint Johns": "St. Johns", "Saint Lucie": "St. Lucie"}.get(c, c))
+    return out
+SRC = tacd_sources(CFG["tacd_sources_csv"]); SRC_SHA = {r["url"]: r["sha256"] for r in SRC.values()}
+SRC_BY_COUNTY = {}
+for _f, _r in sorted(SRC.items()): SRC_BY_COUNTY.setdefault(_r["county"], _r["url"])
+
+def footnotes(path):
+    """Fact's footnote wording, verbatim: the quoted text after 'Wording:' under each numbered heading."""
+    out, n = {}, None
+    for line in open(path):
+        m = re.match(r"(\d+)\. ", line)
+        if m: n = int(m.group(1))
+        m = re.match(r'Wording: "(.*)"\s*$', line)
+        if m and n is not None: out[n] = m.group(1)
+    return out
+
+FOOT = footnotes(CFG["footnotes_md"])
+
 def link(u, text="source"): return f"<a href='{E(u)}'>{E(text)}</a>"
 
 def render_amend3(rows, districts, ballot, counties):
@@ -39,7 +84,7 @@ def render_amend3(rows, districts, ballot, counties):
     have = {r["county"] for r in rows}
     covered = [c for c in names if c in have]; missing = [c for c in names if c not in have]
     sd_have = [c for c in names if any(r["county"] == c for r in districts)]; sd_missing = [c for c in names if c not in sd_have]
-    sd_src = sorted({r["source_url"] for r in districts})[0] if districts else CFG["counties_source"]["url"]
+    sd_file = {c: SRC_BY_COUNTY[c] for c in sd_have}
     nt = {k: sum(r["body_type"] == k for r in rows) for k in ("county", "school_district", "municipality")}
     allrows = rows + districts
     asof = max(r["retrieved_at"] for r in allrows)
@@ -56,7 +101,12 @@ def render_amend3(rows, districts, ballot, counties):
         if not rs: continue
         ds = sorted([r for r in districts if r["county"] == c], key=lambda r: (r["taxing_body"], r["levy_component"]))
         det = (f"<details><summary>Special districts in {E(c)}</summary><table>{hdr}{''.join(tr(r) for r in ds)}</table></details>" if ds else "")
-        sections.append(f"<section id='{E(re.sub(r'[^a-z0-9]+', '-', c.lower()).strip('-'))}'><h3>{E(c)}</h3><table>{hdr}{''.join(tr(r) for r in rs)}</table>{det}</section>")
+        fn = ""
+        if ds and c in CFG["footnote_citations"]:
+            fc = CFG["footnote_citations"][c]
+            fn = (f"<p class=footnote>Note {fc['n']}: &ldquo;{E(FOOT[fc['n']])}&rdquo; Source: "
+                  + "; ".join(f"{link(SRC[f]['url'], 'DOR 2025 TACD (' + SRC[f]['county'] + ')')}, {E(where)}" for f, where in fc["cites"]) + ".</p>")
+        sections.append(f"<section id='{E(re.sub(r'[^a-z0-9]+', '-', c.lower()).strip('-'))}'><h3>{E(c)}</h3><table>{hdr}{''.join(tr(r) for r in rs)}</table>{det}{fn}</section>")
     md = CFG["millage_definition"]; api = f"api/v1/fl/2025/{SLUG.split('/')[-1]}-baseline"
     srcs = sorted({(r["source_agency"], r["source_url"]) for r in allrows})
     body = (
@@ -68,7 +118,9 @@ def render_amend3(rows, districts, ballot, counties):
       f"<p>These are 2025 adopted rates. As of {asof_et.strftime('%B')} {asof_et.day}, {asof_et.year}, {asof_et.strftime('%H:%M')} ET (latest retrieval of a source file, {link(asof_src)}).</p>"
       f"<p>Coverage: {len(covered)} of {len(names)} counties ({link(county_src['url'], 'county list: ' + county_src['agency'])}; rates: {link(srcs[0][1], 'Florida Department of Revenue')}).</p>"
       + (f"<p>Not yet collected: {', '.join(E(c) for c in missing)}.</p>" if missing else "")
-      + f"<p>Special districts: {len(sd_have)} of {len(names)} counties have special-district rows ({link(sd_src, 'Florida Department of Revenue')})" + (f"; not yet collected for: {', '.join(E(c) for c in sd_missing)}" if sd_missing else "") + ".</p>"
+      + f"<p>Special districts: {len(sd_have)} of {len(names)} counties have special-district rows, read from each county's 2025 TACD file ({link(CFG['tacd_index']['url'], 'Florida Department of Revenue TACD index')}): "
+      + ", ".join(f"{E(c)} ({link(sd_file[c], 'TACD')})" for c in sd_have)
+      + (f"; not yet collected for: {', '.join(E(c) for c in sd_missing)}" if sd_missing else "") + ".</p>"
       + f"<p>Rows shown: {nt['county']} county, {nt['school_district']} school district, {nt['municipality']} municipal and {len(districts)} special-district rates ({link(srcs[0][1], 'Florida Department of Revenue')}).</p>"
       + "".join(sections)
       + f"<p>Rows shown on this page: <a href='{PATH}/{api}.csv'>CSV</a> · <a href='{PATH}/{api}.json'>JSON</a>.</p>"
@@ -105,6 +157,7 @@ def main():
         ballot = load_ballot(CFG["ballot_json"])
         rows = rows_from(CFG["rates_csv"])
         districts = rows_from(CFG["districts_csv"]) if os.path.exists(CFG["districts_csv"]) else []
+        fact_gate(districts, CFG["district_fact_csv"])
         counties = [(r["name"].removesuffix(" County"), r["geoid"]) for r in csv.DictReader(open(CFG["counties_csv"]))]
         if len(counties) != 67: raise BuildError(f"county list has {len(counties)} rows, expected 67")
         page, shown = render_amend3(rows, districts, ballot, counties)
