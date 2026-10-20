@@ -66,8 +66,20 @@ h = http.server.ThreadingHTTPServer(("127.0.0.1", 0), lambda *a: http.server.Sim
 threading.Thread(target=h.serve_forever, daemon=True).start()
 code = urllib.request.urlopen(f"http://127.0.0.1:{h.server_port}/{A.SLUG}/").status; h.shutdown()
 ok(code == 200, f"AC10 local preview returns {code}")
-# real ballot file: must fail closed while title / ballot_number are absent
-r = subprocess.run([sys.executable, "amend3.py"], env=dict(os.environ, OUT=os.path.join(tmp, "real")), capture_output=True, text=True)
-print("INFO real build:", r.returncode, r.stdout.strip() or r.stderr.strip()[:200])
+# multi-county rows (e.g. "Flagler/St. Johns") are shown but never counted as extra counties
+multi = sorted({r["county"] for r in rows} - {c for c, _ in counties})
+ok(len(counties) == 67 and n == 67 and "Coverage: 67 of 67 counties" in page and all("/" in m for m in multi), f"multi-county groups {multi} not counted; coverage 67 of 67")
+ok(not re.search(r"\b54\s*(of|/)\s*66\b|of 66\b|/66\b", re.sub(r"<[^>]+>", " ", page)), "page never shows the TACD 54/66 figure")
+# AC2 + AC11 with the real, fact-verified ballot file
+real = json.load(open(A.CFG["ballot_json"]))
+ok(all(v == "CONFIRMED" for v in real.get("verification_status", {}).values()) and real.get("verification_status"), "AC11 fact file: every field CONFIRMED")
+rd = os.path.join(tmp, "real"); shutil.copytree("docs", rd)
+r = subprocess.run([sys.executable, "amend3.py"], env=dict(os.environ, OUT=rd), capture_output=True, text=True)
+ok(r.returncode == 0, f"real build exit 0: {(r.stdout + r.stderr).strip()[:300]}")
+if r.returncode == 0:
+    rp = open(os.path.join(rd, A.SLUG, "index.html")).read()
+    ok(f"<h1>{html.escape(real['title'], quote=True)}</h1>" in rp and f">Ballot Number {real['ballot_number']}</a>" in rp, "AC2 real page: heading = verbatim title, ballot number as label")
+    ok("&ldquo;" + html.escape(real["ballot_summary"], quote=True) + "&rdquo;" in rp, "AC2 real page: verbatim summary in quotes with link")
+    ok(A.check(rp) == [] and "Coverage: 67 of 67 counties" in rp and "Amendment 3" not in rp, "real page passes AC1/5/6 checks, 67 of 67, no 'Amendment 3'")
 shutil.rmtree(tmp)
 print("FAILURES", len(FAIL)); sys.exit(1 if FAIL else 0)
