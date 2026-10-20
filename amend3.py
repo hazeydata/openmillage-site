@@ -5,6 +5,7 @@ source link; checks below fail the build (exit 1) instead of writing a page that
 Deterministic: no clock reads, sorted inputs, fixed formatting. The slug is the single config value "slug"."""
 import csv, datetime, html, json, os, re, sys
 from zoneinfo import ZoneInfo
+from analytics import GOATCOUNTER_TAG
 
 CFG = json.load(open(os.environ.get("AMEND3_CONFIG", "amend3_config.json")))
 BASE = os.environ.get("SITE_BASE", "https://hazeydata.github.io/openmillage-site").rstrip("/")
@@ -137,7 +138,7 @@ def render_amend3(rows, districts, ballot, counties):
       f"<dt>Where do these rates come from?</dt><dd>Each value on this page links to the official document it was read from.</dd></dl>")
     title = ballot["title"]
     page = (f"<!doctype html><html lang=en><head><meta charset=utf-8><title>{E(title)}: Florida 2025 adopted millage baseline</title>"
-            f"<link rel=canonical href='{BASE}/{SLUG}/'><meta name=viewport content='width=device-width'></head>"
+            f"<link rel=canonical href='{BASE}/{SLUG}/'><meta name=viewport content='width=device-width'>{GOATCOUNTER_TAG}</head>"
             f"<body><h1>{E(title)}</h1>{body}<footer><p><a href='{PATH}/llms.txt'>llms.txt</a> · <a href='{PATH}/'>All counties</a></p></footer></body></html>\n")
     return page, allrows
 
