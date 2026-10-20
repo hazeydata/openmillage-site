@@ -1,0 +1,46 @@
+{
+ "slug": "fl/amendment-3",
+ "ballot_json": "data/ref/fl_amend3_ballot.json",
+ "rates_csv": "data/fl-2025.csv",
+ "districts_csv": "data/special/fl-2025-special-districts.csv",
+ "counties_csv": "data/ref/fl_census_counties_2024.csv",
+ "counties_source": {
+  "agency": "U.S. Census Bureau, 2024 Gazetteer Files, Counties",
+  "url": "https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2024_Gazetteer/2024_Gaz_counties_national.zip"
+ },
+ "election_date_source": "https://dos.fl.gov/elections/for-voters/election-dates",
+ "millage_definition": {
+  "text": "Millage is a tax rate defined as the dollars assessed for each $1,000 of value; one mill is one dollar per $1,000 of assessed value.",
+  "url": "https://www.floridarevenue.com/property/Documents/homeowner_guide_millage.pdf",
+  "agency": "Florida Department of Revenue"
+ },
+ "forecast_terms": [
+  "will rise",
+  "will increase",
+  "will fall",
+  "will go up",
+  "expected",
+  "projected",
+  "projection",
+  "forecast",
+  "likely",
+  "anticipated",
+  "estimate"
+ ],
+ "advocacy_terms": [
+  "vote yes",
+  "vote no",
+  "tax grab",
+  "relief",
+  "hike",
+  "tax cut",
+  "slash",
+  "burden",
+  "windfall",
+  "gouge",
+  "money grab",
+  "save you",
+  "protect homeowners",
+  "may change"
+ ]
+}
