@@ -9,7 +9,7 @@ FAIL = []
 def ok(cond, msg): print(("PASS " if cond else "FAIL ") + msg); cond or FAIL.append(msg)
 FIX = {"title": "FIXTURE MEASURE TITLE", "ballot_number": 3, "ballot_summary": "Fixture summary text; this measure will take effect in 2027.",
        "election_date": "2026-11-03", "source_url": "https://constitutionalinitiatives.dos.fl.gov/Home/InitDetail?account=10&seqnum=110",
-       "fact_verified_by": None, "fact_verified_at": None}
+       "fact_verified_by": "fixture", "fact_verified_at": "2026-10-20T00:00-04:00"}
 tmp = tempfile.mkdtemp(); bj = os.path.join(tmp, "ballot.json"); json.dump(FIX, open(bj, "w"))
 counties = [(r["name"].removesuffix(" County"), r["geoid"]) for r in csv.DictReader(open(A.CFG["counties_csv"]))]
 rows = A.rows_from(A.CFG["rates_csv"]); dist = A.rows_from(A.CFG["districts_csv"]) if os.path.exists(A.CFG["districts_csv"]) else []
@@ -43,7 +43,11 @@ ok(all(html.escape(c) in page.split("Not yet collected:")[1].split("</p>")[0] fo
 ok(any("forecast" in e for e in A.check(page.replace("</footer>", "<p>Rates are expected to change <a href='https://x'>s</a></p></footer>"))), "AC5 forecast word caught outside quote")
 ok(not any("forecast" in e for e in A.check(page)), "AC5 forecast words inside the official quote are allowed")
 ok(any("advocacy" in e for e in A.check(page.replace("</footer>", "<p>a tax hike</p></footer>"))), "AC6 advocacy word caught")
-ok("may change" not in page.lower() and "EDR" not in page and "Economic & Demographic Research" not in html.unescape(page), "no 'may change' wording, no EDR (abbreviation or full name)")
+prose = html.unescape(re.sub(r"<[^>]+>", " ", page))  # page prose only: tags (and so row source-link hrefs) removed
+ok("may change" not in prose.lower() and not re.search(r"\bEDR\b", prose) and "Economic & Demographic Research" not in prose and "Economic and Demographic Research" not in prose, "no 'may change' wording, no EDR (abbreviation or full name) in page prose")
+ok("Each value on this page links to the official document it was read from." in page, "T1 FAQ sources answer names no agency")
+nm = sum(r["body_type"] == "municipality" for r in rows)
+ok(f"{nm} municipal" in page and nm == sum(r["body_type"] == "municipality" for r in csv.DictReader(open(A.CFG["rates_csv"]))), f"municipal row count computed from CSV ({nm})")
 # AC7 as-of = max retrieved_at in ET
 import datetime; from zoneinfo import ZoneInfo
 m = datetime.datetime.fromisoformat(max(r["retrieved_at"] for r in shown)).astimezone(ZoneInfo("America/New_York"))
@@ -102,6 +106,12 @@ ok("Coverage: 67 of 69 counties" in p2, "M:66 coverage count still computed with
 nb = os.path.join(tmp, "nb.json"); json.dump({k: v for k, v in FIX.items() if k != "ballot_number"}, open(nb, "w"))
 try: A.load_ballot(nb); ok(False, "M:22 ballot_number required")
 except A.BuildError: ok(True, "M:22 ballot_number required")
+for v, why in ((None, "null"), ("<absent>", "missing")):
+    fb = {k: x for k, x in FIX.items() if not (k == "fact_verified_by" and v == "<absent>")}
+    if v is None: fb["fact_verified_by"] = None
+    pb = os.path.join(tmp, "fb.json"); json.dump(fb, open(pb, "w"))
+    try: A.load_ballot(pb); ok(False, f"T2 fact_verified_by {why} fails closed")
+    except A.BuildError: ok(True, f"T2 fact_verified_by {why} fails closed")
 # AC4b special-district coverage, computed, missing named
 sdc = [c for c, _ in counties if any(r["county"] == c for r in dist)]; sdm = [c for c, _ in counties if c not in sdc]
 line = re.search(r"<p>Special districts: .*?</p>", page).group(0)

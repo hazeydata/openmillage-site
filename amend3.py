@@ -16,10 +16,11 @@ class BuildError(Exception): pass
 
 def load_ballot(path):
     """Fail closed: the page needs fact's verified ballot facts. `title` must be the verbatim measure title
-    (never the 'Ballot Number: N' label); `ballot_number` is rendered only as a label. fact_verified_by may be null."""
+    (never the 'Ballot Number: N' label); `ballot_number` is rendered only as a label. fact_verified_by and
+    fact_verified_at must be set (fact's sign-off); null or missing fails the build."""
     if not os.path.exists(path): raise BuildError(f"ballot facts file missing: {path}")
     b = json.load(open(path))
-    for k in ("title", "ballot_number", "ballot_summary", "election_date", "source_url"):
+    for k in ("title", "ballot_number", "ballot_summary", "election_date", "source_url", "fact_verified_by", "fact_verified_at"):
         if b.get(k) in (None, ""): raise BuildError(f"ballot facts: required field {k!r} missing or empty")
     if re.search(r"ballot\s+number|amendment\s+\d", b["title"], re.I):
         raise BuildError(f"ballot facts: title {b['title']!r} is a label, not the measure title")
@@ -39,6 +40,7 @@ def render_amend3(rows, districts, ballot, counties):
     covered = [c for c in names if c in have]; missing = [c for c in names if c not in have]
     sd_have = [c for c in names if any(r["county"] == c for r in districts)]; sd_missing = [c for c in names if c not in sd_have]
     sd_src = sorted({r["source_url"] for r in districts})[0] if districts else CFG["counties_source"]["url"]
+    nt = {k: sum(r["body_type"] == k for r in rows) for k in ("county", "school_district", "municipality")}
     allrows = rows + districts
     asof = max(r["retrieved_at"] for r in allrows)
     asof_et = datetime.datetime.fromisoformat(asof).astimezone(ZoneInfo("America/New_York"))
@@ -67,11 +69,11 @@ def render_amend3(rows, districts, ballot, counties):
       f"<p>Coverage: {len(covered)} of {len(names)} counties ({link(county_src['url'], 'county list: ' + county_src['agency'])}; rates: {link(srcs[0][1], 'Florida Department of Revenue')}).</p>"
       + (f"<p>Not yet collected: {', '.join(E(c) for c in missing)}.</p>" if missing else "")
       + f"<p>Special districts: {len(sd_have)} of {len(names)} counties have special-district rows ({link(sd_src, 'Florida Department of Revenue')})" + (f"; not yet collected for: {', '.join(E(c) for c in sd_missing)}" if sd_missing else "") + ".</p>"
+      + f"<p>Rows shown: {nt['county']} county, {nt['school_district']} school district, {nt['municipality']} municipal and {len(districts)} special-district rates ({link(srcs[0][1], 'Florida Department of Revenue')}).</p>"
       + "".join(sections)
       + f"<p>Rows shown on this page: <a href='{PATH}/{api}.csv'>CSV</a> · <a href='{PATH}/{api}.json'>JSON</a>.</p>"
       f"<h2>Questions</h2><dl><dt>What is millage?</dt><dd>{E(md['agency'])}: <q>{E(md['text'])}</q> {link(md['url'])}</dd>"
-      f"<dt>Where do these rates come from?</dt><dd>Each rate links to the official file it was read from: "
-      + "; ".join(f"{E(a)} ({link(u)})" for a, u in srcs) + ".</dd></dl>")
+      f"<dt>Where do these rates come from?</dt><dd>Each value on this page links to the official document it was read from.</dd></dl>")
     title = ballot["title"]
     page = (f"<!doctype html><html lang=en><head><meta charset=utf-8><title>{E(title)}: Florida 2025 adopted millage baseline</title>"
             f"<link rel=canonical href='{BASE}/{SLUG}/'><meta name=viewport content='width=device-width'></head>"
