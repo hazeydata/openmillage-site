@@ -7,3 +7,4 @@
 
 ## Rules
 - Rates are never estimated; if a body is missing, it is not yet collected.
+- Florida 2025 adopted millage baseline for the 2026 ballot measure numbered 3: https://hazeydata.github.io/openmillage-site/fl/amendment-3/

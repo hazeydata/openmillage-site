@@ -1,0 +1,90 @@
+{
+ "slug": "fl/amendment-3",
+ "ballot_json": "data/ref/fl_amend3_ballot.json",
+ "rates_csv": "data/fl-2025.csv",
+ "districts_csv": "data/special/fl-2025-special-districts.csv",
+ "counties_csv": "data/ref/fl_census_counties_2024.csv",
+ "counties_source": {
+  "agency": "U.S. Census Bureau, 2024 Gazetteer Files, Counties",
+  "url": "https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2024_Gazetteer/2024_Gaz_counties_national.zip"
+ },
+ "election_date_source": "https://dos.fl.gov/elections/for-voters/election-dates",
+ "millage_definition": {
+  "text": "Millage is a tax rate defined as the dollars assessed for each $1,000 of value; one mill is one dollar per $1,000 of assessed value.",
+  "url": "https://www.floridarevenue.com/property/Documents/homeowner_guide_millage.pdf",
+  "agency": "Florida Department of Revenue"
+ },
+ "forecast_terms": [
+  "will rise",
+  "will increase",
+  "will fall",
+  "will go up",
+  "expected",
+  "projected",
+  "projection",
+  "forecast",
+  "likely",
+  "anticipated",
+  "estimate"
+ ],
+ "advocacy_terms": [
+  "vote yes",
+  "vote no",
+  "tax grab",
+  "relief",
+  "hike",
+  "tax cut",
+  "slash",
+  "burden",
+  "windfall",
+  "gouge",
+  "money grab",
+  "save you",
+  "protect homeowners",
+  "may change"
+ ],
+ "tacd_index": {
+  "agency": "Florida Department of Revenue, 2025 Taxing Authority Code Descriptions (TACD) index",
+  "url": "https://floridarevenue.com/property/dataportal/Pages/default.aspx?path=/property/dataportal/Documents/PTO%20Data%20Portal/TACD%20History/2025%20Taxing%20Authority%20Code%20Descriptions"
+ },
+ "district_fact_csv": "data/ref/fl_special_district_for_implement.csv",
+ "tacd_sources_csv": "data/ref/tacd_sources_2025.csv",
+ "footnotes_md": "data/ref/fl_special_district_footnotes.md",
+ "footnote_citations": {
+  "St. Johns": {
+   "n": 1,
+   "cites": [
+    [
+     "2025 Saint Johns TACD.pdf",
+     "pages 1, 2 and 8"
+    ]
+   ]
+  },
+  "Leon": {
+   "n": 2,
+   "cites": [
+    [
+     "2025 Leon TACD.pdf",
+     "page 1"
+    ]
+   ]
+  },
+  "Broward": {
+   "n": 3,
+   "cites": [
+    [
+     "2025 Broward TACD.xlsx",
+     "Sheet1, column K ('SFWMD')"
+    ],
+    [
+     "2025 Palm Beach TACD.xlsx",
+     "three-part split, Sheet 1"
+    ],
+    [
+     "2025 Saint Lucie TACD.pdf",
+     "three-part split, page 1"
+    ]
+   ]
+  }
+ }
+}

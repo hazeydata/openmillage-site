@@ -1,0 +1,42 @@
+{
+  "official_name_exact": "Ballot Number: 3",
+  "is_exactly_Amendment_3": {
+    "value": false,
+    "note": "The FL DOS initiatives database lists this measure as 'Ballot Number: 3', with '(3)' in the Serial #(Ballot #) column. No DOS page fetched shows the literal string 'Amendment 3'. 'Amendment 3' is the common shorthand. Lee County's DOE-sourced ballot language (secondary, not used to fill fields) renders it as 'No. 3 Constitutional Amendment'. Spec Q3: use the official title on the page."
+  },
+  "ballot_summary": "This amendment increases the homestead exemption, for all non-school taxes, to $150,000 in 2027 and $250,000 in 2028, and adjusts for inflation thereafter. It requires the Legislature to prescribe a uniform procedure for counties and municipalities, for their respective levies, to increase the homestead exemption up to full assessed value, and allows special districts, subject to referendum approval, to do the same. Persons who are not Florida residents on December 31, 2026, will receive the existing homestead exemption upon qualifying for a homestead exemption, with the increased homestead exemption beginning with the fifth year of exemption, to the extent permitted by the U.S. Constitution. This amendment reduces the annual cap on assessment increases for non-homestead properties from 10% to 5%. This amendment requires counties and municipalities to use property taxes solely for public safety, education and schools, infrastructure, natural resources, bond debt service, retirement benefits for employees, and operations and administration. Other expenditures may be approved by county officers or county or municipal governing bodies unless prohibited by general law, notwithstanding Article VII, Section 9(a) of the Florida Constitution, which allows counties and municipalities to levy property taxes for their respective purposes. This amendment takes effect January 1, 2027.",
+  "election_date": "2026-11-03",
+  "election_year": 2026,
+  "source_url": "https://constitutionalinitiatives.dos.fl.gov/Home/InitDetail?account=10&seqnum=110",
+  "supporting_urls": {
+    "ballot_list": "https://dos.elections.myflorida.com/initiatives/initSearch.asp (redirects to https://constitutionalinitiatives.dos.fl.gov/)",
+    "election_date": "https://dos.fl.gov/elections/for-voters/election-dates"
+  },
+  "sponsor": "The Florida Legislature/House (HJR 1F)",
+  "constitutional_reference": "Article VII, Sections 4, 6, and 9, and Article XII, Florida Constitution",
+  "made_ballot_date": "2026-06-16",
+  "retrieval_date": "2026-10-20",
+  "verification_status": {
+    "official_ballot_title": "CONFIRMED",
+    "amendment_number": "CONFIRMED",
+    "official_name_exact": "CONFIRMED",
+    "is_exactly_Amendment_3": "CONFIRMED",
+    "ballot_summary": "CONFIRMED",
+    "election_date": "CONFIRMED",
+    "election_year": "CONFIRMED",
+    "source_url": "CONFIRMED",
+    "sponsor": "CONFIRMED",
+    "constitutional_reference": "CONFIRMED",
+    "made_ballot_date": "CONFIRMED"
+  },
+  "notes": {
+    "title_case": "DOS shows the title in all caps. Lee County's DOE-sourced ballot language uses title case: 'Increased Homestead Exemption; Lower Cap on Increases in Non-Homestead Property Assessments'.",
+    "summary_whitespace": "Copied verbatim from the DOS detail page, which runs it as one paragraph. Ballot renderings break it into paragraphs.",
+    "pdf_booklet": "The DOS booklet PDF (files.floridados.gov/media/711369/...) returned non-PDF content to curl and was not used.",
+    "other_amendment_3_candidates": "Earlier general elections (e.g. 2018, 2024) also had measures numbered 3. Those were not fetched from DOS in this pass, so their titles are UNVERIFIED and deliberately not listed. The spec means the 2026 measure: it says 'for the 2026 election', it's property-tax/millage related, and DOS 2026 GEN ballot #3 is this HJR 1F property-tax measure. Other 2026 ballot measures: #1 BUDGET STABILIZATION FUND (HJR 5019), #2 EXEMPTION OF TANGIBLE PERSONAL PROPERTY ON AGRICULTURAL LAND FROM TAXATION (HJR 1215)."
+  },
+  "fact_verified_by": "fact",
+  "fact_verified_at": "2026-10-20T11:25:00-04:00",
+  "title": "INCREASED HOMESTEAD EXEMPTION; LOWER CAP ON INCREASES IN NON-HOMESTEAD PROPERTY ASSESSMENTS",
+  "ballot_number": 3
+}
