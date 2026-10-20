@@ -38,14 +38,23 @@ def fact_gate(districts, path):
     """Fact's special-district verification (key county|body_id|levy_component, since body_id repeats across counties).
     Fails closed unless every published district row is in fact's file with match=true and the same rate, and has its own
     https source link (the row's own source_url is the link), and fact's tacd_source_url must be set and point at a file in the TACD
-    source list whose sha256 equals the row's sha256."""
+    source list whose sha256 equals the row's sha256. Duplicate data rows or duplicate fact rows (same key) fail, and the row's
+    county must equal fact's county exactly (case-sensitive), so a mis-cased row fails instead of dropping off the page."""
     if not os.path.exists(path): raise BuildError(f"special-district fact file missing: {path}")
     from decimal import Decimal
-    fact = {r["row_id"]: r for r in csv.DictReader(open(path, newline=""))}
-    bad = []
+    fact, bad = {}, []
+    for f in csv.DictReader(open(path, newline="")):
+        if f["row_id"] in fact: bad.append(f"{f['row_id']}: duplicate fact row")
+        fact[f["row_id"]] = f
+    seen = set()
+    for r in districts:
+        k = district_key(r)
+        if k in seen: bad.append(f"{k}: duplicate data row")
+        seen.add(k)
     for r in districts:
         k = district_key(r); f = fact.get(k)
         if f is None: bad.append(f"{k}: not in fact file")
+        elif f["county"] != r["county"]: bad.append(f"{k}: county {r['county']!r} is not an exact match for fact {f['county']!r}")
         elif f["match"].strip().lower() != "true": bad.append(f"{k}: fact match={f['match']!r}")
         elif Decimal(f["rate"]) != Decimal(r["rate"]): bad.append(f"{k}: rate {r['rate']} vs fact {f['rate']}")
         if not r["source_url"].startswith("https://"): bad.append(f"{k}: no source link")

@@ -125,6 +125,28 @@ except A.BuildError: ok(True, "fact gate fails on a row missing from fact")
 d4 = copy.deepcopy(dist); d4[0]["source_url"] = ""
 try: A.fact_gate(d4, A.CFG["district_fact_csv"]); ok(False, "fact gate fails on a district row without a source link")
 except A.BuildError: ok(True, "fact gate fails on a district row without a source link")
+d6 = copy.deepcopy(dist); d6[0]["source_url"] = "http://" + d6[0]["source_url"].split("://", 1)[1]
+try: A.fact_gate(d6, A.CFG["district_fact_csv"]); ok(False, "fact gate fails on an http:// (not https) source link")
+except A.BuildError as e: ok("no source link" in str(e), "fact gate fails on an http:// (not https) source link")
+def fact_file(fr, name):
+    fp = os.path.join(tmp, name)
+    with open(fp, "w", newline="") as fh:
+        w = csv.DictWriter(fh, fieldnames=list(fr[0].keys()), lineterminator="\n"); w.writeheader(); w.writerows(fr)
+    return fp
+frows0 = list(csv.DictReader(open(A.CFG["district_fact_csv"], newline="")))
+fm = copy.deepcopy(frows0); fm[0]["match"] = "false"; fpm = fact_file(fm, "fact_matchfalse.csv")
+try: A.fact_gate(dist, fpm); ok(False, "fact gate fails on fact match=false")
+except A.BuildError as e: ok("match='false'" in str(e), "fact gate fails on fact match=false")
+try: A.fact_gate(dist + [copy.deepcopy(dist[0])], A.CFG["district_fact_csv"]); ok(False, "fact gate fails on a duplicate data row")
+except A.BuildError as e: ok("duplicate data row" in str(e), "fact gate fails on a duplicate data row")
+try: A.fact_gate(dist, fact_file(frows0 + [copy.deepcopy(frows0[0])], "fact_dup.csv")); ok(False, "fact gate fails on a duplicate fact row")
+except A.BuildError as e: ok("duplicate fact row" in str(e), "fact gate fails on a duplicate fact row")
+d7 = copy.deepcopy(dist); i7 = next(i for i, r in enumerate(d7) if r["county"] == "Alachua"); d7[i7]["county"] = "ALACHUA"
+try: A.fact_gate(d7, A.CFG["district_fact_csv"]); ok(False, "fact gate fails on a mis-cased county (ALACHUA), exact key match")
+except A.BuildError as e: ok("not an exact match" in str(e), "fact gate fails on a mis-cased county (ALACHUA), exact key match")
+cjm = os.path.join(tmp, "cfg_matchfalse.json"); json.dump(dict(cfg, district_fact_csv=fpm), open(cjm, "w"))
+r = subprocess.run([sys.executable, "amend3.py"], env=dict(os.environ, OUT=os.path.join(tmp, "omf"), AMEND3_CONFIG=cjm), capture_output=True, text=True)
+ok(r.returncode == 1 and "fact gate" in r.stderr and not os.path.exists(os.path.join(tmp, "omf", A.SLUG, "index.html")), "main() runs the fact gate: a match=false fact row fails the real build")
 try: A.fact_gate(dist, os.path.join(tmp, "none.csv")); ok(False, "fact gate fails closed without the fact file")
 except A.BuildError: ok(True, "fact gate fails closed without the fact file")
 # tacd_source_url blank / sha256 mismatch fail the build
