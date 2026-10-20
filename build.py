@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Static build: ../ptax/data/*.csv -> docs/ (GitHub Pages). Per-county pages, JSON API, sitemap, llms.txt."""
 import csv, glob, json, os, re, html, datetime
+from analytics import GOATCOUNTER_TAG
 BASE = os.environ.get("SITE_BASE", "https://hazeydata.github.io/openmillage-site").rstrip("/")
 PATH = "/" + BASE.split("/", 3)[3] if BASE.count("/") > 2 else ""
 OUT = "docs"; os.makedirs(OUT, exist_ok=True)
@@ -14,7 +15,7 @@ def page(path, title, body, jsonld=None, desc=""):
     ld = f'<script type="application/ld+json">{json.dumps(jsonld)}</script>' if jsonld else ""
     open(os.path.join(OUT, path), "w").write(f"<!doctype html><html lang=en><head><meta charset=utf-8><title>{html.escape(title)}</title>"
       f"<meta name=description content='{html.escape(desc, quote=True)}'><link rel=canonical href='{BASE}/{path[:-10] if path.endswith('index.html') else path}'>"
-      f"<meta name=viewport content='width=device-width'>{ld}<script data-goatcounter='https://openmillage.goatcounter.com/count' async src='https://gc.zgo.at/count.js'></script></head><body><h1>{html.escape(title)}</h1>{body}"
+      f"<meta name=viewport content='width=device-width'>{ld}{GOATCOUNTER_TAG}</head><body><h1>{html.escape(title)}</h1>{body}"
       f"<footer><p>Official rates only, each row linked to its government source. <a href='{PATH}/llms.txt'>llms.txt</a> · <a href='{PATH}/'>All counties</a></p></footer></body></html>")
 links = []
 for (st, yr, co), rs in sorted(by.items()):

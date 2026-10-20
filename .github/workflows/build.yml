@@ -13,6 +13,7 @@ jobs:
       - run: rm -rf docs && DATA_GLOB='data/*.csv' python3 build.py
       - run: python3 amend3.py
       - run: python3 tests/test_amend3.py
+      - run: python3 tests/test_analytics.py
       - run: |
           git config user.name "openmillage-build"
           git config user.email "actions@users.noreply.github.com"
