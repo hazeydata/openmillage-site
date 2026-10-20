@@ -35,8 +35,8 @@
     "pdf_booklet": "The DOS booklet PDF (files.floridados.gov/media/711369/...) returned non-PDF content to curl and was not used.",
     "other_amendment_3_candidates": "Earlier general elections (e.g. 2018, 2024) also had measures numbered 3. Those were not fetched from DOS in this pass, so their titles are UNVERIFIED and deliberately not listed. The spec means the 2026 measure: it says 'for the 2026 election', it's property-tax/millage related, and DOS 2026 GEN ballot #3 is this HJR 1F property-tax measure. Other 2026 ballot measures: #1 BUDGET STABILIZATION FUND (HJR 5019), #2 EXEMPTION OF TANGIBLE PERSONAL PROPERTY ON AGRICULTURAL LAND FROM TAXATION (HJR 1215)."
   },
-  "fact_verified_by": null,
-  "fact_verified_at": null,
+  "fact_verified_by": "fact",
+  "fact_verified_at": "2026-10-20T11:25:00-04:00",
   "title": "INCREASED HOMESTEAD EXEMPTION; LOWER CAP ON INCREASES IN NON-HOMESTEAD PROPERTY ASSESSMENTS",
   "ballot_number": 3
 }

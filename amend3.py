@@ -37,6 +37,8 @@ def render_amend3(rows, districts, ballot, counties):
     names = [c for c, _ in counties]
     have = {r["county"] for r in rows}
     covered = [c for c in names if c in have]; missing = [c for c in names if c not in have]
+    sd_have = [c for c in names if any(r["county"] == c for r in districts)]; sd_missing = [c for c in names if c not in sd_have]
+    sd_src = sorted({r["source_url"] for r in districts})[0] if districts else CFG["counties_source"]["url"]
     allrows = rows + districts
     asof = max(r["retrieved_at"] for r in allrows)
     asof_et = datetime.datetime.fromisoformat(asof).astimezone(ZoneInfo("America/New_York"))
@@ -64,6 +66,7 @@ def render_amend3(rows, districts, ballot, counties):
       f"<p>These are 2025 adopted rates. As of {asof_et.strftime('%B')} {asof_et.day}, {asof_et.year}, {asof_et.strftime('%H:%M')} ET (latest retrieval of a source file, {link(asof_src)}).</p>"
       f"<p>Coverage: {len(covered)} of {len(names)} counties ({link(county_src['url'], 'county list: ' + county_src['agency'])}; rates: {link(srcs[0][1], 'Florida Department of Revenue')}).</p>"
       + (f"<p>Not yet collected: {', '.join(E(c) for c in missing)}.</p>" if missing else "")
+      + f"<p>Special districts: {len(sd_have)} of {len(names)} counties have special-district rows ({link(sd_src, 'Florida Department of Revenue')})" + (f"; not yet collected for: {', '.join(E(c) for c in sd_missing)}" if sd_missing else "") + ".</p>"
       + "".join(sections)
       + f"<p>Rows shown on this page: <a href='{PATH}/{api}.csv'>CSV</a> · <a href='{PATH}/{api}.json'>JSON</a>.</p>"
       f"<h2>Questions</h2><dl><dt>What is millage?</dt><dd>{E(md['agency'])}: <q>{E(md['text'])}</q> {link(md['url'])}</dd>"
