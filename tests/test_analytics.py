@@ -11,7 +11,7 @@ def ok(cond, msg): print(("PASS " if cond else "FAIL ") + msg); cond or FAIL.app
 # pinned literals, independent of the constant
 SITE = "https://openmillage.goatcounter.com/count"; JS = "https://gc.zgo.at/count.js"
 ok(f"data-goatcounter='{SITE}'" in GOATCOUNTER_TAG and f"src='{JS}'" in GOATCOUNTER_TAG, "constant carries the pinned site code and count.js")
-JS_TYPES = {"", "text/javascript", "application/javascript", "module"}
+JS_TYPES = {"", "text/javascript", "application/javascript"}  # classic scripts only: no module, no nomodule
 VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr"}
 INERT = {"noscript", "template"}
 
@@ -23,7 +23,7 @@ class TagFinder(html.parser.HTMLParser):
     def handle_starttag(self, tag, attrs):
         a = dict(attrs)
         if tag == "script" and a.get("data-goatcounter") == SITE and a.get("src") == JS:
-            self.hits.append((list(self.stack), (a.get("type") or "").strip().lower()))
+            self.hits.append((list(self.stack), (a.get("type") or "").strip().lower(), "nomodule" in a))
         if tag not in VOID: self.stack.append(tag)
     def handle_startendtag(self, tag, attrs): self.handle_starttag(tag, attrs); tag in VOID or self.stack.pop()
     def handle_endtag(self, tag):
@@ -32,7 +32,7 @@ class TagFinder(html.parser.HTMLParser):
 
 def good(path):
     f = TagFinder(); f.feed(open(path, encoding="utf-8").read()); f.close()
-    return any("head" in st and not INERT & set(st) and "body" not in st and ty in JS_TYPES for st, ty in f.hits)
+    return any("head" in st and not INERT & set(st) and "body" not in st and ty in JS_TYPES for st, ty, nomod in f.hits if not nomod)
 
 walked = sorted(os.path.relpath(os.path.join(d, n), "docs") for d, _, fs in os.walk("docs") for n in fs if n.endswith(".html"))
 pages = sorted(os.path.relpath(p, "docs") for p in glob.glob("docs/**/*.html", recursive=True))
@@ -53,27 +53,38 @@ bad = [p for p in walked if not good(os.path.join("docs", p))]
 ok(not bad, f"all {len(walked)} pages carry the tag as an executable script in <head> (no comment/noscript/template)" + (f"; bad: {bad[:5]}" if bad else ""))
 ok("fl/amendment-3/index.html" in walked and "fl/amendment-3/index.html" not in bad, "amendment-3 page carries the tag")
 
-def ci_steps(path):
-    """Jobs -> list of (job_keys, step_keys). Uses PyYAML if installed, otherwise a strict line parse of this
-    workflow's layout (2-space jobs, 4-space job keys, '      - ' steps, 8-space step keys). Comments are dropped."""
-    try:
-        import yaml
-        y = yaml.safe_load(open(path))
-        return [(j, s) for j in (y.get("jobs") or {}).values() for s in (j.get("steps") or [])]
-    except ImportError: pass
-    out, job, step, injobs = [], None, None, False
+def ci_yaml(path):
+    """PyYAML view, or None when PyYAML is not installed: (triggers, [(job, step)])."""
+    try: import yaml
+    except ImportError: return None
+    y = yaml.safe_load(open(path))
+    on = y.get("on", y.get(True))  # YAML 1.1 reads a bare 'on' key as True
+    trig = set(on) if isinstance(on, dict) else set([on] if isinstance(on, str) else on or [])
+    return trig, [(j, s) for j in (y.get("jobs") or {}).values() for s in (j.get("steps") or [])]
+def ci_lines(path):
+    """Strict line parse of this workflow's layout (2-space jobs/triggers, 4-space job keys, '      - ' steps,
+    8-space step keys; keys may be quoted). Comments are dropped. Same shape as ci_yaml."""
+    K = r"[\"']?([\w-]+)[\"']?"
+    trig, out, job, step, top = set(), [], None, None, None
     for line in open(path):
         if re.match(r"\s*#", line) or not line.strip(): continue
         line = line.rstrip("\n")
-        if re.match(r"^\S", line): injobs = line.startswith("jobs:"); continue
-        if not injobs: continue
-        if m := re.match(r"^  (\S[^:]*):\s*$", line): job = {}; continue
+        if m := re.match(r"^" + K + r":", line): top = m[1]; job = step = None; continue
+        if top == "on":
+            if m := re.match(r"^  " + K + r":", line): trig.add(m[1])
+            continue
+        if top != "jobs": continue
+        if re.match(r"^  \S[^:]*:\s*$", line): job, step = {}, None; continue
         if job is None: continue
-        if m := re.match(r"^    ([\w-]+):\s*(.*)$", line): job[m[1]] = m[2]; continue
-        if m := re.match(r"^      - ([\w-]+):\s*(.*)$", line): step = {m[1]: m[2]}; out.append((job, step)); continue
-        if (m := re.match(r"^        ([\w-]+):\s*(.*)$", line)) and step is not None: step[m[1]] = m[2]
-    return out
-steps = [(j, s) for j, s in ci_steps(".github/workflows/build.yml") if str(s.get("run", "")).strip() == "python3 tests/test_analytics.py"]
-ok(len(steps) == 1 and all(k not in d for j, s in steps for d in (j, s) for k in ("if", "continue-on-error")),
-   f"build.yml has exactly one unconditional step 'run: python3 tests/test_analytics.py' (no if:/continue-on-error on step or job); found {len(steps)}")
+        if m := re.match(r"^    " + K + r":\s*(.*)$", line): job[m[1]] = m[2]; step = None; continue
+        if m := re.match(r"^      - " + K + r":\s*(.*)$", line): step = {m[1]: m[2]}; out.append((job, step)); continue
+        if (m := re.match(r"^        " + K + r":\s*(.*)$", line)) and step is not None: step[m[1]] = m[2]
+    return trig, out
+def ci_summary(trig, pairs):
+    hits = [(j, s) for j, s in pairs if str(s.get("run", "")).strip() == "python3 tests/test_analytics.py"]
+    return ("push" in trig, len(hits), sorted({k for j, s in hits for d in (j, s) for k in d if k in ("if", "continue-on-error", "strategy")}))
+WF = ".github/workflows/build.yml"
+lines_view, yaml_view = ci_summary(*ci_lines(WF)), ci_yaml(WF)
+ok(yaml_view is None or ci_summary(*yaml_view) == lines_view, f"line parser and PyYAML agree on build.yml: lines={lines_view} yaml={yaml_view and ci_summary(*yaml_view)}")
+ok(lines_view == (True, 1, []), f"build.yml runs on push and has exactly one unconditional step 'run: python3 tests/test_analytics.py' (no if:/continue-on-error/strategy on step or job); got push,count,flags={lines_view}")
 print("FAILURES", len(FAIL)); sys.exit(1 if FAIL else 0)
