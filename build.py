@@ -22,7 +22,7 @@ def page(path, title, body, jsonld=None, desc=""):
       f"<meta name=viewport content='width=device-width'>{ld}{GOATCOUNTER_TAG}</head><body><h1>{html.escape(title)}</h1>{body}"
       f"<footer><p>Official rates only, each row linked to its government source. <a href='{PATH}/llms.txt'>llms.txt</a> · <a href='{PATH}/'>All counties</a></p></footer></body></html>")
 MUTED = "style='color:#666;font-size:0.85em'"
-def sd_levy(r): return r['levy_component'] + (f" ({COMBINED[r['levy_component']]})" if r['levy_component'] in COMBINED else "")
+def sd_levy(r): return f"({COMBINED[r['levy_component']]})" if r['levy_component'] in COMBINED else r['levy_component']
 def sd_tr(r):
     note = f"<br><small {MUTED}>{html.escape(r['note'])}</small>" if r['note'] else ""
     return (f"<tr><td>{html.escape(r['taxing_body'])}{note}</td><td>{html.escape(sd_levy(r))}</td><td style='text-align:right;white-space:nowrap'>{float(r['rate']):.4f} {r['unit']}</td>"
