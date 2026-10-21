@@ -158,12 +158,45 @@ shutil.rmtree(tmp); shutil.rmtree(t2)
 po = pg("polk"); i = [po.find(s) for s in ("Special districts</h2>", sentence, NO_ROWS)]
 ok(-1 not in i and i == sorted(i), "visual: Polk order is heading, coverage, empty-state line")
 BANNED = re.compile(r"\b(CEO|rulings?|R6)\b", re.I)
-hits = ["CEO ruling 2026-10-20", "ceo", "Ruling", "rulings", "r6", "per R6."]
+hits = ["CEO ruling 2026-10-20", "CEO rulings", "Fred ruling", "(ruling 5)", "ceo", "Ruling", "rulings", "r6", "per R6."]
 misses = ["Osceola", "OSCEOLA County", "overruling", "AR6X", "R60", "ceos", "rulingx"]
 ok(all(BANNED.search(s) for s in hits) and not any(BANNED.search(s) for s in misses), "banned-word regex fixture: catches CEO/ruling/R6 in any case, not Osceola, overruling, AR6X or R60")
-public = [p for p in glob.glob("docs/**/*", recursive=True) if os.path.isfile(p) and p.endswith((".html", ".json", ".txt", ".csv", ".xml", ".md", ".js"))]
-leaks = [p for p in public if BANNED.search(open(p, encoding="utf-8").read())]
-ok(public and not leaks, f"no internal wording (CEO, ruling, R6) in {len(public)} public files" + (f"; found in {leaks[:5]}" if leaks else ""))
+SCANNED = (".html", ".json", ".txt", ".csv", ".xml", ".md", ".js", ".lock")
+SCAN_ROOTS = ("docs", "data")
+def scan(root):
+    files = [p for p in glob.glob(os.path.join(root, "**/*"), recursive=True) if os.path.isfile(p) and p.endswith(SCANNED)]
+    return files, [p for p in files if BANNED.search(open(p, encoding="utf-8").read())]
+fx = tempfile.mkdtemp()
+for n, body in (("notes.md", "Per the CEO ruling."), ("app.js", "var n = 'ruling 5';"), ("osceola.md", "Osceola County"), ("ok.js", "var c = 'Osceola';")):
+    open(os.path.join(fx, n), "w").write(body)
+fx_files, fx_leaks = scan(fx)
+ok(len(fx_files) == 4 and sorted(os.path.basename(p) for p in fx_leaks) == ["app.js", "notes.md"], f"banned-word scanner flags the .md and .js fixtures and spares Osceola: {sorted(os.path.basename(p) for p in fx_leaks)}")
+shutil.rmtree(fx)
+pd = tempfile.mkdtemp(); shutil.copytree("data", os.path.join(pd, "data"))
+for phrase in ("CEO ruling", "Fred ruling", "CEO rulings", "(ruling 5)"):
+    with open(os.path.join(pd, "data/special/tacd_county_status_open.csv"), "a") as f: f.write(f"Planted,exception,{phrase}\n")
+    pl = scan(os.path.join(pd, "data"))[1]
+    ok(any(p.endswith("tacd_county_status_open.csv") for p in pl), f"planted {phrase!r} in a data/ copy is caught by the published-file scan")
+    shutil.copy(os.path.join("data/special/tacd_county_status_open.csv"), os.path.join(pd, "data/special/tacd_county_status_open.csv"))
+shutil.rmtree(pd)
+ok(set(SCANNED) == {".html", ".json", ".txt", ".csv", ".xml", ".md", ".js", ".lock"} and len(SCANNED) == 8, f"banned-word scan covers exactly the published extensions: {SCANNED}")
+ok(SCAN_ROOTS == ("docs", "data"), f"banned-word scan roots are exactly docs/ and data/: {SCAN_ROOTS}")
+def scan_all(base="."):
+    return [p for r in SCAN_ROOTS for p in scan(os.path.join(base, r))[1]]
+pb = tempfile.mkdtemp()
+for r in ("docs", "data"): shutil.copytree(r, os.path.join(pb, r))
+ok(not scan_all(pb), "clean copies of docs/ and data/ have no internal wording before planting")
+for rel, phrase in (("data/SOURCES.lock", "CEO ruling"), ("docs/index.html", "Fred ruling")):
+    t = os.path.join(pb, rel); orig = open(t, "rb").read()
+    open(t, "ab").write(f"\n{phrase}\n".encode())
+    caught = [os.path.relpath(p, pb) for p in scan_all(pb)]
+    ok(caught == [rel], f"planted {phrase!r} in a temp copy of {rel} is caught by the published-file scan: {caught}")
+    open(t, "wb").write(orig)
+shutil.rmtree(pb)
+ok(not os.path.exists(pb), "planted fixtures leave no files behind")
+for root in SCAN_ROOTS:
+    public, leaks = scan(root)
+    ok(public and not leaks, f"no internal wording (CEO, ruling, R6) in {len(public)} published files under {root}/" + (f"; found in {leaks[:5]}" if leaks else ""))
 raw = {r["body_id"]: r["note"] for r in csv.DictReader(open(sources.ALT_FILE)) if r["body_id"] == "fl-cftod-special_district"}
 ok("every code 70 city total reconciles" in raw["fl-cftod-special_district"] and "reconciles" not in cf[0]["note"] and "reconciles" not in oh,
    "CFTOD reconciliation detail stays in the pinned data, not in reader copy")
