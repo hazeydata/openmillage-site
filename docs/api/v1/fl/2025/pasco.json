@@ -16,7 +16,22 @@
   "source_agency": "Florida Department of Revenue (Data Book: Millage and Taxes Levied, sheet 'Millage Rates')",
   "source_url": "https://floridarevenue.com/property/Documents/millage_taxes_levied.xlsx",
   "sha256": "af531b32f72a3f1fb04b6e484abddae5b312b9b2e7de22818349da7d33dc8e80",
-  "retrieved_at": "2026-10-14T07:08:54+00:00"
+  "retrieved_at": "2026-10-14T07:08:54+00:00",
+  "source_page": null,
+  "extraction": null,
+  "printed_label": null,
+  "independence": null,
+  "note": null,
+  "also_cited": null,
+  "additional_sources": [
+   {
+    "source_agency": "Pasco County Board of County Commissioners (Resolution No. 25-348)",
+    "source_url": "https://pascocountyfl.gov/Documents/Services/Office%20of%20Management%20%26%20Budget/Resolution%20No.%2025-348%20Adopting%20Final%20Millage%20Rates%20for%20Fiscal%20Year%202026.pdf?t=202509181034040",
+    "sha256": "7754093762ee671448bbb49c103a5dd24c93a2f0f6ce99340d28f1dc22308dde",
+    "source_page": "1",
+    "retrieved_at": "2026-10-20T18:19:13+00:00"
+   }
+  ]
  },
  {
   "state": "FL",
@@ -35,7 +50,14 @@
   "source_agency": "Florida Department of Revenue (Data Book: Millage and Taxes Levied, sheet 'Millage Rates')",
   "source_url": "https://floridarevenue.com/property/Documents/millage_taxes_levied.xlsx",
   "sha256": "af531b32f72a3f1fb04b6e484abddae5b312b9b2e7de22818349da7d33dc8e80",
-  "retrieved_at": "2026-10-14T07:08:54+00:00"
+  "retrieved_at": "2026-10-14T07:08:54+00:00",
+  "source_page": null,
+  "extraction": null,
+  "printed_label": null,
+  "independence": null,
+  "note": null,
+  "also_cited": null,
+  "additional_sources": null
  },
  {
   "state": "FL",
@@ -54,7 +76,14 @@
   "source_agency": "Florida Department of Revenue (Data Book: Millage and Taxes Levied, sheet 'Millage Rates')",
   "source_url": "https://floridarevenue.com/property/Documents/millage_taxes_levied.xlsx",
   "sha256": "af531b32f72a3f1fb04b6e484abddae5b312b9b2e7de22818349da7d33dc8e80",
-  "retrieved_at": "2026-10-14T07:08:54+00:00"
+  "retrieved_at": "2026-10-14T07:08:54+00:00",
+  "source_page": null,
+  "extraction": null,
+  "printed_label": null,
+  "independence": null,
+  "note": null,
+  "also_cited": null,
+  "additional_sources": null
  },
  {
   "state": "FL",
@@ -73,7 +102,14 @@
   "source_agency": "Florida Department of Revenue (Data Book: Millage and Taxes Levied, sheet 'Millage Rates')",
   "source_url": "https://floridarevenue.com/property/Documents/millage_taxes_levied.xlsx",
   "sha256": "af531b32f72a3f1fb04b6e484abddae5b312b9b2e7de22818349da7d33dc8e80",
-  "retrieved_at": "2026-10-14T07:08:54+00:00"
+  "retrieved_at": "2026-10-14T07:08:54+00:00",
+  "source_page": null,
+  "extraction": null,
+  "printed_label": null,
+  "independence": null,
+  "note": null,
+  "also_cited": null,
+  "additional_sources": null
  },
  {
   "state": "FL",
@@ -92,7 +128,14 @@
   "source_agency": "Florida Office of Economic & Demographic Research (Municipal Ad Valorem Tax Profile; data source FL DOR)",
   "source_url": "https://edr.state.fl.us/Content/local-government/data/data-a-to-z/advaltxmu.xlsx",
   "sha256": "5874badb986d1486f506dcf4a20a167cabfdab1ba07b5991607de0a95b6b6ec8",
-  "retrieved_at": "2026-10-14T07:08:54+00:00"
+  "retrieved_at": "2026-10-14T07:08:54+00:00",
+  "source_page": null,
+  "extraction": null,
+  "printed_label": null,
+  "independence": null,
+  "note": null,
+  "also_cited": null,
+  "additional_sources": null
  },
  {
   "state": "FL",
@@ -111,7 +154,14 @@
   "source_agency": "Florida Office of Economic & Demographic Research (Municipal Ad Valorem Tax Profile; data source FL DOR)",
   "source_url": "https://edr.state.fl.us/Content/local-government/data/data-a-to-z/advaltxmu.xlsx",
   "sha256": "5874badb986d1486f506dcf4a20a167cabfdab1ba07b5991607de0a95b6b6ec8",
-  "retrieved_at": "2026-10-14T07:08:54+00:00"
+  "retrieved_at": "2026-10-14T07:08:54+00:00",
+  "source_page": null,
+  "extraction": null,
+  "printed_label": null,
+  "independence": null,
+  "note": null,
+  "also_cited": null,
+  "additional_sources": null
  },
  {
   "state": "FL",
@@ -130,7 +180,14 @@
   "source_agency": "Florida Office of Economic & Demographic Research (Municipal Ad Valorem Tax Profile; data source FL DOR)",
   "source_url": "https://edr.state.fl.us/Content/local-government/data/data-a-to-z/advaltxmu.xlsx",
   "sha256": "5874badb986d1486f506dcf4a20a167cabfdab1ba07b5991607de0a95b6b6ec8",
-  "retrieved_at": "2026-10-14T07:08:54+00:00"
+  "retrieved_at": "2026-10-14T07:08:54+00:00",
+  "source_page": null,
+  "extraction": null,
+  "printed_label": null,
+  "independence": null,
+  "note": null,
+  "also_cited": null,
+  "additional_sources": null
  },
  {
   "state": "FL",
@@ -149,7 +206,14 @@
   "source_agency": "Florida Office of Economic & Demographic Research (Municipal Ad Valorem Tax Profile; data source FL DOR)",
   "source_url": "https://edr.state.fl.us/Content/local-government/data/data-a-to-z/advaltxmu.xlsx",
   "sha256": "5874badb986d1486f506dcf4a20a167cabfdab1ba07b5991607de0a95b6b6ec8",
-  "retrieved_at": "2026-10-14T07:08:54+00:00"
+  "retrieved_at": "2026-10-14T07:08:54+00:00",
+  "source_page": null,
+  "extraction": null,
+  "printed_label": null,
+  "independence": null,
+  "note": null,
+  "also_cited": null,
+  "additional_sources": null
  },
  {
   "state": "FL",
@@ -168,7 +232,14 @@
   "source_agency": "Florida Office of Economic & Demographic Research (Municipal Ad Valorem Tax Profile; data source FL DOR)",
   "source_url": "https://edr.state.fl.us/Content/local-government/data/data-a-to-z/advaltxmu.xlsx",
   "sha256": "5874badb986d1486f506dcf4a20a167cabfdab1ba07b5991607de0a95b6b6ec8",
-  "retrieved_at": "2026-10-14T07:08:54+00:00"
+  "retrieved_at": "2026-10-14T07:08:54+00:00",
+  "source_page": null,
+  "extraction": null,
+  "printed_label": null,
+  "independence": null,
+  "note": null,
+  "also_cited": null,
+  "additional_sources": null
  },
  {
   "state": "FL",
@@ -187,6 +258,13 @@
   "source_agency": "Florida Office of Economic & Demographic Research (Municipal Ad Valorem Tax Profile; data source FL DOR)",
   "source_url": "https://edr.state.fl.us/Content/local-government/data/data-a-to-z/advaltxmu.xlsx",
   "sha256": "5874badb986d1486f506dcf4a20a167cabfdab1ba07b5991607de0a95b6b6ec8",
-  "retrieved_at": "2026-10-14T07:08:54+00:00"
+  "retrieved_at": "2026-10-14T07:08:54+00:00",
+  "source_page": null,
+  "extraction": null,
+  "printed_label": null,
+  "independence": null,
+  "note": null,
+  "also_cited": null,
+  "additional_sources": null
  }
 ]

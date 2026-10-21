@@ -3,8 +3,11 @@
 
 ## Data
 - JSON per county: https://hazeydata.github.io/openmillage-site/api/v1/<state>/<year>/<county>.json
-- Fields: state, year, county, taxing_body, body_type, body_id, nces_leaid, fips (county 5-digit or Census place 7-digit GEOID), levy_component, levy_scope, rate_kind (adopted | aggregate_effective = DOR less-than-countywide levies divided by countywide taxable value), rate, unit (mills = $ per $1,000 taxable value), source_url, sha256, retrieved_at
+- Fields: state, year, county, taxing_body, body_type, body_id, nces_leaid, fips (county 5-digit or Census place 7-digit GEOID), levy_component, levy_scope, rate_kind (adopted | aggregate_effective = DOR less-than-countywide levies divided by countywide taxable value), rate, unit (mills = $ per $1,000 taxable value), source_url, sha256, retrieved_at; additive keys (null when not applicable): source_page, extraction, printed_label, independence, note, also_cited, additional_sources (list of source_agency, source_url, sha256, source_page, retrieved_at)
+- Independent special districts (body_type special_district) are published per county. 57 of 67 Florida counties checked against official sources; 45 have special-district rows. Not yet sourced: Calhoun, Clay, Collier, Columbia, Gadsden, Levy, Liberty, Monroe, Sumter, Taylor.
 
 ## Rules
 - Rates are never estimated; if a body is missing, it is not yet collected.
+- Absent is not zero: a county or special district with no row has not been sourced yet; never read a missing rate as 0.
+- Special-district rates are never summed.
 - Florida 2025 adopted millage baseline for the 2026 ballot measure numbered 3: https://hazeydata.github.io/openmillage-site/fl/amendment-3/

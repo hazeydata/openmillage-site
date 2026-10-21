@@ -16,7 +16,14 @@
   "source_agency": "Florida Department of Revenue (Data Book: Millage and Taxes Levied, sheet 'Millage Rates')",
   "source_url": "https://floridarevenue.com/property/Documents/millage_taxes_levied.xlsx",
   "sha256": "af531b32f72a3f1fb04b6e484abddae5b312b9b2e7de22818349da7d33dc8e80",
-  "retrieved_at": "2026-10-14T07:08:54+00:00"
+  "retrieved_at": "2026-10-14T07:08:54+00:00",
+  "source_page": null,
+  "extraction": null,
+  "printed_label": null,
+  "independence": null,
+  "note": null,
+  "also_cited": null,
+  "additional_sources": null
  },
  {
   "state": "FL",
@@ -35,7 +42,14 @@
   "source_agency": "Florida Department of Revenue (Data Book: Millage and Taxes Levied, sheet 'Millage Rates')",
   "source_url": "https://floridarevenue.com/property/Documents/millage_taxes_levied.xlsx",
   "sha256": "af531b32f72a3f1fb04b6e484abddae5b312b9b2e7de22818349da7d33dc8e80",
-  "retrieved_at": "2026-10-14T07:08:54+00:00"
+  "retrieved_at": "2026-10-14T07:08:54+00:00",
+  "source_page": null,
+  "extraction": null,
+  "printed_label": null,
+  "independence": null,
+  "note": null,
+  "also_cited": null,
+  "additional_sources": null
  },
  {
   "state": "FL",
@@ -54,7 +68,14 @@
   "source_agency": "Florida Department of Revenue (Data Book: Millage and Taxes Levied, sheet 'Millage Rates')",
   "source_url": "https://floridarevenue.com/property/Documents/millage_taxes_levied.xlsx",
   "sha256": "af531b32f72a3f1fb04b6e484abddae5b312b9b2e7de22818349da7d33dc8e80",
-  "retrieved_at": "2026-10-14T07:08:54+00:00"
+  "retrieved_at": "2026-10-14T07:08:54+00:00",
+  "source_page": null,
+  "extraction": null,
+  "printed_label": null,
+  "independence": null,
+  "note": null,
+  "also_cited": null,
+  "additional_sources": null
  },
  {
   "state": "FL",
@@ -73,7 +94,14 @@
   "source_agency": "Florida Office of Economic & Demographic Research (Municipal Ad Valorem Tax Profile; data source FL DOR)",
   "source_url": "https://edr.state.fl.us/Content/local-government/data/data-a-to-z/advaltxmu.xlsx",
   "sha256": "5874badb986d1486f506dcf4a20a167cabfdab1ba07b5991607de0a95b6b6ec8",
-  "retrieved_at": "2026-10-14T07:08:54+00:00"
+  "retrieved_at": "2026-10-14T07:08:54+00:00",
+  "source_page": null,
+  "extraction": null,
+  "printed_label": null,
+  "independence": null,
+  "note": null,
+  "also_cited": null,
+  "additional_sources": null
  },
  {
   "state": "FL",
@@ -92,7 +120,14 @@
   "source_agency": "Florida Office of Economic & Demographic Research (Municipal Ad Valorem Tax Profile; data source FL DOR)",
   "source_url": "https://edr.state.fl.us/Content/local-government/data/data-a-to-z/advaltxmu.xlsx",
   "sha256": "5874badb986d1486f506dcf4a20a167cabfdab1ba07b5991607de0a95b6b6ec8",
-  "retrieved_at": "2026-10-14T07:08:54+00:00"
+  "retrieved_at": "2026-10-14T07:08:54+00:00",
+  "source_page": null,
+  "extraction": null,
+  "printed_label": null,
+  "independence": null,
+  "note": null,
+  "also_cited": null,
+  "additional_sources": null
  },
  {
   "state": "FL",
@@ -111,7 +146,14 @@
   "source_agency": "Florida Office of Economic & Demographic Research (Municipal Ad Valorem Tax Profile; data source FL DOR)",
   "source_url": "https://edr.state.fl.us/Content/local-government/data/data-a-to-z/advaltxmu.xlsx",
   "sha256": "5874badb986d1486f506dcf4a20a167cabfdab1ba07b5991607de0a95b6b6ec8",
-  "retrieved_at": "2026-10-14T07:08:54+00:00"
+  "retrieved_at": "2026-10-14T07:08:54+00:00",
+  "source_page": null,
+  "extraction": null,
+  "printed_label": null,
+  "independence": null,
+  "note": null,
+  "also_cited": null,
+  "additional_sources": null
  },
  {
   "state": "FL",
@@ -130,6 +172,65 @@
   "source_agency": "Florida Office of Economic & Demographic Research (Municipal Ad Valorem Tax Profile; data source FL DOR)",
   "source_url": "https://edr.state.fl.us/Content/local-government/data/data-a-to-z/advaltxmu.xlsx",
   "sha256": "5874badb986d1486f506dcf4a20a167cabfdab1ba07b5991607de0a95b6b6ec8",
-  "retrieved_at": "2026-10-14T07:08:54+00:00"
+  "retrieved_at": "2026-10-14T07:08:54+00:00",
+  "source_page": null,
+  "extraction": null,
+  "printed_label": null,
+  "independence": null,
+  "note": null,
+  "also_cited": null,
+  "additional_sources": null
+ },
+ {
+  "state": "FL",
+  "year": "2025",
+  "county": "Duval",
+  "taxing_body": "St. Johns River Water Management District",
+  "body_type": "special_district",
+  "body_id": "fl-sjrwmd-special_district",
+  "nces_leaid": "",
+  "fips": "",
+  "levy_component": "operating",
+  "levy_scope": "county:Duval;tacd:'OLD;ATLANTIC;GENERAL;JACKSONVILLE;NEPTUNE;TOWN",
+  "rate_kind": "adopted",
+  "rate": "0.1793",
+  "unit": "mills",
+  "source_agency": "Florida Department of Revenue, Property Tax Oversight (2025 TACD, as filed by the county property appraiser)",
+  "source_url": "https://floridarevenue.com/property/dataportal/Documents/PTO%20Data%20Portal/TACD%20History/2025%20Taxing%20Authority%20Code%20Descriptions/2025%20Duval%20TACD.pdf",
+  "sha256": "387f026f19bc4c2f56399d03cf12e72657ba68f5aa0df881c2921fc95d382125",
+  "retrieved_at": "2026-10-19T19:13:37+00:00",
+  "source_page": "1",
+  "extraction": "pdftotext-layout",
+  "printed_label": "WATER MANAGEMENT DISTRICT",
+  "independence": null,
+  "note": null,
+  "also_cited": null,
+  "additional_sources": null
+ },
+ {
+  "state": "FL",
+  "year": "2025",
+  "county": "Duval",
+  "taxing_body": "Florida Inland Navigation District",
+  "body_type": "special_district",
+  "body_id": "fl-find-special_district",
+  "nces_leaid": "",
+  "fips": "",
+  "levy_component": "operating",
+  "levy_scope": "county:Duval;tacd:'OLD;ATLANTIC;GENERAL;JACKSONVILLE;NEPTUNE;TOWN",
+  "rate_kind": "adopted",
+  "rate": "0.0270",
+  "unit": "mills",
+  "source_agency": "Florida Department of Revenue, Property Tax Oversight (2025 TACD, as filed by the county property appraiser)",
+  "source_url": "https://floridarevenue.com/property/dataportal/Documents/PTO%20Data%20Portal/TACD%20History/2025%20Taxing%20Authority%20Code%20Descriptions/2025%20Duval%20TACD.pdf",
+  "sha256": "387f026f19bc4c2f56399d03cf12e72657ba68f5aa0df881c2921fc95d382125",
+  "retrieved_at": "2026-10-19T19:13:37+00:00",
+  "source_page": "1",
+  "extraction": "pdftotext-layout",
+  "printed_label": "FLORIDA INLAND NAVIGATION",
+  "independence": null,
+  "note": null,
+  "also_cited": null,
+  "additional_sources": null
  }
 ]
