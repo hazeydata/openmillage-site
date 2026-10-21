@@ -463,7 +463,7 @@
   "extraction": "xlsx",
   "printed_label": "SFWMD-EVERGLADES CONSTRUCTION PROJECT",
   "independence": null,
-  "note": "Shown as one combined rate. Orange County's authority list prints it in three parts: 0.0948 + 0.1026 + 0.0327 = 0.2301.",
+  "note": null,
   "also_cited": null,
   "additional_sources": null
  },
@@ -567,7 +567,7 @@
   "extraction": "xlsx",
   "printed_label": "SFWMD-DISTRICT-WIDE",
   "independence": null,
-  "note": "Shown as one combined rate. Orange County's authority list prints it in three parts: 0.0948 + 0.1026 + 0.0327 = 0.2301.",
+  "note": null,
   "also_cited": null,
   "additional_sources": null
  },
@@ -593,7 +593,7 @@
   "extraction": "xlsx",
   "printed_label": "SFWMD-OKEECHOBEE BASIN",
   "independence": null,
-  "note": "Shown as one combined rate. Orange County's authority list prints it in three parts: 0.0948 + 0.1026 + 0.0327 = 0.2301.",
+  "note": null,
   "also_cited": null,
   "additional_sources": null
  },

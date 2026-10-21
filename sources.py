@@ -11,9 +11,9 @@ COUNTIES_FILE = "data/ref/fl_census_counties_2024.csv"
 LOCK = "data/SOURCES.lock"
 COMBINED = {"all_components_combined": "operating + debt, combined"}
 NOTE_OVERRIDES = {
-    "fl-sjrwmd-special_district": "Rate as printed in the county's 2025 final millage table.",
-    "fl-sfwmd-special_district": "Shown as one combined rate. Orange County's authority list prints it in three parts: 0.0948 + 0.1026 + 0.0327 = 0.2301.",
-    "fl-cftod-special_district": "Formerly Reedy Creek Improvement District. Independent special district. Printed as one combined operating and debt rate, levied only in mill code 70 (Bay Lake, Lake Buena Vista and unincorporated Reedy Creek).",
+    ("Orange", "fl-sjrwmd-special_district"): "Rate as printed in the county's 2025 final millage table.",
+    ("Orange", "fl-sfwmd-special_district"): "Shown as one combined rate. Orange County's authority list prints it in three parts: 0.0948 + 0.1026 + 0.0327 = 0.2301.",
+    ("Orange", "fl-cftod-special_district"): "Formerly Reedy Creek Improvement District. Independent special district. Printed as one combined operating and debt rate, levied only in mill code 70 (Bay Lake, Lake Buena Vista and unincorporated Reedy Creek).",
 }
 HEX = re.compile(r"^[0-9a-f]{64}$")
 
@@ -51,7 +51,7 @@ def _row(r, **extra):
 
 def _sd(r, label):
     return _row(r, source_page=r.get("source_page") or None, extraction=r.get("extraction") or None, printed_label=r.get(label) or None,
-                independence=r.get("independence") or None, note=NOTE_OVERRIDES.get(r["body_id"], r.get("note") or None), also_cited=r.get("also_cited") or None)
+                independence=r.get("independence") or None, note=NOTE_OVERRIDES.get((r["county"], r["body_id"]), r.get("note") or None), also_cited=r.get("also_cited") or None)
 
 
 def key(r):

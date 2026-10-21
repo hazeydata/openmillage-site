@@ -157,8 +157,12 @@ ok(r.returncode == 0 and r2.returncode == 0 and snap(tmp) == snap(t2), f"AC19 tw
 shutil.rmtree(tmp); shutil.rmtree(t2)
 po = pg("polk"); i = [po.find(s) for s in ("Special districts</h2>", sentence, NO_ROWS)]
 ok(-1 not in i and i == sorted(i), "visual: Polk order is heading, coverage, empty-state line")
-public = [p for p in glob.glob("docs/**/*", recursive=True) if os.path.isfile(p) and p.endswith((".html", ".json", ".txt", ".csv", ".xml"))]
-leaks = [p for p in public if re.search(r"CEO|ruling|R6", open(p, encoding="utf-8").read())]
+BANNED = re.compile(r"\b(CEO|rulings?|R6)\b", re.I)
+hits = ["CEO ruling 2026-10-20", "ceo", "Ruling", "rulings", "r6", "per R6."]
+misses = ["Osceola", "OSCEOLA County", "overruling", "AR6X", "R60", "ceos", "rulingx"]
+ok(all(BANNED.search(s) for s in hits) and not any(BANNED.search(s) for s in misses), "banned-word regex fixture: catches CEO/ruling/R6 in any case, not Osceola, overruling, AR6X or R60")
+public = [p for p in glob.glob("docs/**/*", recursive=True) if os.path.isfile(p) and p.endswith((".html", ".json", ".txt", ".csv", ".xml", ".md", ".js"))]
+leaks = [p for p in public if BANNED.search(open(p, encoding="utf-8").read())]
 ok(public and not leaks, f"no internal wording (CEO, ruling, R6) in {len(public)} public files" + (f"; found in {leaks[:5]}" if leaks else ""))
 raw = {r["body_id"]: r["note"] for r in csv.DictReader(open(sources.ALT_FILE)) if r["body_id"] == "fl-cftod-special_district"}
 ok("every code 70 city total reconciles" in raw["fl-cftod-special_district"] and "reconciles" not in cf[0]["note"] and "reconciles" not in oh,
@@ -168,4 +172,13 @@ NOTES = {"fl-sjrwmd-special_district": "Rate as printed in the county's 2025 fin
          "fl-cftod-special_district": "Formerly Reedy Creek Improvement District. Independent special district. Printed as one combined operating and debt rate, levied only in mill code 70 (Bay Lake, Lake Buena Vista and unincorporated Reedy Creek)."}
 ok(all(r["note"] == NOTES[r["body_id"]] and f"<small style='color:#666;font-size:0.85em'>{html.escape(NOTES[r['body_id']])}</small>" in oh for r in now_or if r["body_id"] in NOTES)
    and sum(r["body_id"] in NOTES for r in now_or) == 3, "Orange district notes match the writing pass in JSON and on the page")
+raw_notes = {(r["county"], r["body_id"], r["levy_component"]): None for r in csv.DictReader(open(sources.SD_FILE))}
+raw_notes.update({(r["county"], r["body_id"], r["levy_component"]): r["note"] or None for r in csv.DictReader(open(sources.ALT_FILE)) if r["body_type"] == "special_district"})
+other = [r for r in sd if r["county"] != "Orange"]
+texts = [html.escape(v) for v in NOTES.values()] + list(NOTES.values())
+bad_json = [sources.key(r) for r in other if r["note"] != raw_notes[(r["county"], r["body_id"], r["levy_component"])]]
+bad_pages = sorted({r["county"] for r in other if any(x in pg(re.sub(r"[^a-z0-9]+", "-", r["county"].lower()).strip("-")) for x in texts)})
+bad_api = [r["county"] for r in other if any(x in (r["note"] or "") for x in NOTES.values())]
+ok(len(other) == 162 and not bad_json and not bad_pages and not bad_api,
+   f"Orange note overrides stay in Orange: {len(other)} other-county rows keep their source notes; mismatches {bad_json[:3]}, pages with Orange text {bad_pages[:5]}")
 print("FAILURES", len(FAIL)); sys.exit(1 if FAIL else 0)
