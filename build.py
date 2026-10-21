@@ -21,11 +21,12 @@ def page(path, title, body, jsonld=None, desc=""):
       f"<meta name=description content='{html.escape(desc, quote=True)}'><link rel=canonical href='{BASE}/{path[:-10] if path.endswith('index.html') else path}'>"
       f"<meta name=viewport content='width=device-width'>{ld}{GOATCOUNTER_TAG}</head><body><h1>{html.escape(title)}</h1>{body}"
       f"<footer><p>Official rates only, each row linked to its government source. <a href='{PATH}/llms.txt'>llms.txt</a> · <a href='{PATH}/'>All counties</a></p></footer></body></html>")
+MUTED = "style='color:#666;font-size:0.85em'"
 def sd_rate(r): return r['display_rate'] or f"{float(r['rate']):.4f} {r['unit']}"
 def sd_tr(r):
-    note = f"<br><small>{html.escape(r['note'])}</small>" if r['note'] else ""
-    return (f"<tr><td>{html.escape(r['taxing_body'])}{note}</td><td>{html.escape(r['levy_component'])}</td><td>{html.escape(sd_rate(r))}</td>"
-            f"<td><a href='{html.escape(r['source_url'])}'>source</a></td><td><code>{r['sha256']}</code></td></tr>")
+    note = f"<br><small {MUTED}>{html.escape(r['note'])}</small>" if r['note'] else ""
+    return (f"<tr><td>{html.escape(r['taxing_body'])}{note}</td><td>{html.escape(r['levy_component'])}</td><td style='text-align:right'>{html.escape(sd_rate(r))}</td>"
+            f"<td><a href='{html.escape(r['source_url'])}'>source</a> <code title='{r['sha256']}'>{r['sha256'][:8]}</code></td></tr>")
 links = []
 for (st, yr, co), rs in sorted(by.items()):
     p = f"{st.lower()}/{yr}/{slug(co)}-county/index.html"; urls.append(f"{BASE}/{p[:-10]}")
@@ -39,8 +40,8 @@ for (st, yr, co), rs in sorted(by.items()):
     elif not sds:
         sdh = f"<p>{NO_ROWS}</p>"
     else:
-        sdh = "<table><tr><th>Taxing body</th><th>Levy</th><th>Rate</th><th>Source</th><th>sha256</th></tr>" + "".join(sd_tr(r) for r in sds) + "</table>"
-    sdh = (f"<h2>Special districts</h2>{sdh}" if sdh else "") + f"<p>{COV}</p>"
+        sdh = "<table><tr><th>Taxing body</th><th>Levy</th><th>Rate</th><th>Source</th></tr>" + "".join(sd_tr(r) for r in sds) + "</table>"
+    sdh = f"<h2 style='margin-top:2em'>Special districts</h2><p {MUTED}>{COV}</p>{sdh}" if sdh else f"<p {MUTED}>{COV}</p>"
     api = f"api/v1/{st.lower()}/{yr}/{slug(co)}.json"
     os.makedirs(os.path.dirname(f"{OUT}/{api}"), exist_ok=True); json.dump(rs, open(f"{OUT}/{api}", "w"), indent=1)
     ds = {"@context": "https://schema.org", "@type": "Dataset", "name": f"{co} County, {st} property tax millage rates {yr}",

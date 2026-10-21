@@ -103,10 +103,10 @@ ok(len(agg_csv) == 55 and sorted(map(str, agg_csv)) == sorted(map(str, agg_api))
 cov = sources.coverage(rows)
 with_rows = cov["counties_with_rows"]
 for c in with_rows:
-    h = pg(re.sub(r"[^a-z0-9]+", "-", c.lower()).strip("-")); sec = h.split("<h2>Special districts</h2>", 1)[-1]
+    h = pg(re.sub(r"[^a-z0-9]+", "-", c.lower()).strip("-")); sec = h.split("Special districts</h2>", 1)[-1]
     srows = [r for r in rows if r["county"] == c and r["body_type"] == "special_district"]
-    if not ("<h2>Special districts</h2>" in h and all(html.escape(r["taxing_body"]) in sec and r["sha256"] in sec and html.escape(r["source_url"]) in sec
-            and html.escape(r["levy_component"]) in sec and html.escape(r["display_rate"] or f"{float(r['rate']):.4f} {r['unit']}") in sec for r in srows)):
+    if not ("Special districts</h2>" in h and all(html.escape(r["taxing_body"]) in sec and f"title='{r['sha256']}'>{r['sha256'][:8]}</code>" in sec and html.escape(r["source_url"]) in sec
+            and html.escape(r["levy_component"]) in sec and ("<td style='text-align:right'>" + html.escape(r["display_rate"] or f"{float(r['rate']):.4f} {r['unit']}") + "</td>") in sec for r in srows)):
         FAIL.append(f"AC7 {c}")
 ok(not [f for f in FAIL if f.startswith("AC7")], f"AC7 {len(with_rows)} county pages carry a Special districts section with name, levy, rate, source link and sha256")
 
@@ -119,8 +119,8 @@ oh = pg("orange")
 ok(len(cf) == 1 and cf[0]["taxing_body"] == "Central Florida Tourism Oversight District" and cf[0]["display_rate"] == "12.4236 (operating + debt, combined)"
    and cf[0]["rate"] == "12.4236" and cf[0]["sha256"] == CFTOD_SHA and "formerly Reedy Creek" in cf[0]["note"] and "contentFileID=416847" in cf[0]["source_url"],
    "AC9 CFTOD JSON row golden")
-ok("<td>Central Florida Tourism Oversight District<br>" in oh and "<td>12.4236 (operating + debt, combined)</td>" in oh and "formerly Reedy Creek" in oh
-   and "contentFileID=416847" in oh and CFTOD_SHA in oh, "AC9 CFTOD on the Orange page")
+ok("<td>Central Florida Tourism Oversight District<br>" in oh and "<td style='text-align:right'>12.4236 (operating + debt, combined)</td>" in oh and "formerly Reedy Creek" in oh
+   and "contentFileID=416847" in oh and f"title='{CFTOD_SHA}'" in oh, "AC9 CFTOD on the Orange page")
 ch = [r for r in js("alachua") if r["taxing_body"] == "Children's Trust of Alachua County"]
 ok(len(ch) == 1 and ch[0]["rate"] == "0.4500" and ch[0]["sha256"].startswith("6f6d8dfb") and ch[0]["sha256"].endswith("0861")
    and "Children&#x27;s Trust of Alachua County" in pg("alachua") and "0.4500 mills" in pg("alachua"), "AC10 Children's Trust of Alachua County golden")
@@ -130,12 +130,12 @@ sentence = sources.coverage_sentence(cov)
 pages = glob.glob("docs/fl/2025/*-county/index.html")
 ok(all(sentence in open(p).read() for p in pages + ["docs/index.html"]), f"AC12 computed coverage sentence on index and all {len(pages)} county pages")
 ok((cov["checked"], cov["total"]) == (57, 67) and cov["with_rows"] + len(cov["no_rows"]) == cov["checked"], f"AC12 computed {sentence}")
-ok(all(NO_ROWS in pg(c.lower()) and "0.0000" not in pg(c.lower()).split("<h2>Special districts</h2>")[1].split("<p>Source:")[0] for c in cov["no_rows"]),
+ok(all(NO_ROWS in pg(c.lower()) and "0.0000" not in pg(c.lower()).split("Special districts</h2>")[1].split("<p>Source:")[0] for c in cov["no_rows"]),
    f"AC13 the {len(cov['no_rows'])} computed no-rows counties show the fixed string: {cov['no_rows']}")
-ok(sorted(cov["not_yet_sourced"]) == sorted(OPEN) and all("not yet sourced" in pg(c.lower()) and NO_ROWS not in pg(c.lower()) and "<h2>Special districts</h2><table>" not in pg(c.lower()) for c in OPEN)
+ok(sorted(cov["not_yet_sourced"]) == sorted(OPEN) and all("not yet sourced" in pg(c.lower()) and NO_ROWS not in pg(c.lower()) and "<th>Taxing body</th><th>Levy</th><th>Rate</th>" not in pg(c.lower()) for c in OPEN)
    and all(c in open("docs/index.html").read().split("<p>Independent special districts not yet sourced")[1].split("</p>")[0] for c in OPEN), "AC14 the 10 open counties are listed as not yet sourced on the index and their pages")
-ok("aggregate_effective</em> are not adopted rates" in oh and "aggregate_effective</em>" not in oh.split("<h2>Special districts</h2>")[1], "AC15 aggregate_effective note still renders")
-ok(not re.search(r"(?i)<t[dh]>(total|sum)", oh.split("<h2>Special districts</h2>")[1].split("<p>Source:")[0]), "AC15 no special-district totals row")
+ok("aggregate_effective</em> are not adopted rates" in oh and "aggregate_effective</em>" not in oh.split("Special districts</h2>")[1], "AC15 aggregate_effective note still renders")
+ok(not re.search(r"(?i)<t[dh]>(total|sum)", oh.split("Special districts</h2>")[1].split("<p>Source:")[0]), "AC15 no special-district totals row")
 
 ld = json.loads(re.search(r'<script type="application/ld\+json">(.*?)</script>', oh).group(1))
 pl = json.loads(re.search(r'<script type="application/ld\+json">(.*?)</script>', pg("pasco")).group(1))
@@ -153,4 +153,6 @@ def snap(d):
 tmp, r = build_copy(); t2, r2 = build_copy()
 ok(r.returncode == 0 and r2.returncode == 0 and snap(tmp) == snap(t2), f"AC19 two builds produce byte-identical docs/ ({len(snap(tmp))} files) apart from lastmod")
 shutil.rmtree(tmp); shutil.rmtree(t2)
+po = pg("polk"); i = [po.find(s) for s in ("Special districts</h2>", sentence, NO_ROWS)]
+ok(-1 not in i and i == sorted(i), "visual: Polk order is heading, coverage, empty-state line")
 print("FAILURES", len(FAIL)); sys.exit(1 if FAIL else 0)
