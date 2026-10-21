@@ -161,8 +161,17 @@ BANNED = re.compile(r"\b(CEO|rulings?|R6)\b", re.I)
 hits = ["CEO ruling 2026-10-20", "ceo", "Ruling", "rulings", "r6", "per R6."]
 misses = ["Osceola", "OSCEOLA County", "overruling", "AR6X", "R60", "ceos", "rulingx"]
 ok(all(BANNED.search(s) for s in hits) and not any(BANNED.search(s) for s in misses), "banned-word regex fixture: catches CEO/ruling/R6 in any case, not Osceola, overruling, AR6X or R60")
-public = [p for p in glob.glob("docs/**/*", recursive=True) if os.path.isfile(p) and p.endswith((".html", ".json", ".txt", ".csv", ".xml", ".md", ".js"))]
-leaks = [p for p in public if BANNED.search(open(p, encoding="utf-8").read())]
+SCANNED = (".html", ".json", ".txt", ".csv", ".xml", ".md", ".js")
+def scan(root):
+    files = [p for p in glob.glob(os.path.join(root, "**/*"), recursive=True) if os.path.isfile(p) and p.endswith(SCANNED)]
+    return files, [p for p in files if BANNED.search(open(p, encoding="utf-8").read())]
+fx = tempfile.mkdtemp()
+for n, body in (("notes.md", "Per the CEO ruling."), ("app.js", "var n = 'ruling 5';"), ("osceola.md", "Osceola County"), ("ok.js", "var c = 'Osceola';")):
+    open(os.path.join(fx, n), "w").write(body)
+fx_files, fx_leaks = scan(fx)
+ok(len(fx_files) == 4 and sorted(os.path.basename(p) for p in fx_leaks) == ["app.js", "notes.md"], f"banned-word scanner flags the .md and .js fixtures and spares Osceola: {sorted(os.path.basename(p) for p in fx_leaks)}")
+shutil.rmtree(fx)
+public, leaks = scan("docs")
 ok(public and not leaks, f"no internal wording (CEO, ruling, R6) in {len(public)} public files" + (f"; found in {leaks[:5]}" if leaks else ""))
 raw = {r["body_id"]: r["note"] for r in csv.DictReader(open(sources.ALT_FILE)) if r["body_id"] == "fl-cftod-special_district"}
 ok("every code 70 city total reconciles" in raw["fl-cftod-special_district"] and "reconciles" not in cf[0]["note"] and "reconciles" not in oh,
