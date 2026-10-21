@@ -3,9 +3,9 @@ Calhoun,exception,"scanned PDF; phase 5 cell-level OCR (collector/tacd_cellocr.p
 Clay,exception,scanned PDF; phase 5 cell-level OCR reconciles 6 of 7 areas; area 006 fails (OCR read 2.4014 as 24014 and the TOTAL as 15.2525); a single failing area fails the OCR gate; no value corrected
 Columbia,exception,"scanned PDF; phase 5 cell-level OCR reconciles 4 of 5 areas; area 7 (NFLMIP): the printed components sum to 13.4453 but the printed TOTAL is 21.2603 (the row prints no component that makes up the difference), so the file itself does not reconcile; county stays out"
 Monroe,exception,"text layer unusable; phase 5 cell-level OCR with deskew reconciles 35 of 36 OCR area rows; area 620D sums 8.6415 against a printed 8.6420 (one 0.0948 cell read as 0.0943), and several area codes were misread or rows merged (36 rows read, ~40 printed); a single failing area fails the OCR gate; no value corrected"
-Collier,exception,authority list with no per-area printed TOTAL (ruling 5)
-Sumter,exception,authority list; city totals printed but not their components (ruling 5)
-Gadsden,exception,"spreadsheet authority list + stratum list, no per-area TOTAL (ruling 5)"
+Collier,exception,authority list with no per-area printed TOTAL; open because the component rates cannot be reconciled against a printed area total
+Sumter,exception,authority list; city totals printed but not their components; open because no area total can be reconciled from the file
+Gadsden,exception,"spreadsheet authority list + stratum list, no per-area TOTAL; open because the component rates cannot be reconciled against a printed area total"
 Liberty,no_file,no source: no 2025 TACD file in the DOR folder
 Levy,exception,"list of area codes with a printed total and the municipal rate only; the other components of each total are not printed per area, so the totals cannot be reconciled from the file"
 Taylor,exception,"X-matrix of which authorities apply to each code plus a rate list; no per-area printed TOTAL to reconcile against (summing the X'd rates would be our own derivation); page 2 scanned, OCR gave 0 rows"
