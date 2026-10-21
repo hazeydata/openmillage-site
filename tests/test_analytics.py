@@ -41,7 +41,7 @@ locs = re.findall(r"<loc>([^<]+)</loc>", open("docs/sitemap.xml", encoding="utf-
 ok(len(locs) > 0 and len(walked) == len(locs), f"page count {len(walked)} equals sitemap URL count {len(locs)}")
 # docs/ page set equals a fresh build.py + amend3.py run in a temp dir
 tmp = tempfile.mkdtemp()
-for n in ("build.py", "amend3.py", "analytics.py", "amend3_config.json"): shutil.copy(n, tmp)
+for n in ("build.py", "sources.py", "amend3.py", "analytics.py", "amend3_config.json"): shutil.copy(n, tmp)
 shutil.copytree("data", os.path.join(tmp, "data"))
 env = dict(os.environ, DATA_GLOB="data/*.csv"); env.pop("OUT", None)
 r1 = subprocess.run([sys.executable, "build.py"], cwd=tmp, env=env, capture_output=True, text=True)
