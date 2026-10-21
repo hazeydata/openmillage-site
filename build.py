@@ -2,7 +2,7 @@
 """Static build: data/ (pinned by data/SOURCES.lock) -> docs/ (GitHub Pages). Per-county pages, JSON API, sitemap, llms.txt."""
 import json, os, re, html, datetime
 from analytics import GOATCOUNTER_TAG
-from sources import load_rows, coverage, coverage_sentence, EXTRA_KEYS
+from sources import COMBINED, load_rows, coverage, coverage_sentence, EXTRA_KEYS
 BASE = os.environ.get("SITE_BASE", "https://hazeydata.github.io/openmillage-site").rstrip("/")
 PATH = "/" + BASE.split("/", 3)[3] if BASE.count("/") > 2 else ""
 OUT = "docs"; os.makedirs(OUT, exist_ok=True)
@@ -22,11 +22,11 @@ def page(path, title, body, jsonld=None, desc=""):
       f"<meta name=viewport content='width=device-width'>{ld}{GOATCOUNTER_TAG}</head><body><h1>{html.escape(title)}</h1>{body}"
       f"<footer><p>Official rates only, each row linked to its government source. <a href='{PATH}/llms.txt'>llms.txt</a> · <a href='{PATH}/'>All counties</a></p></footer></body></html>")
 MUTED = "style='color:#666;font-size:0.85em'"
-def sd_rate(r): return r['display_rate'] or f"{float(r['rate']):.4f} {r['unit']}"
+def sd_levy(r): return r['levy_component'] + (f" ({COMBINED[r['levy_component']]})" if r['levy_component'] in COMBINED else "")
 def sd_tr(r):
     note = f"<br><small {MUTED}>{html.escape(r['note'])}</small>" if r['note'] else ""
-    return (f"<tr><td>{html.escape(r['taxing_body'])}{note}</td><td>{html.escape(r['levy_component'])}</td><td style='text-align:right'>{html.escape(sd_rate(r))}</td>"
-            f"<td><a href='{html.escape(r['source_url'])}'>source</a> <code title='{r['sha256']}'>{r['sha256'][:8]}</code></td></tr>")
+    return (f"<tr><td>{html.escape(r['taxing_body'])}{note}</td><td>{html.escape(sd_levy(r))}</td><td style='text-align:right;white-space:nowrap'>{float(r['rate']):.4f} {r['unit']}</td>"
+            f"<td style='white-space:nowrap'><a href='{html.escape(r['source_url'])}'>source</a> <code title='{r['sha256']}'>{r['sha256'][:8]}</code></td></tr>")
 links = []
 for (st, yr, co), rs in sorted(by.items()):
     p = f"{st.lower()}/{yr}/{slug(co)}-county/index.html"; urls.append(f"{BASE}/{p[:-10]}")

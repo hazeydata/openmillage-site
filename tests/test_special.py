@@ -106,7 +106,7 @@ for c in with_rows:
     h = pg(re.sub(r"[^a-z0-9]+", "-", c.lower()).strip("-")); sec = h.split("Special districts</h2>", 1)[-1]
     srows = [r for r in rows if r["county"] == c and r["body_type"] == "special_district"]
     if not ("Special districts</h2>" in h and all(html.escape(r["taxing_body"]) in sec and f"title='{r['sha256']}'>{r['sha256'][:8]}</code>" in sec and html.escape(r["source_url"]) in sec
-            and html.escape(r["levy_component"]) in sec and ("<td style='text-align:right'>" + html.escape(r["display_rate"] or f"{float(r['rate']):.4f} {r['unit']}") + "</td>") in sec for r in srows)):
+            and html.escape(r["levy_component"]) in sec and f"<td style='text-align:right;white-space:nowrap'>{float(r['rate']):.4f} {r['unit']}</td>" in sec for r in srows)):
         FAIL.append(f"AC7 {c}")
 ok(not [f for f in FAIL if f.startswith("AC7")], f"AC7 {len(with_rows)} county pages carry a Special districts section with name, levy, rate, source link and sha256")
 
@@ -116,10 +116,11 @@ ok([{k: r[k] for k in sources.BASE_KEYS} for r in now_or if r["body_type"] != "s
 
 cf = [r for r in now_or if r["body_id"] == "fl-cftod-special_district"]
 oh = pg("orange")
-ok(len(cf) == 1 and cf[0]["taxing_body"] == "Central Florida Tourism Oversight District" and cf[0]["display_rate"] == "12.4236 (operating + debt, combined)"
+ok(len(cf) == 1 and cf[0]["taxing_body"] == "Central Florida Tourism Oversight District" and "display_rate" not in cf[0] and cf[0]["levy_component"] == "all_components_combined"
    and cf[0]["rate"] == "12.4236" and cf[0]["sha256"] == CFTOD_SHA and "formerly Reedy Creek" in cf[0]["note"] and "contentFileID=416847" in cf[0]["source_url"],
    "AC9 CFTOD JSON row golden")
-ok("<td>Central Florida Tourism Oversight District<br>" in oh and "<td style='text-align:right'>12.4236 (operating + debt, combined)</td>" in oh and "formerly Reedy Creek" in oh
+ok(any("<td>Central Florida Tourism Oversight District<br>" in tr and "<td>all_components_combined (operating + debt, combined)</td>" in tr
+   and "<td style='text-align:right;white-space:nowrap'>12.4236 mills</td>" in tr for tr in oh.split("<tr>")) and "formerly Reedy Creek" in oh
    and "contentFileID=416847" in oh and f"title='{CFTOD_SHA}'" in oh, "AC9 CFTOD on the Orange page")
 ch = [r for r in js("alachua") if r["taxing_body"] == "Children's Trust of Alachua County"]
 ok(len(ch) == 1 and ch[0]["rate"] == "0.4500" and ch[0]["sha256"].startswith("6f6d8dfb") and ch[0]["sha256"].endswith("0861")

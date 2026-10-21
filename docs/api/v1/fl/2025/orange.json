@@ -23,7 +23,6 @@
   "independence": null,
   "note": null,
   "also_cited": null,
-  "display_rate": null,
   "additional_sources": null
  },
  {
@@ -50,7 +49,6 @@
   "independence": null,
   "note": null,
   "also_cited": null,
-  "display_rate": null,
   "additional_sources": null
  },
  {
@@ -77,7 +75,6 @@
   "independence": null,
   "note": null,
   "also_cited": null,
-  "display_rate": null,
   "additional_sources": null
  },
  {
@@ -104,7 +101,6 @@
   "independence": null,
   "note": null,
   "also_cited": null,
-  "display_rate": null,
   "additional_sources": null
  },
  {
@@ -131,7 +127,6 @@
   "independence": null,
   "note": null,
   "also_cited": null,
-  "display_rate": null,
   "additional_sources": null
  },
  {
@@ -158,7 +153,6 @@
   "independence": null,
   "note": null,
   "also_cited": null,
-  "display_rate": null,
   "additional_sources": null
  },
  {
@@ -185,7 +179,6 @@
   "independence": null,
   "note": null,
   "also_cited": null,
-  "display_rate": null,
   "additional_sources": null
  },
  {
@@ -212,7 +205,6 @@
   "independence": null,
   "note": null,
   "also_cited": null,
-  "display_rate": null,
   "additional_sources": null
  },
  {
@@ -239,7 +231,6 @@
   "independence": null,
   "note": null,
   "also_cited": null,
-  "display_rate": null,
   "additional_sources": null
  },
  {
@@ -266,7 +257,6 @@
   "independence": null,
   "note": null,
   "also_cited": null,
-  "display_rate": null,
   "additional_sources": null
  },
  {
@@ -293,7 +283,6 @@
   "independence": null,
   "note": null,
   "also_cited": null,
-  "display_rate": null,
   "additional_sources": null
  },
  {
@@ -320,7 +309,6 @@
   "independence": null,
   "note": null,
   "also_cited": null,
-  "display_rate": null,
   "additional_sources": null
  },
  {
@@ -347,7 +335,6 @@
   "independence": null,
   "note": null,
   "also_cited": null,
-  "display_rate": null,
   "additional_sources": null
  },
  {
@@ -374,7 +361,6 @@
   "independence": null,
   "note": null,
   "also_cited": null,
-  "display_rate": null,
   "additional_sources": null
  },
  {
@@ -401,7 +387,6 @@
   "independence": null,
   "note": null,
   "also_cited": null,
-  "display_rate": null,
   "additional_sources": null
  },
  {
@@ -428,7 +413,6 @@
   "independence": null,
   "note": null,
   "also_cited": null,
-  "display_rate": null,
   "additional_sources": null
  },
  {
@@ -455,7 +439,6 @@
   "independence": null,
   "note": null,
   "also_cited": null,
-  "display_rate": null,
   "additional_sources": null
  },
  {
@@ -482,7 +465,6 @@
   "independence": null,
   "note": "mill codes are the matrix columns where the rate is printed; every column adds to its printed SUB TOTAL",
   "also_cited": null,
-  "display_rate": null,
   "additional_sources": null
  },
  {
@@ -509,7 +491,6 @@
   "independence": null,
   "note": "printed as one combined rate (as in the Broward TACD); the Orange TACD authority list prints the parts 0.0948 + 0.1026 + 0.0327 = 0.2301",
   "also_cited": null,
-  "display_rate": null,
   "additional_sources": null
  },
  {
@@ -536,7 +517,6 @@
   "independence": null,
   "note": "formerly Reedy Creek Improvement District; independent special district (CEO ruling 2026-10-20); printed as one operating + debt rate, levied only in mill code 70 (Bay Lake, Lake Buena Vista, uninc. Reedy Creek); every code 70 city total reconciles",
   "also_cited": "corroboration only (document not on file; the row cites the printed 12.4236 total): Central Florida Tourism Oversight District 2025 Continuing Disclosure https://www.oversightdistrict.org/wp-content/uploads/2026/03/2025-Continuing-Disclosure.pdf (FY2026 3.8400 debt + 8.5836 operating)",
-  "display_rate": "12.4236 (operating + debt, combined)",
   "additional_sources": null
  }
 ]

@@ -2,7 +2,7 @@ import csv, glob, hashlib, json, os, re
 
 BASE_KEYS = ["state", "year", "county", "taxing_body", "body_type", "body_id", "nces_leaid", "fips", "levy_component", "levy_scope",
              "rate_kind", "rate", "unit", "source_agency", "source_url", "sha256", "retrieved_at"]
-EXTRA_KEYS = ["source_page", "extraction", "printed_label", "independence", "note", "also_cited", "display_rate", "additional_sources"]
+EXTRA_KEYS = ["source_page", "extraction", "printed_label", "independence", "note", "also_cited", "additional_sources"]
 BASE_FILE = "data/fl-2025.csv"
 SD_FILE = "data/special/fl-2025-special-districts.csv"
 ALT_FILE = "data/special/fl-2025-alt-sources.csv"
@@ -45,10 +45,8 @@ def _row(r, **extra):
 
 
 def _sd(r, label):
-    combined = COMBINED.get(r["levy_component"])
     return _row(r, source_page=r.get("source_page") or None, extraction=r.get("extraction") or None, printed_label=r.get(label) or None,
-                independence=r.get("independence") or None, note=r.get("note") or None, also_cited=r.get("also_cited") or None,
-                display_rate=f"{float(r['rate']):.4f} ({combined})" if combined else None)
+                independence=r.get("independence") or None, note=r.get("note") or None, also_cited=r.get("also_cited") or None)
 
 
 def key(r):
