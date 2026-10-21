@@ -177,7 +177,7 @@
   "extraction": "pdftotext-layout",
   "printed_label": "WATER SFWMD DIST",
   "independence": null,
-  "note": null,
+  "note": "Shown as one combined rate. Orange County's authority list prints it in three parts: 0.0948 + 0.1026 + 0.0327 = 0.2301.",
   "also_cited": null,
   "additional_sources": null
  },
@@ -203,7 +203,7 @@
   "extraction": "pdftotext-layout",
   "printed_label": "MANAGEMENT SFWMD OKCH",
   "independence": null,
-  "note": null,
+  "note": "Shown as one combined rate. Orange County's authority list prints it in three parts: 0.0948 + 0.1026 + 0.0327 = 0.2301.",
   "also_cited": null,
   "additional_sources": null
  },
@@ -229,7 +229,7 @@
   "extraction": "pdftotext-layout",
   "printed_label": "DISTRICTS SFWMD EVGLD",
   "independence": null,
-  "note": null,
+  "note": "Shown as one combined rate. Orange County's authority list prints it in three parts: 0.0948 + 0.1026 + 0.0327 = 0.2301.",
   "also_cited": null,
   "additional_sources": null
  },
@@ -255,7 +255,7 @@
   "extraction": "pdftotext-layout",
   "printed_label": "SJRWMD",
   "independence": null,
-  "note": null,
+  "note": "Rate as printed in the county's 2025 final millage table.",
   "also_cited": null,
   "additional_sources": null
  }

@@ -463,7 +463,7 @@
   "extraction": "pdftotext-layout",
   "printed_label": "ST JOHNS RIVER WMD",
   "independence": null,
-  "note": "mill codes are the matrix columns where the rate is printed; every column adds to its printed SUB TOTAL",
+  "note": "Rate as printed in the county's 2025 final millage table.",
   "also_cited": null,
   "additional_sources": null
  },
@@ -489,7 +489,7 @@
   "extraction": "pdftotext-layout",
   "printed_label": "SOUTH FLORIDA WMD",
   "independence": null,
-  "note": "printed as one combined rate (as in the Broward TACD); the Orange TACD authority list prints the parts 0.0948 + 0.1026 + 0.0327 = 0.2301",
+  "note": "Shown as one combined rate. Orange County's authority list prints it in three parts: 0.0948 + 0.1026 + 0.0327 = 0.2301.",
   "also_cited": null,
   "additional_sources": null
  },
@@ -515,7 +515,7 @@
   "extraction": "pdftotext-layout",
   "printed_label": "REEDY CREEK IMPR. DIST. & DEBT",
   "independence": null,
-  "note": "formerly Reedy Creek Improvement District; independent special district (CEO ruling 2026-10-20); printed as one operating + debt rate, levied only in mill code 70 (Bay Lake, Lake Buena Vista, uninc. Reedy Creek); every code 70 city total reconciles",
+  "note": "Formerly Reedy Creek Improvement District. Independent special district. Printed as one combined operating and debt rate, levied only in mill code 70 (Bay Lake, Lake Buena Vista and unincorporated Reedy Creek).",
   "also_cited": "corroboration only (document not on file; the row cites the printed 12.4236 total): Central Florida Tourism Oversight District 2025 Continuing Disclosure https://www.oversightdistrict.org/wp-content/uploads/2026/03/2025-Continuing-Disclosure.pdf (FY2026 3.8400 debt + 8.5836 operating)",
   "additional_sources": null
  }

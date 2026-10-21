@@ -1087,7 +1087,7 @@
   "extraction": "pdftotext-layout",
   "printed_label": "MILLAGE ------------------------------------------------ So Fla Wtr Mgnt",
   "independence": null,
-  "note": null,
+  "note": "Shown as one combined rate. Orange County's authority list prints it in three parts: 0.0948 + 0.1026 + 0.0327 = 0.2301.",
   "also_cited": null,
   "additional_sources": null
  },
@@ -1113,7 +1113,7 @@
   "extraction": "pdftotext-layout",
   "printed_label": "RATES Regional Evr Proj",
   "independence": null,
-  "note": null,
+  "note": "Shown as one combined rate. Orange County's authority list prints it in three parts: 0.0948 + 0.1026 + 0.0327 = 0.2301.",
   "also_cited": null,
   "additional_sources": null
  },
@@ -1139,7 +1139,7 @@
   "extraction": "pdftotext-layout",
   "printed_label": "Millages Okeechobee Basin",
   "independence": null,
-  "note": null,
+  "note": "Shown as one combined rate. Orange County's authority list prints it in three parts: 0.0948 + 0.1026 + 0.0327 = 0.2301.",
   "also_cited": null,
   "additional_sources": null
  },

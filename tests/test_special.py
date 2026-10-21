@@ -9,9 +9,9 @@ def ok(cond, msg): print(("PASS " if cond else "FAIL ") + msg); cond or FAIL.app
 API = "docs/api/v1/fl/2025"
 def js(c): return json.load(open(f"{API}/{c}.json"))
 def pg(c): return open(f"docs/fl/2025/{c}-county/index.html", encoding="utf-8").read()
-SENT = "57 of 67 Florida counties checked against official sources; 46 have special-district rows."
+SENT = "57 of 67 Florida counties checked against official sources; 45 have special-district rows."
 NO_ROWS = "No special-district rows published yet for this county."
-SPEC_NO_ROWS = ["Bradford", "Citrus", "Franklin", "Glades", "Hardee", "Highlands", "Nassau", "Okeechobee", "Polk", "Wakulla", "Walton"]
+NO_ROWS_COUNTIES = ["Bradford", "Citrus", "Franklin", "Glades", "Hardee", "Highlands", "Nassau", "Okeechobee", "Pasco", "Polk", "Wakulla", "Walton"]
 OPEN = ["Calhoun", "Clay", "Columbia", "Monroe", "Collier", "Sumter", "Gadsden", "Levy", "Taylor", "Liberty"]
 CFTOD_SHA = "1f4e3b57663e35703d71d5338c0add294164c90813ef78275af7d978a9486a68"
 
@@ -117,10 +117,10 @@ ok([{k: r[k] for k in sources.BASE_KEYS} for r in now_or if r["body_type"] != "s
 cf = [r for r in now_or if r["body_id"] == "fl-cftod-special_district"]
 oh = pg("orange")
 ok(len(cf) == 1 and cf[0]["taxing_body"] == "Central Florida Tourism Oversight District" and "display_rate" not in cf[0] and cf[0]["levy_component"] == "all_components_combined"
-   and cf[0]["rate"] == "12.4236" and cf[0]["sha256"] == CFTOD_SHA and "formerly Reedy Creek" in cf[0]["note"] and "contentFileID=416847" in cf[0]["source_url"],
+   and cf[0]["rate"] == "12.4236" and cf[0]["sha256"] == CFTOD_SHA and "Formerly Reedy Creek" in cf[0]["note"] and "contentFileID=416847" in cf[0]["source_url"],
    "AC9 CFTOD JSON row golden")
 ok(any("<td>Central Florida Tourism Oversight District<br>" in tr and re.findall(r"<td>([^<]*)</td>", tr)[0] == "(operating + debt, combined)"
-   and "<td style='text-align:right;white-space:nowrap'>12.4236 mills</td>" in tr for tr in oh.split("<tr>")) and "formerly Reedy Creek" in oh
+   and "<td style='text-align:right;white-space:nowrap'>12.4236 mills</td>" in tr for tr in oh.split("<tr>")) and "Formerly Reedy Creek" in oh
    and "contentFileID=416847" in oh and f"title='{CFTOD_SHA}'" in oh, "AC9 CFTOD on the Orange page")
 ch = [r for r in js("alachua") if r["taxing_body"] == "Children's Trust of Alachua County"]
 ok(len(ch) == 1 and ch[0]["rate"] == "0.4500" and ch[0]["sha256"].startswith("6f6d8dfb") and ch[0]["sha256"].endswith("0861")
@@ -130,7 +130,8 @@ ok(len(now_or) == 20 and len(main_or) == 17 and any(r["body_type"] == "special_d
 sentence = sources.coverage_sentence(cov)
 pages = glob.glob("docs/fl/2025/*-county/index.html")
 ok(all(sentence in open(p).read() for p in pages + ["docs/index.html"]), f"AC12 computed coverage sentence on index and all {len(pages)} county pages")
-ok((cov["checked"], cov["total"]) == (57, 67) and cov["with_rows"] + len(cov["no_rows"]) == cov["checked"], f"AC12 computed {sentence}")
+ok(sentence == SENT and (cov["checked"], cov["total"], cov["with_rows"]) == (57, 67, 45) and cov["with_rows"] + len(cov["no_rows"]) == cov["checked"], f"AC12 computed sentence equals the ruled string: {sentence}")
+ok(cov["no_rows"] == NO_ROWS_COUNTIES, f"AC13 no-rows counties are the ruled 12: {cov['no_rows']}")
 ok(all(NO_ROWS in pg(c.lower()) and "0.0000" not in pg(c.lower()).split("Special districts</h2>")[1].split("<p>Source:")[0] for c in cov["no_rows"]),
    f"AC13 the {len(cov['no_rows'])} computed no-rows counties show the fixed string: {cov['no_rows']}")
 ok(sorted(cov["not_yet_sourced"]) == sorted(OPEN) and all("not yet sourced" in pg(c.lower()) and NO_ROWS not in pg(c.lower()) and "<th>Taxing body</th><th>Levy</th><th>Rate</th>" not in pg(c.lower()) for c in OPEN)
@@ -156,4 +157,15 @@ ok(r.returncode == 0 and r2.returncode == 0 and snap(tmp) == snap(t2), f"AC19 tw
 shutil.rmtree(tmp); shutil.rmtree(t2)
 po = pg("polk"); i = [po.find(s) for s in ("Special districts</h2>", sentence, NO_ROWS)]
 ok(-1 not in i and i == sorted(i), "visual: Polk order is heading, coverage, empty-state line")
+public = [p for p in glob.glob("docs/**/*", recursive=True) if os.path.isfile(p) and p.endswith((".html", ".json", ".txt", ".csv", ".xml"))]
+leaks = [p for p in public if re.search(r"CEO|ruling|R6", open(p, encoding="utf-8").read())]
+ok(public and not leaks, f"no internal wording (CEO, ruling, R6) in {len(public)} public files" + (f"; found in {leaks[:5]}" if leaks else ""))
+raw = {r["body_id"]: r["note"] for r in csv.DictReader(open(sources.ALT_FILE)) if r["body_id"] == "fl-cftod-special_district"}
+ok("every code 70 city total reconciles" in raw["fl-cftod-special_district"] and "reconciles" not in cf[0]["note"] and "reconciles" not in oh,
+   "CFTOD reconciliation detail stays in the pinned data, not in reader copy")
+NOTES = {"fl-sjrwmd-special_district": "Rate as printed in the county's 2025 final millage table.",
+         "fl-sfwmd-special_district": "Shown as one combined rate. Orange County's authority list prints it in three parts: 0.0948 + 0.1026 + 0.0327 = 0.2301.",
+         "fl-cftod-special_district": "Formerly Reedy Creek Improvement District. Independent special district. Printed as one combined operating and debt rate, levied only in mill code 70 (Bay Lake, Lake Buena Vista and unincorporated Reedy Creek)."}
+ok(all(r["note"] == NOTES[r["body_id"]] and f"<small style='color:#666;font-size:0.85em'>{html.escape(NOTES[r['body_id']])}</small>" in oh for r in now_or if r["body_id"] in NOTES)
+   and sum(r["body_id"] in NOTES for r in now_or) == 3, "Orange district notes match the writing pass in JSON and on the page")
 print("FAILURES", len(FAIL)); sys.exit(1 if FAIL else 0)
