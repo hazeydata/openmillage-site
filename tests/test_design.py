@@ -8,7 +8,7 @@ FAIL = []
 def ok(cond, msg): print(("PASS " if cond else "FAIL ") + msg); cond or FAIL.append(msg)
 def rd(p): return open(p, encoding="utf-8").read()
 CFG = json.load(open("amend3_config.json")); SLUG = CFG["slug"].strip("/")
-BASE = os.environ.get("SITE_BASE", "https://hazeydata.github.io/openmillage-site").rstrip("/")
+BASE = os.environ.get("SITE_BASE", "https://openmillage.com").rstrip("/")
 PATH = "/" + BASE.split("/", 3)[3] if BASE.count("/") > 2 else ""
 pages = sorted(glob.glob("docs/**/*.html", recursive=True))
 county_pages = sorted(glob.glob("docs/fl/2025/*-county/index.html"))
