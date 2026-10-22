@@ -1,5 +1,5 @@
 # OpenMillage
-> Official US property tax rates (millage) per taxing body, every row linked to a government source with sha256 of the source file. Pilot: Florida 2025.
+> Official US property tax rates (millage) per taxing body, each row linked to a government source with sha256 of the source file. Pilot: Florida 2025.
 
 ## Data
 - JSON per county: https://hazeydata.github.io/openmillage-site/api/v1/<state>/<year>/<county>.json
