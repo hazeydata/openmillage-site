@@ -39,7 +39,7 @@ expected = f"{len(prim_rows)} official rates from {join(types)}" + (
     f" (additional source{'s' if len(extras) > 1 else ''}: {join(extras)})" if extras else "") + ", retrieved "
 
 idx = open("docs/index.html", encoding="utf-8").read()
-m = re.search(r"<p>(\d+ official rates [^<]*)</p>", idx)
+m = re.search(r"<p class=lead>(\d+ official rates [^<]*)</p>", idx)
 ok(bool(m), "homepage lead paragraph present")
 lead = html.unescape(m.group(1)) if m else ""
 print("lead:", lead)
@@ -54,7 +54,7 @@ def tree(d):
             for p, _, fs in os.walk(d) for f in fs}
 def planted(path, old, new):
     tmp = tempfile.mkdtemp()
-    for n in ("build.py", "sources.py", "amend3.py", "analytics.py", "amend3_config.json"): shutil.copy(n, tmp)
+    for n in ("build.py", "sources.py", "amend3.py", "analytics.py", "site_chrome.py", "amend3_config.json"): shutil.copy(n, tmp)
     shutil.copytree("data", os.path.join(tmp, "data")); shutil.copytree("docs", os.path.join(tmp, "docs"))
     p = os.path.join(tmp, path); s = open(p, encoding="utf-8").read(); assert old in s, old
     open(p, "w", encoding="utf-8").write(s.replace(old, new, 1))

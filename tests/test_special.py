@@ -3,7 +3,7 @@
 build.py and amend3.py: python3 tests/test_special.py"""
 import csv, glob, html, json, os, re, shutil, subprocess, sys, tempfile
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__))); sys.path.insert(0, ROOT); os.chdir(ROOT)
-import sources
+import sources, site_chrome
 FAIL = []
 def ok(cond, msg): print(("PASS " if cond else "FAIL ") + msg); cond or FAIL.append(msg)
 API = "docs/api/v1/fl/2025"
@@ -17,7 +17,7 @@ CFTOD_SHA = "1f4e3b57663e35703d71d5338c0add294164c90813ef78275af7d978a9486a68"
 
 def build_copy(mutate=None):
     tmp = tempfile.mkdtemp()
-    for n in ("build.py", "sources.py", "amend3.py", "analytics.py", "amend3_config.json"): shutil.copy(n, tmp)
+    for n in ("build.py", "sources.py", "amend3.py", "analytics.py", "site_chrome.py", "amend3_config.json"): shutil.copy(n, tmp)
     shutil.copytree("data", os.path.join(tmp, "data"))
     if mutate: mutate(tmp)
     blocker = os.path.join(tmp, "nonet"); os.makedirs(blocker)
@@ -106,7 +106,7 @@ for c in with_rows:
     h = pg(re.sub(r"[^a-z0-9]+", "-", c.lower()).strip("-")); sec = h.split("Special districts</h2>", 1)[-1]
     srows = [r for r in rows if r["county"] == c and r["body_type"] == "special_district"]
     if not ("Special districts</h2>" in h and all(html.escape(r["taxing_body"]) in sec and f"title='{r['sha256']}'>{r['sha256'][:8]}</code>" in sec and html.escape(r["source_url"]) in sec
-            and (r["levy_component"] == "all_components_combined" or html.escape(r["levy_component"]) in sec) and f"<td style='text-align:right;white-space:nowrap'>{float(r['rate']):.4f} {r['unit']}</td>" in sec for r in srows)):
+            and (r["levy_component"] == "all_components_combined" or html.escape(site_chrome.label(r["levy_component"])) in sec) and f"<td class=num>{float(r['rate']):.4f} {r['unit']}</td>" in sec for r in srows)):
         FAIL.append(f"AC7 {c}")
 ok(not [f for f in FAIL if f.startswith("AC7")], f"AC7 {len(with_rows)} county pages carry a Special districts section with name, levy, rate, source link and sha256")
 
@@ -120,7 +120,7 @@ ok(len(cf) == 1 and cf[0]["taxing_body"] == "Central Florida Tourism Oversight D
    and cf[0]["rate"] == "12.4236" and cf[0]["sha256"] == CFTOD_SHA and "Formerly Reedy Creek" in cf[0]["note"] and "contentFileID=416847" in cf[0]["source_url"],
    "AC9 CFTOD JSON row golden")
 ok(any("<td>Central Florida Tourism Oversight District<br>" in tr and re.findall(r"<td>([^<]*)</td>", tr)[0] == "(operating + debt, combined)"
-   and "<td style='text-align:right;white-space:nowrap'>12.4236 mills</td>" in tr for tr in oh.split("<tr>")) and "Formerly Reedy Creek" in oh
+   and "<td class=num>12.4236 mills</td>" in tr for tr in oh.split("<tr>")) and "Formerly Reedy Creek" in oh
    and "contentFileID=416847" in oh and f"title='{CFTOD_SHA}'" in oh, "AC9 CFTOD on the Orange page")
 ch = [r for r in js("alachua") if r["taxing_body"] == "Children's Trust of Alachua County"]
 ok(len(ch) == 1 and ch[0]["rate"] == "0.4500" and ch[0]["sha256"].startswith("6f6d8dfb") and ch[0]["sha256"].endswith("0861")
@@ -203,7 +203,7 @@ ok("every code 70 city total reconciles" in raw["fl-cftod-special_district"] and
 NOTES = {"fl-sjrwmd-special_district": "Rate as printed in the county's 2025 final millage table.",
          "fl-sfwmd-special_district": "Shown as one combined rate. Orange County's authority list prints it in three parts: 0.0948 + 0.1026 + 0.0327 = 0.2301.",
          "fl-cftod-special_district": "Formerly Reedy Creek Improvement District. Independent special district. Printed as one combined operating and debt rate, levied only in mill code 70 (Bay Lake, Lake Buena Vista and unincorporated Reedy Creek)."}
-ok(all(r["note"] == NOTES[r["body_id"]] and f"<small style='color:#666;font-size:0.85em'>{html.escape(NOTES[r['body_id']])}</small>" in oh for r in now_or if r["body_id"] in NOTES)
+ok(all(r["note"] == NOTES[r["body_id"]] and f"<small class=muted>{html.escape(NOTES[r['body_id']])}</small>" in oh for r in now_or if r["body_id"] in NOTES)
    and sum(r["body_id"] in NOTES for r in now_or) == 3, "Orange district notes match the writing pass in JSON and on the page")
 raw_notes = {(r["county"], r["body_id"], r["levy_component"]): None for r in csv.DictReader(open(sources.SD_FILE))}
 raw_notes.update({(r["county"], r["body_id"], r["levy_component"]): r["note"] or None for r in csv.DictReader(open(sources.ALT_FILE)) if r["body_type"] == "special_district"})

@@ -101,5 +101,15 @@ def coverage(rows, state="FL", year="2025"):
             "no_rows": [c for c in checked if c not in with_rows], "not_yet_sourced": open_, "counties_with_rows": with_rows}
 
 
+def data_updated(rows):
+    """Footer date: the latest retrieved_at across all published rows (from the data, not the build clock), as an
+    America/New_York date, plus the source_url of that retrieval (ties broken by URL)."""
+    import datetime
+    from zoneinfo import ZoneInfo
+    latest = max(r["retrieved_at"] for r in rows)
+    url = min(r["source_url"] for r in rows if r["retrieved_at"] == latest)
+    return datetime.datetime.fromisoformat(latest).astimezone(ZoneInfo("America/New_York")).date(), url
+
+
 def coverage_sentence(cov):
     return f"{cov['checked']} of {cov['total']} Florida counties checked against official sources; {cov['with_rows']} have special-district rows."
