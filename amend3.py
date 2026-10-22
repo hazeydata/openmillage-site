@@ -5,6 +5,8 @@ source link; checks below fail the build (exit 1) instead of writing a page that
 Deterministic: no clock reads, sorted inputs, fixed formatting. The slug is the single config value "slug"."""
 import csv, datetime, html, json, os, re, sys
 from zoneinfo import ZoneInfo
+import sources
+import site_chrome as sc
 from analytics import GOATCOUNTER_TAG
 
 CFG = json.load(open(os.environ.get("AMEND3_CONFIG", "amend3_config.json")))
@@ -89,7 +91,8 @@ FOOT = footnotes(CFG["footnotes_md"])
 
 def link(u, text="source"): return f"<a href='{E(u)}'>{E(text)}</a>"
 
-def render_amend3(rows, districts, ballot, counties):
+def render_amend3(rows, districts, ballot, counties, sd_counties=None):
+    if sd_counties is None: sd_counties = sources.coverage(sources.load_rows())["counties_with_rows"]
     names = [c for c, _ in counties]
     have = {r["county"] for r in rows}
     covered = [c for c in names if c in have]; missing = [c for c in names if c not in have]
@@ -102,21 +105,28 @@ def render_amend3(rows, districts, ballot, counties):
     asof_src = next(r["source_url"] for r in sorted(allrows, key=lambda r: (r["retrieved_at"], r["source_url"])) if r["retrieved_at"] == asof)
     county_src = CFG["counties_source"]; ed = datetime.date.fromisoformat(ballot["election_date"])
     group = lambda c: sorted([r for r in rows if r["county"] == c], key=lambda r: ({"county": 0, "school_district": 1}.get(r["body_type"], 2), r["taxing_body"], r["levy_component"], r["levy_scope"]))
-    def tr(r): return (f"<tr><td>{E(r['taxing_body'])}</td><td>{E(r['body_type'])}</td><td>{E(r['levy_component'])} ({E(r['levy_scope'])})</td>"
-                       f"<td class=rate data-body-id='{E(r['body_id'])}' data-levy='{E(r['levy_component'])}|{E(r['levy_scope'])}'>{E(r['rate'])} {E(r['unit'])} {link(r['source_url'])}</td></tr>")
-    hdr = "<tr><th>Taxing body</th><th>Type</th><th>Levy</th><th>Adopted rate</th></tr>"
-    sections = []
+    nm = lambda r: E(sc.display_name(r['taxing_body']))
+    def tr(r): return (f"<tr><td>{nm(r)}</td><td>{E(sc.label(r['body_type']))}</td><td>{E(sc.label(r['levy_component']))} ({E(sc.label(r['levy_scope']))})</td>"
+                       f"<td class='rate num' data-body-id='{E(r['body_id'])}' data-levy='{E(r['levy_component'])}|{E(r['levy_scope'])}'>{E(r['rate'])} {E(r['unit'])} "
+                       f"<a href='{E(r['source_url'])}' aria-label='Source for {nm(r)}'>source</a></td></tr>")
+    def table(cap, trs):
+        return sc.tablewrap(cap, f"<table><caption>{E(cap)}</caption><thead><tr><th scope=col>Taxing body</th><th scope=col>Type</th><th scope=col>Levy</th>"
+                                 f"<th scope=col class=num>Adopted rate</th></tr></thead><tbody>{trs}</tbody></table>")
+    sections, slugs = [], []
     for c in names + sorted(have - set(names)):
         rs = group(c)
         if not rs: continue
         ds = sorted([r for r in districts if r["county"] == c], key=lambda r: (r["taxing_body"], r["levy_component"]))
-        det = (f"<details><summary>Special districts in {E(c)}</summary><table>{hdr}{''.join(tr(r) for r in ds)}</table></details>" if ds else "")
+        det = (f"<details><summary>Special districts in {E(c)}</summary>{table('Special districts in ' + c, ''.join(tr(r) for r in ds))}</details>" if ds else "")
         fn = ""
         if ds and c in CFG["footnote_citations"]:
             fc = CFG["footnote_citations"][c]
             fn = (f"<p class=footnote>Note {fc['n']}: &ldquo;{E(FOOT[fc['n']])}&rdquo; Source: "
                   + "; ".join(f"{link(SRC[f]['url'], 'DOR 2025 TACD (' + SRC[f]['county'] + ')')}, {E(where)}" for f, where in fc["cites"]) + ".</p>")
-        sections.append(f"<section id='{E(re.sub(r'[^a-z0-9]+', '-', c.lower()).strip('-'))}'><h3>{E(c)}</h3><table>{hdr}{''.join(tr(r) for r in rs)}</table>{det}{fn}</section>")
+        sid = E(re.sub(r'[^a-z0-9]+', '-', c.lower()).strip('-')); slugs.append((sid, c))
+        sections.append(f"<section id='{sid}'><h3>{E(c)}</h3>{table('Adopted rates in ' + c, ''.join(tr(r) for r in rs))}{det}{fn}<a class=top href='#main'>Back to top</a></section>")
+    jump = "<nav aria-label=\"Jump to county\" class=jump><ul>" + "".join(f"<li><a href='#{sid}'>{E(c)}</a></li>" for sid, c in slugs) + "</ul></nav>"
+    n_sd = len(sd_counties); others = sorted(set(sd_counties) - set(sd_have))
     md = CFG["millage_definition"]; api = f"api/v1/fl/2025/{SLUG.split('/')[-1]}-baseline"
     srcs = sorted({(r["source_agency"], r["source_url"]) for r in allrows})
     body = (
@@ -128,18 +138,19 @@ def render_amend3(rows, districts, ballot, counties):
       f"<p>These are 2025 adopted rates. As of {asof_et.strftime('%B')} {asof_et.day}, {asof_et.year}, {asof_et.strftime('%H:%M')} ET (latest retrieval of a source file, {link(asof_src)}).</p>"
       f"<p>Coverage: {len(covered)} of {len(names)} counties ({link(county_src['url'], 'county list: ' + county_src['agency'])}; rates: {link(srcs[0][1], 'Florida Department of Revenue')}).</p>"
       + (f"<p>Not yet collected: {', '.join(E(c) for c in missing)}.</p>" if missing else "")
-      + f"<p>Special districts: {len(sd_have)} of {len(names)} counties have special-district rows, read from each county's 2025 TACD file ({link(CFG['tacd_index']['url'], 'Florida Department of Revenue TACD index')}): "
+      + f"<p>Special districts: {n_sd} of {len(names)} Florida counties have special-district rows. This page lists the {len(sd_have)} read from each county's 2025 TACD file ({link(CFG['tacd_index']['url'], 'Florida Department of Revenue TACD index')}): "
       + ", ".join(f"{E(c)} ({link(sd_file[c], 'TACD')})" for c in sd_have)
-      + (f"; not yet collected for: {', '.join(E(c) for c in sd_missing)}" if sd_missing else "") + ".</p>"
+      + (f"; not yet collected for: {', '.join(E(c) for c in sd_missing)}" if sd_missing else "") + "."
+      + (f" The other {n_sd - len(sd_have)} ({' and '.join(E(c) for c in others)}) come from county property appraisers; see their county pages." if others else "") + "</p>"
       + f"<p>Rows shown: {nt['county']} county, {nt['school_district']} school district, {nt['municipality']} municipal and {len(districts)} special-district rates ({link(srcs[0][1], 'Florida Department of Revenue')}).</p>"
-      + "".join(sections)
+      + jump + "".join(sections)
       + f"<p>Rows shown on this page: <a href='{PATH}/{api}.csv'>CSV</a> · <a href='{PATH}/{api}.json'>JSON</a>.</p>"
       f"<h2>Questions</h2><dl><dt>What is millage?</dt><dd>{E(md['agency'])}: <q>{E(md['text'])}</q> {link(md['url'])}</dd>"
       f"<dt>Where do these rates come from?</dt><dd>Each value on this page links to the official document it was read from.</dd></dl>")
     title = ballot["title"]
     page = (f"<!doctype html><html lang=en><head><meta charset=utf-8><title>{E(title)}: Florida 2025 adopted millage baseline</title>"
-            f"<link rel=canonical href='{BASE}/{SLUG}/'><meta name=viewport content='width=device-width'>{GOATCOUNTER_TAG}</head>"
-            f"<body><h1>{E(title)}</h1>{body}<footer><p><a href='{PATH}/llms.txt'>llms.txt</a> · <a href='{PATH}/'>All counties</a></p></footer></body></html>\n")
+            f"<link rel=canonical href='{BASE}/{SLUG}/'>{sc.head_extra(PATH)}{GOATCOUNTER_TAG}</head>"
+            f"{sc.body(PATH, E(title), body, 'amend', SLUG)}</html>\n")
     return page, allrows
 
 BLOCK = re.compile(r"<(tr|p|li|dd|dt|h1|h2|h3|summary|caption|title)\b[^>]*>(.*?)</\1>", re.S)  # a table row is one block: its rate cell carries the link
@@ -170,7 +181,7 @@ def main():
         fact_gate(districts, CFG["district_fact_csv"])
         counties = [(r["name"].removesuffix(" County"), r["geoid"]) for r in csv.DictReader(open(CFG["counties_csv"]))]
         if len(counties) != 67: raise BuildError(f"county list has {len(counties)} rows, expected 67")
-        page, shown = render_amend3(rows, districts, ballot, counties)
+        page, shown = render_amend3(rows, districts, ballot, counties, sources.coverage(sources.load_rows())["counties_with_rows"])
         errs = check(page)
         if errs: raise BuildError("page checks failed:\n  " + "\n  ".join(errs))
     except BuildError as e:
@@ -188,7 +199,9 @@ def main():
         s = open(sm).read(); lm = (re.findall(r"<lastmod>([^<]+)</lastmod>", s) or [""])[0]
         open(sm, "w").write(s.replace("</urlset>", f"<url><loc>{url}</loc>" + (f"<lastmod>{lm}</lastmod>" if lm else "") + "</url></urlset>"))
     lt = f"{OUT}/llms.txt"; line = f"- Florida 2025 adopted millage baseline for the 2026 ballot measure numbered 3: {url}\n"
-    if os.path.exists(lt) and line not in open(lt).read(): open(lt, "a").write(line)
+    if os.path.exists(lt) and line not in open(lt).read():
+        txt = open(lt).read()
+        open(lt, "w").write(txt[:-len(sc.FEEDBACK)] + line + sc.FEEDBACK if txt.endswith(sc.FEEDBACK) else txt + line)
     print(f"amend3: wrote {SLUG}/index.html ({len(shown)} rows)"); return 0
 
 if __name__ == "__main__": sys.exit(main())

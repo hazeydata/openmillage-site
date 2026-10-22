@@ -17,7 +17,8 @@ page, shown = A.render_amend3(rows, dist, A.load_ballot(bj), counties)
 
 # R3: template never names the measure itself
 ok(not re.search(r"amendment\s*3", open("amend3.py").read(), re.I), "template contains no literal 'Amendment 3'")
-ok("Amendment 3" not in page, "rendered page contains no 'Amendment 3'")
+strip_chrome = lambda h: re.sub(r"<header>.*?</header>", "", h, flags=re.S)  # site nav legitimately links "Amendment 3"
+ok("Amendment 3" not in strip_chrome(page), "rendered page contains no 'Amendment 3' outside the site header")
 # AC1 sourcing check passes, and a planted unsourced number fails
 ok(A.check(page) == [], "AC1/5/6 checks pass on the rendered page: %s" % A.check(page)[:3])
 ok(any("without source link" in e for e in A.check(page.replace("</footer>", "<p>Total 42 mills</p></footer>"))), "AC1 unsourced number is caught")
@@ -31,7 +32,7 @@ for bad, why in ((None, "missing file"), ({**FIX, "title": "Ballot Number: 3"}, 
 ok("<h1>FIXTURE MEASURE TITLE</h1>" in page and ">Ballot Number 3</a>" in page and "Ballot Number 3</h1>" not in page, "heading = title, ballot number only as label")
 ok("&ldquo;" + html.escape(FIX["ballot_summary"], quote=True) + "&rdquo;" in page, "AC2 summary rendered verbatim in quotes")
 # AC3 table values equal CSV
-cells = re.findall(r"<td class=rate data-body-id='([^']*)' data-levy='([^']*)'>([^ ]+) ([a-z]+) <a href='([^']+)'", page)
+cells = re.findall(r"<td class='rate num' data-body-id='([^']*)' data-levy='([^']*)'>([^ ]+) ([a-z]+) <a href='([^']+)'", page)
 src = {(r["body_id"], html.escape(r["levy_component"] + "|" + r["levy_scope"], quote=True), r["county"]): r for r in shown}
 mism = sum(1 for b, l, v, u, s in cells if not any(k[0] == b and k[1] == l and r["rate"] == v and r["unit"] == u and html.escape(r["source_url"], quote=True) == s for k, r in src.items()))
 ok(len(cells) == len(shown) and mism == 0, f"AC3 {len(cells)} table values vs {len(shown)} CSV rows, {mism} mismatches")
@@ -84,7 +85,7 @@ if r.returncode == 0:
     rp = open(os.path.join(rd, A.SLUG, "index.html")).read()
     ok(f"<h1>{html.escape(real['title'], quote=True)}</h1>" in rp and f">Ballot Number {real['ballot_number']}</a>" in rp, "AC2 real page: heading = verbatim title, ballot number as label")
     ok("&ldquo;" + html.escape(real["ballot_summary"], quote=True) + "&rdquo;" in rp, "AC2 real page: verbatim summary in quotes with link")
-    ok(A.check(rp) == [] and "Coverage: 67 of 67 counties" in rp and "Amendment 3" not in rp, "real page passes AC1/5/6 checks, 67 of 67, no 'Amendment 3'")
+    ok(A.check(rp) == [] and "Coverage: 67 of 67 counties" in rp and "Amendment 3" not in strip_chrome(rp), "real page passes AC1/5/6 checks, 67 of 67, no 'Amendment 3'")
 # mutant killers (Test, 2026-10-20)
 fcsv = os.path.join(tmp, "kinds.csv")
 with open(A.CFG["rates_csv"]) as f: hdr_line = f.readline()
@@ -92,7 +93,7 @@ open(fcsv, "w").write(hdr_line + ",".join(["FL", "2025", "Testcounty", "X", "cou
 ok(A.rows_from(fcsv) == [], "M:32 rate_kind filter drops aggregate_effective rows")
 ok(all(r["rate_kind"] == "adopted" for r in shown) and "aggregate_effective" not in page, "M:32 page shows adopted rows only")
 det = "".join(re.findall(r"<details>.*?</details>", page, re.S))
-ok(len(dist) > 0 and len(re.findall(r"<td class=rate", det)) == len(dist), f"M:54 all {len(dist)} special-district rows rendered inside collapsed <details>")
+ok(len(dist) > 0 and len(re.findall(r"<td class='rate num'", det)) == len(dist), f"M:54 all {len(dist)} special-district rows rendered inside collapsed <details>")
 faq4 = page.replace("</dl>", "<dt>a</dt><dd>b</dd><dt>c</dt><dd>d</dd></dl>")
 ok(any("FAQ" in e for e in A.check(faq4)), "M:93 a 4th FAQ item fails the check")
 ok("<p>&ldquo;" + html.escape(FIX["title"], quote=True) + "&rdquo;</p>" in page, "M:61 title wrapped in opening and closing quote marks")
@@ -180,7 +181,9 @@ ok(Dd(nums[0]) == Dd(bro[0]["rate"]) and [Dd(x) for x in nums[1:4]] == [comps["o
 # AC4b special-district coverage, computed, missing named
 sdc = [c for c, _ in counties if any(r["county"] == c for r in dist)]; sdm = [c for c, _ in counties if c not in sdc]
 line = re.search(r"<p>Special districts: .*?</p>", page).group(0)
-ok(f"Special districts: {len(sdc)} of 67 counties" in line and all(html.escape(c) in line for c in sdm), f"AC4b special districts {len(sdc)} of 67, {len(sdm)} missing named")
+import sources
+nsd = sources.coverage(sources.load_rows())["with_rows"]
+ok(f"Special districts: {nsd} of 67 Florida counties have special-district rows. This page lists the {len(sdc)} read from" in line and all(html.escape(c) in line for c in sdm), f"AC4b special districts {len(sdc)} of 67, {len(sdm)} missing named")
 ok(len(sdc) == len({r["county"] for r in dist} & {c for c, _ in counties}), f"AC4b count equals counties with special-district rows ({len(sdc)})")
 ok(html.escape(A.CFG["tacd_index"]["url"], quote=True) in line, "AC4b count links the DOR TACD index")
 tl = dict(re.findall(r"([A-Z][A-Za-z.\- ]+?) \(<a href='([^']+)'>TACD</a>\)", line))

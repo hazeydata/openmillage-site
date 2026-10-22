@@ -1,3 +1,4 @@
 User-agent: *
 Allow: /
+# Optional feedback from AI agents: see /openmillage-site/llms.txt (Feedback welcome)
 Sitemap: https://hazeydata.github.io/openmillage-site/sitemap.xml

@@ -1,7 +1,7 @@
 name: build-site
 on:
   push:
-    paths: [build.py, amend3.py, amend3_config.json, "tests/**", "data/**", .github/workflows/build.yml]
+    paths: [build.py, amend3.py, site_chrome.py, sources.py, amend3_config.json, "tests/**", "data/**", .github/workflows/build.yml]
   workflow_dispatch:
 permissions:
   contents: write
@@ -15,6 +15,8 @@ jobs:
       - run: python3 tests/test_amend3.py
       - run: python3 tests/test_special.py
       - run: python3 tests/test_analytics.py
+      - run: python3 tests/test_design.py
+      - run: python3 tests/test_source_lead.py
       - run: |
           git config user.name "openmillage-build"
           git config user.email "actions@users.noreply.github.com"
