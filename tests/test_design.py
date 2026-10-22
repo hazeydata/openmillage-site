@@ -135,7 +135,7 @@ for cty, rs in sorted(_by.items()):
     want = [g for g in ("County", "School", "Municipalities") if any(GROUP_OF[r["body_type"]] == g for r in rs)]
     heads = re.findall(r"<h2(?: id=[^>]*)?>([^<]+)</h2>", h)
     got = [x for x in heads if x in GROUP_OF.values()]
-    exp = want + (["Special districts"] if "<h2>Special districts</h2>" in h else [])
+    exp = want + (["Special districts"] if "<h2 id=special-districts>Special districts</h2>" in h else [])
     if got != exp: gbad.append((cty, got, exp)); continue
     # every row sits under its own group's heading, and each group's table holds exactly that group's rows
     parts = re.split(r"<h2(?: id=[^>]*)?>([^<]+)</h2>", h)
@@ -188,7 +188,7 @@ ok("aria-label=Breadcrumb" not in idx, "home has no breadcrumbs (it is the root)
 from zoneinfo import ZoneInfo
 _lat = max(r["retrieved_at"] for r in rows); _d = datetime.datetime.fromisoformat(_lat).astimezone(ZoneInfo("America/New_York")).date()
 _u = min(r["source_url"] for r in rows if r["retrieved_at"] == _lat)
-upd = f"<footer><p>Data updated <time datetime={_d.isoformat()}>{_d.strftime('%B')} {_d.day}, {_d.year}</time> (latest source retrieval, <a href='{html.escape(_u)}'>source</a>).</p>"
+upd = f"<footer><p>Site data updated <time datetime={_d.isoformat()}>{_d.strftime('%B')} {_d.day}, {_d.year}</time> (latest source retrieval across all pages, <a href='{html.escape(_u)}'>source</a>).</p>"
 ftbad = [p for p in pages if upd not in rd(p)]
 ok(not ftbad, f"every page footer says 'Data updated {_d}' from the latest retrieved_at in data/, linked to that source; failing {ftbad[:3]}")
 ok("date.today" not in rd("site_chrome.py") and "data_updated(rows)" in rd("build.py"), "footer date is not the build clock")
@@ -196,4 +196,47 @@ ok("date.today" not in rd("site_chrome.py") and "data_updated(rows)" in rd("buil
 # --- alt-county name join: 'A', 'A and B', 'A, B and C'
 ok([sc.name_list(x) for x in (["A"], ["A", "B"], ["A", "B", "C"], ["A", "B", "C", "D"])] == ["A", "A and B", "A, B and C", "A, B, C and D"], "name_list joins 3+ names as 'A, B and C'")
 ok("' and '.join" not in rd("amend3.py"), "amend3.py uses name_list, not ' and '.join")
+# --- Tobias #1: body padding is 1rem on every side (not '0 1rem')
+_body = re.findall(r"(?:^|\n|\})body\{([^}]*)\}", css)
+_pads = [d.strip() for blk in _body for d in blk.split(";") if d.strip().startswith("padding")]
+ok(_pads == ["padding:1rem"] or (len(_pads) == 1 and re.fullmatch(r"padding:(1rem)( 1rem){3}", _pads[0])), f"body padding is 1rem on all four sides: {_pads}")
+
+# --- Footer date on PERTURBED data: copy the repo to a tmp dir, move one row's retrieved_at, rebuild there, and the footer must follow
+import shutil as _sh, subprocess as _sp, tempfile as _tf, hashlib as _hl
+_tmp = _tf.mkdtemp(prefix="om-footer-")
+try:
+    _sh.copytree(ROOT, os.path.join(_tmp, "r"), ignore=_sh.ignore_patterns(".git", "docs", "__pycache__"))
+    _r = os.path.join(_tmp, "r"); _csvp = os.path.join(_r, "data/fl-2025.csv")
+    _lines = open(_csvp, encoding="utf-8").read().splitlines(keepends=True)
+    _hdr = next(csv.reader([_lines[0]])); _ri = _hdr.index("retrieved_at"); _si = _hdr.index("source_url")
+    _row = next(csv.reader([_lines[1]]))
+    _new = "2026-11-05T03:30:00+00:00"   # 23:30 ET on November 4: also checks the ET conversion
+    _old = _row[_ri]; assert _old in _lines[1] and _old < _new
+    _lines[1] = _lines[1].replace(_old, _new, 1); open(_csvp, "w", encoding="utf-8").write("".join(_lines))
+    _lk = json.load(open(os.path.join(_r, "data/SOURCES.lock")))
+    for _f in _lk["files"]:
+        if _f["path"] == "data/fl-2025.csv": _f["sha256"] = _hl.sha256(open(_csvp, "rb").read()).hexdigest()
+    json.dump(_lk, open(os.path.join(_r, "data/SOURCES.lock"), "w"), indent=1)
+    _env = dict(os.environ, DATA_GLOB="data/*.csv")
+    _b = _sp.run([sys.executable, "build.py"], cwd=_r, env=_env, capture_output=True, text=True)
+    _a = _sp.run([sys.executable, "amend3.py"], cwd=_r, env=_env, capture_output=True, text=True)
+    ok(_b.returncode == 0 and _a.returncode == 0, f"perturbed build ok: {(_b.stderr + _a.stderr)[-300:]}")
+    _want = f"Site data updated <time datetime=2026-11-04>November 4, 2026</time> (latest source retrieval across all pages, <a href='{html.escape(_row[_si])}'>source</a>)"
+    _pp = [os.path.join(_r, "docs", x) for x in ("index.html", "fl/2025/palm-beach-county/index.html", "fl/2025/orange-county/index.html", f"{SLUG}/index.html")]
+    _miss = [x for x in _pp if not os.path.exists(x) or _want not in rd(x)]
+    ok(not _miss, f"footer follows a moved retrieved_at on perturbed data (home, Palm Beach, Orange, Amendment 3): failing {[os.path.relpath(x, _r) for x in _miss]}")
+finally:
+    _sh.rmtree(_tmp, ignore_errors=True)
+
+# --- amend3.check: the footer exemption covers only the data-computed <time>; a future year anywhere else in that paragraph, or a wrong date, is caught
+import amend3 as _A3
+_fp = re.search(r"<footer>.*?</footer>", ah, re.S).group(0)
+ok(_A3.check(ah) == [], "real Amendment 3 page passes amend3.check")
+ok(any("future-year" in e for e in _A3.check(ah.replace("(latest source retrieval across all pages,", "(latest source retrieval across all pages, through 2027,"))), "future year beside the footer date is still caught")
+_bad = re.sub(r"<time datetime=[0-9-]+>[^<]*</time>", "<time datetime=2027-01-02>January 2, 2027</time>", _fp, 1)
+ok(any("footer date" in e for e in _A3.check(ah.replace(_fp, _bad))), "a footer date that is not the data date (2027) is caught")
+ok(any("footer date" in e for e in _A3.check(ah.replace(_fp, _fp.replace("Site data updated", "Data refreshed")))), "a missing footer date is caught")
+ok(re.search(r"As of [A-Z][a-z]+ \d+, \d{4}, \d\d:\d\d ET \(latest retrieval of a source file used on this page; the footer's site data date covers every page, <a ", ah) is not None, "Amendment 3 'as of' is labelled as this page's sources, distinct from the site footer date")
+ok("Municipal rates in " in rd("docs/fl/2025/palm-beach-county/index.html") and "Municipalities rates" not in "".join(rd(p) for p in county_pages), "caption reads 'Municipal rates', never 'Municipalities rates'")
+ok(all(re.findall(r"<h2(?: id=[^ >]+)?>(County|School|Municipalities|Special districts)</h2>", rd(p)) == re.findall(r"<h2 id=[a-z-]+>(County|School|Municipalities|Special districts)</h2>", rd(p)) for p in county_pages), "every group heading, including Special districts, has an id")
 print("FAILURES", len(FAIL)); sys.exit(1 if FAIL else 0)

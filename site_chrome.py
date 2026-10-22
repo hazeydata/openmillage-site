@@ -82,7 +82,7 @@ def crumbs(PATH, trail):
     return "<nav aria-label=Breadcrumb class=crumbs>" + " &rsaquo; ".join(parts) + "</nav>"
 def footer(PATH, lead="", updated=None):
     d, u = updated
-    up = f"<p>Data updated <time datetime={d.isoformat()}>{d.strftime('%B')} {d.day}, {d.year}</time> (latest source retrieval, <a href='{html.escape(u)}'>source</a>).</p>"
+    up = f"<p>Site data updated <time datetime={d.isoformat()}>{d.strftime('%B')} {d.day}, {d.year}</time> (latest source retrieval across all pages, <a href='{html.escape(u)}'>source</a>).</p>"
     return (f"<footer>{up}<p>{lead}<a href='{PATH}/llms.txt'>llms.txt</a> · <a href='{PATH}/'>All counties</a></p>"
             "<p>Data: CC BY 4.0 (<a href='https://creativecommons.org/licenses/by/4.0/'>licence</a>). Published by Hazey Data.</p></footer>")
 def tablewrap(aria, table): return f"<div class=tablewrap tabindex=0 role=region aria-label=\"{html.escape(aria)}\">{table}</div>"

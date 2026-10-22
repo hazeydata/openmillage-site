@@ -135,7 +135,7 @@ def render_amend3(rows, districts, ballot, counties, sd_counties=None):
       f"<blockquote class=official><p>&ldquo;{E(ballot['title'])}&rdquo;</p><p>&ldquo;{E(ballot['ballot_summary'])}&rdquo;</p><p>{link(ballot['source_url'])}</p></blockquote>"
       f"<p>Election date: {ed.strftime('%B')} {ed.day}, {ed.year} ({link(CFG['election_date_source'])}).</p>"
       f"<h2>Adopted millage by county</h2>"
-      f"<p>These are 2025 adopted rates. As of {asof_et.strftime('%B')} {asof_et.day}, {asof_et.year}, {asof_et.strftime('%H:%M')} ET (latest retrieval of a source file, {link(asof_src)}).</p>"
+      f"<p>These are 2025 adopted rates. As of {asof_et.strftime('%B')} {asof_et.day}, {asof_et.year}, {asof_et.strftime('%H:%M')} ET (latest retrieval of a source file used on this page; the footer's site data date covers every page, {link(asof_src)}).</p>"
       f"<p>Coverage: {len(covered)} of {len(names)} counties ({link(county_src['url'], 'county list: ' + county_src['agency'])}; rates: {link(srcs[0][1], 'Florida Department of Revenue')}).</p>"
       + (f"<p>Not yet collected: {', '.join(E(c) for c in missing)}.</p>" if missing else "")
       + f"<p>Special districts: {n_sd} of {len(names)} Florida counties have special-district rows. This page lists the {len(sd_have)} read from each county's 2025 TACD file ({link(CFG['tacd_index']['url'], 'Florida Department of Revenue TACD index')}): "
@@ -169,7 +169,14 @@ def check(page):
     for w in CFG["advocacy_terms"]:
         if re.search(r"\b" + re.escape(w.lower()) + r"\b", plain): errs.append(f"advocacy term: {w!r}")
     if len(re.findall(r"<dt>", body)) > 3: errs.append("FAQ has more than 3 items")
-    if re.search(r"\b20(2[6-9]|[3-9]\d)\b", re.sub(r"<[^>]+>", " ", re.sub(r"<blockquote class=official>.*?</blockquote>|<table>.*?</table>|Election date:.*?</p>|As of .*?</p>|Data updated .*?</p>", " ", body, flags=re.S))):
+    # Footer date: only the <time> element itself is exempt from the future-year rule, and only when it equals the date
+    # computed from the data (sources.data_updated); any other date there, or any other text in that paragraph, is checked.
+    want = sources.data_updated(sources.load_rows())[0]
+    ft = re.findall(r"Site data updated <time datetime=([0-9-]+)>([^<]*)</time>", body)
+    if len(ft) != 1: errs.append(f"footer date: expected one 'Site data updated' <time>, found {len(ft)}")
+    elif ft[0] != (want.isoformat(), f"{want.strftime('%B')} {want.day}, {want.year}"): errs.append(f"footer date {ft[0]} is not the data date {want}")
+    body = re.sub(r"(Site data updated )<time datetime=[0-9-]+>[^<]*</time>", r"\1", body)
+    if re.search(r"\b20(2[6-9]|[3-9]\d)\b", re.sub(r"<[^>]+>", " ", re.sub(r"<blockquote class=official>.*?</blockquote>|<table>.*?</table>|Election date:.*?</p>|As of .*?</p>", " ", body, flags=re.S))):
         errs.append("future-year number outside official quote / election date / as-of date")
     return errs
 

@@ -45,7 +45,7 @@ def page(path, title, body, jsonld=None, desc="", current=None, lead="", trail=N
       f"<meta name=description content='{html.escape(desc, quote=True)}'><link rel=canonical href='{BASE}/{path[:-10] if path.endswith('index.html') else path}'>"
       f"{sc.head_extra(PATH)}{ld}{GOATCOUNTER_TAG}</head>{sc.body(PATH, html.escape(title), body, current, AMEND, lead, UPDATED, trail)}</html>")
 open(f"{OUT}/style.css", "w").write(sc.CSS)
-GROUPS = [("County", ("county",)), ("School", ("school_district",)), ("Municipalities", ("municipality",))]  # then Special districts (below)
+GROUPS = [("County", "County", ("county",)), ("School", "School", ("school_district",)), ("Municipalities", "Municipal", ("municipality",))]  # (heading, caption word, body types)  # then Special districts (below)
 COLS = [("Taxing body", 0), ("Type", 0), ("Levy", 0), ("Rate kind", 0), ("Rate", 1), ("Source", 0)]
 HEAD_LEAD = "Official rates only, each row linked to its government source. "
 def table(caption, cols, trs):
@@ -74,9 +74,9 @@ for (st, yr, co), rs in sorted(by.items()):
     p = f"{st.lower()}/{yr}/{slug(co)}-county/index.html"; urls.append(f"{BASE}/{p[:-10]}")
     base = [r for r in rs if r['body_type'] != 'special_district']; sds = [r for r in rs if r['body_type'] == 'special_district']
     groups = []
-    for gname, bts in GROUPS:
+    for gname, cap, bts in GROUPS:
         g = [r for r in base if r['body_type'] in bts]
-        if g: groups.append(f"<h2 id={slug(gname)}>{gname}</h2>" + table(f"{gname} rates in {co} County", COLS, "".join(base_tr(r) for r in g)))
+        if g: groups.append(f"<h2 id={slug(gname)}>{gname}</h2>" + table(f"{cap} rates in {co} County", COLS, "".join(base_tr(r) for r in g)))
     if co in cov['not_yet_sourced']:
         sdh = f"<p>Independent special districts: {NYS}. The official source for this county has not been checked yet; absent is not zero.</p>"
     elif co not in cov['counties']:
@@ -85,7 +85,7 @@ for (st, yr, co), rs in sorted(by.items()):
         sdh = f"<p>{NO_ROWS}</p>"
     else:
         sdh = table(f"Independent special districts in {co} County", [("Taxing body", 0), ("Levy", 0), ("Rate", 1), ("Source", 0)], "".join(sd_tr(r) for r in sds))
-    sdh = f"<h2>Special districts</h2><p class=muted>{COV}</p>{sdh}" if sdh else f"<p class=muted>{COV}</p>"
+    sdh = f"<h2 id=special-districts>Special districts</h2><p class=muted>{COV}</p>{sdh}" if sdh else f"<p class=muted>{COV}</p>"
     api = f"api/v1/{st.lower()}/{yr}/{slug(co)}.json"
     os.makedirs(os.path.dirname(f"{OUT}/{api}"), exist_ok=True); json.dump(rs, open(f"{OUT}/{api}", "w"), indent=1)
     ds = {"@context": "https://schema.org", "@type": "Dataset", "name": f"{co} County, {st} property tax millage rates {yr}",
