@@ -175,7 +175,7 @@ console.log(JSON.stringify(out));""" % (json.dumps(lis), js.group(1))
 else:
     ok(True, "node not available: filter behaviour checked statically only")
 
-# --- Tobias #7: nav (Method, API), breadcrumbs, footer 'Data updated <date>' from the data
+# --- Tobias #7: nav (Method, API), breadcrumbs, footer 'Site data updated <date>' from the data
 import site_chrome as sc
 api_href = f"{PATH}/{sc.api_page(SLUG)}"; meth_href = f"{PATH}/{sc.METHOD_PAGE}"
 ok(os.path.exists("docs/" + sc.api_page(SLUG)) and os.path.exists("docs/" + sc.METHOD_PAGE), f"Method ({sc.METHOD_PAGE}) and API ({sc.api_page(SLUG)}) targets exist in docs/")
@@ -190,7 +190,7 @@ _lat = max(r["retrieved_at"] for r in rows); _d = datetime.datetime.fromisoforma
 _u = min(r["source_url"] for r in rows if r["retrieved_at"] == _lat)
 upd = f"<footer><p>Site data updated <time datetime={_d.isoformat()}>{_d.strftime('%B')} {_d.day}, {_d.year}</time> (latest source retrieval across all pages, <a href='{html.escape(_u)}'>source</a>).</p>"
 ftbad = [p for p in pages if upd not in rd(p)]
-ok(not ftbad, f"every page footer says 'Data updated {_d}' from the latest retrieved_at in data/, linked to that source; failing {ftbad[:3]}")
+ok(not ftbad, f"every page footer says 'Site data updated {_d}' from the latest retrieved_at in data/, linked to that source; failing {ftbad[:3]}")
 ok("date.today" not in rd("site_chrome.py") and "data_updated(rows)" in rd("build.py"), "footer date is not the build clock")
 
 # --- alt-county name join: 'A', 'A and B', 'A, B and C'
