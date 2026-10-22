@@ -94,6 +94,29 @@ ok(rd("docs/robots.txt") == f"User-agent: *\nAllow: /\n# Optional feedback from 
 ok(n > 0,f"computed count of counties with special-district rows: {n}")
 ok(f"{n} have special-district rows" in idx and f"{n} have special-district rows" in llms and all(f"{n} have special-district rows" in rd(p) for p in county_pages), "count sentence on home, llms.txt and every county page")
 ok(f"Special districts: {n} of 67 Florida counties have special-district rows" in ah, "amendment page states the same count")
+# Amendment 3 sub-counts, computed from data/ independently of sources.py and amend3.py
+import csv
+def _sdc(path): return {r["county"] for r in csv.DictReader(open(path, newline="", encoding="utf-8")) if r["state"] == "FL" and r["year"] == "2025" and r["body_type"] == "special_district" and r["rate_kind"] == "adopted"}
+_tacd_c = _sdc(CFG["districts_csv"]); _alt_c = _sdc("data/special/fl-2025-alt-sources.csv") - _tacd_c
+d_n, d_tacd = len(_tacd_c | _alt_c), len(_tacd_c); d_names = " and ".join(sorted(_alt_c))
+ah_txt = html.unescape(ah)
+ok(d_n == n, f"data/ count {d_n} equals sources.coverage count {n}")
+ok(f"Special districts: {d_n} of 67 Florida counties" in ah_txt, f"amendment page states '{d_n} of 67'")
+ok(f"This page lists the {d_tacd} read from each county's 2025 TACD file" in ah_txt, f"amendment page states 'lists the {d_tacd}'")
+ok(bool(_alt_c) and f"The other {d_n - d_tacd} ({d_names}) come from county property appraisers" in ah_txt, f"amendment page states 'The other {d_n - d_tacd} ({d_names})'")
+# Renderer tracks the data: re-render the sentence from perturbed inputs (catches literals that happen to match today's data)
+import amend3
+_rows = amend3.rows_from(CFG["rates_csv"]); _dist = amend3.rows_from(CFG["districts_csv"])
+_cty = [(r["name"].removesuffix(" County"), r["geoid"]) for r in csv.DictReader(open(CFG["counties_csv"]))]
+_ballot = json.load(open(CFG["ballot_json"])); _all = sorted(_tacd_c | _alt_c)
+def _sent(dist, sdc):
+    pg = html.unescape(amend3.render_amend3(_rows, dist, _ballot, _cty, sdc)[0])
+    return pg[pg.index("Special districts: "):pg.index("</p>", pg.index("Special districts: "))]
+for _drop_alt, _drop_tacd in ((sorted(_alt_c)[:1], []), ([], sorted(_tacd_c)[:2])):
+    _d = [r for r in _dist if r["county"] not in _drop_tacd]; _sdc = [c for c in _all if c not in _drop_alt]
+    _t = _tacd_c - set(_drop_tacd); _o = sorted(set(_sdc) - _t); _s = _sent(_d, _sdc)
+    ok(f"Special districts: {len(_sdc)} of 67 " in _s and f"lists the {len(_t)} read" in _s and ((f"The other {len(_o)} ({' and '.join(_o)}) come" in _s) if _o else "The other" not in _s),
+       f"perturbed inputs (drop alt {_drop_alt}, drop TACD {_drop_tacd}) render {len(_sdc)} of 67 / lists the {len(_t)} / The other {len(_o)}: {_s[-160:]!r}")
 found = set()
 for p in pages + ["docs/llms.txt"]:
     found |= set(re.findall(r"(\d+) (?:of 67 Florida counties have|have) special-district rows", rd(p)))
