@@ -141,7 +141,7 @@ def render_amend3(rows, districts, ballot, counties, sd_counties=None):
       + f"<p>Special districts: {n_sd} of {len(names)} Florida counties have special-district rows. This page lists the {len(sd_have)} read from each county's 2025 TACD file ({link(CFG['tacd_index']['url'], 'Florida Department of Revenue TACD index')}): "
       + ", ".join(f"{E(c)} ({link(sd_file[c], 'TACD')})" for c in sd_have)
       + (f"; not yet collected for: {', '.join(E(c) for c in sd_missing)}" if sd_missing else "") + "."
-      + (f" The other {n_sd - len(sd_have)} ({' and '.join(E(c) for c in others)}) come from county property appraisers; see their county pages." if others else "") + "</p>"
+      + (f" The other {n_sd - len(sd_have)} ({sc.name_list(E(c) for c in others)}) come from county property appraisers; see their county pages." if others else "") + "</p>"
       + f"<p>Rows shown: {nt['county']} county, {nt['school_district']} school district, {nt['municipality']} municipal and {len(districts)} special-district rates ({link(srcs[0][1], 'Florida Department of Revenue')}).</p>"
       + jump + "".join(sections)
       + f"<p>Rows shown on this page: <a href='{PATH}/{api}.csv'>CSV</a> · <a href='{PATH}/{api}.json'>JSON</a>.</p>"
@@ -150,7 +150,7 @@ def render_amend3(rows, districts, ballot, counties, sd_counties=None):
     title = ballot["title"]
     page = (f"<!doctype html><html lang=en><head><meta charset=utf-8><title>{E(title)}: Florida 2025 adopted millage baseline</title>"
             f"<link rel=canonical href='{BASE}/{SLUG}/'>{sc.head_extra(PATH)}{GOATCOUNTER_TAG}</head>"
-            f"{sc.body(PATH, E(title), body, 'amend', SLUG)}</html>\n")
+            f"{sc.body(PATH, E(title), body, 'amend', SLUG, '', sources.data_updated(sources.load_rows()), [('2025 adopted millage baseline', None)])}</html>\n")
     return page, allrows
 
 BLOCK = re.compile(r"<(tr|p|li|dd|dt|h1|h2|h3|summary|caption|title)\b[^>]*>(.*?)</\1>", re.S)  # a table row is one block: its rate cell carries the link
@@ -169,7 +169,7 @@ def check(page):
     for w in CFG["advocacy_terms"]:
         if re.search(r"\b" + re.escape(w.lower()) + r"\b", plain): errs.append(f"advocacy term: {w!r}")
     if len(re.findall(r"<dt>", body)) > 3: errs.append("FAQ has more than 3 items")
-    if re.search(r"\b20(2[6-9]|[3-9]\d)\b", re.sub(r"<[^>]+>", " ", re.sub(r"<blockquote class=official>.*?</blockquote>|<table>.*?</table>|Election date:.*?</p>|As of .*?</p>", " ", body, flags=re.S))):
+    if re.search(r"\b20(2[6-9]|[3-9]\d)\b", re.sub(r"<[^>]+>", " ", re.sub(r"<blockquote class=official>.*?</blockquote>|<table>.*?</table>|Election date:.*?</p>|As of .*?</p>|Data updated .*?</p>", " ", body, flags=re.S))):
         errs.append("future-year number outside official quote / election date / as-of date")
     return errs
 
