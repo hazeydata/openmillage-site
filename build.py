@@ -5,9 +5,27 @@ from analytics import GOATCOUNTER_TAG
 from sources import COMBINED, load_rows, coverage, coverage_sentence, EXTRA_KEYS
 BASE = os.environ.get("SITE_BASE", "https://hazeydata.github.io/openmillage-site").rstrip("/")
 PATH = "/" + BASE.split("/", 3)[3] if BASE.count("/") > 2 else ""
-OUT = "docs"; os.makedirs(OUT, exist_ok=True)
+OUT = "docs"
 slug = lambda s: re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")
 rows = load_rows()
+def source_type(agency):
+    """Map a row's source_agency to the short type named in the homepage lead. Unknown agencies fail the build."""
+    for pat, name in ((r"^Florida Department of Revenue", "Florida DOR"), (r"^Florida Office of Economic & Demographic Research", "EDR"),
+                      (r"County Property Appraiser", "county property appraisers")):
+        if re.search(pat, agency): return name
+    raise SystemExit(f"build.py: unmapped source_agency for homepage lead: {agency!r}")
+def extra_name(agency):
+    m = re.match(r"^(.+? County) Board of County Commissioners \(Resolution", agency)
+    if m: return f"{m.group(1)} BOCC resolution"
+    raise SystemExit(f"build.py: unmapped additional source_agency for homepage lead: {agency!r}")
+def name_list(xs): return xs[0] if len(xs) == 1 else ", ".join(xs[:-1]) + " and " + xs[-1]
+def source_lead(rows):
+    order = ["Florida DOR", "EDR", "county property appraisers"]
+    prim = sorted({source_type(r["source_agency"]) for r in rows}, key=lambda t: (order.index(t) if t in order else len(order), t))
+    extra = sorted({extra_name(a["source_agency"]) for r in rows for a in r.get("additional_sources") or []})
+    return "from " + name_list(prim) + (f" (additional source{'s' if len(extra) > 1 else ''}: {name_list(extra)})" if extra else "")
+LEAD_SRC = source_lead(rows)  # validates every source before anything is written to docs/
+os.makedirs(OUT, exist_ok=True)
 cov = coverage(rows); COV = html.escape(coverage_sentence(cov))
 NO_ROWS = "No special-district rows published yet for this county."
 NYS = "not yet sourced"
@@ -21,19 +39,6 @@ def page(path, title, body, jsonld=None, desc=""):
       f"<meta name=description content='{html.escape(desc, quote=True)}'><link rel=canonical href='{BASE}/{path[:-10] if path.endswith('index.html') else path}'>"
       f"<meta name=viewport content='width=device-width'>{ld}{GOATCOUNTER_TAG}</head><body><h1>{html.escape(title)}</h1>{body}"
       f"<footer><p>Official rates only, each row linked to its government source. <a href='{PATH}/llms.txt'>llms.txt</a> · <a href='{PATH}/'>All counties</a></p></footer></body></html>")
-def source_type(agency):
-    """Map a row's source_agency to the short type named in the homepage lead. Unknown agencies fail the build."""
-    for pat, name in ((r"^Florida Department of Revenue", "Florida DOR"), (r"^Florida Office of Economic & Demographic Research", "EDR"),
-                      (r"County Property Appraiser", "county property appraisers"), (r"County Board of County Commissioners", "county commissions")):
-        if re.search(pat, agency): return name
-    raise SystemExit(f"build.py: unmapped source_agency for homepage lead: {agency!r}")
-def name_list(xs): return xs[0] if len(xs) == 1 else ", ".join(xs[:-1]) + " and " + xs[-1]
-def source_lead(rows):
-    order = ["Florida DOR", "EDR", "county property appraisers", "county commissions"]
-    key = lambda t: (order.index(t) if t in order else len(order), t)
-    prim = sorted({source_type(r["source_agency"]) for r in rows}, key=key)
-    extra = sorted({source_type(a["source_agency"]) for r in rows for a in r.get("additional_sources") or []} - set(prim), key=key)
-    return "from " + name_list(prim) + (f" (additional sources: {name_list(extra)})" if extra else "")
 MUTED = "style='color:#666;font-size:0.85em'"
 def sd_levy(r): return f"({COMBINED[r['levy_component']]})" if r['levy_component'] in COMBINED else r['levy_component']
 def sd_tr(r):
@@ -69,7 +74,7 @@ for (st, yr, co), rs in sorted(by.items()):
          f"<table><tr><th>Taxing body</th><th>Type</th><th>Levy</th><th>Rate kind</th><th>Rate</th><th>Source</th></tr>{trs}</table>{note}{sdh}{meta}<p>JSON: <a href='{PATH}/{api}'>{api}</a></p>", ds,
          f"Official {yr} property tax millage rates for {len(rs)} levies in {co} County, {st}, each linked to its government source. Retrieved {ret}.")
     links.append(f"<li><a href='{PATH}/{p[:-10]}'>{html.escape(co)} County, {st}</a> ({len(rs)} rates)</li>")
-page("index.html", "Florida property tax millage rates 2025, each linked to its official source", f"<p>{len(rows)} official rates {html.escape(source_lead(rows))}, retrieved {max(r['retrieved_at'] for r in rows)[:10]} (UTC). {sum(r['rate_kind']=='aggregate_effective' for r in rows)} rows are aggregate_effective (DOR less-than-countywide totals), not adopted rates. {sum(r['body_type']=='special_district' for r in rows)} rows are independent special districts.</p><p>{COV}</p><p>Independent special districts {NYS} (absent is not zero): {html.escape(', '.join(cov['not_yet_sourced']))}.</p><ul>{''.join(links)}</ul>",
+page("index.html", "Florida property tax millage rates 2025, each linked to its official source", f"<p>{len(rows)} official rates {html.escape(LEAD_SRC)}, retrieved {max(r['retrieved_at'] for r in rows)[:10]} (UTC). {sum(r['rate_kind']=='aggregate_effective' for r in rows)} rows are aggregate_effective (DOR less-than-countywide totals), not adopted rates. {sum(r['body_type']=='special_district' for r in rows)} rows are independent special districts.</p><p>{COV}</p><p>Independent special districts {NYS} (absent is not zero): {html.escape(', '.join(cov['not_yet_sourced']))}.</p><ul>{''.join(links)}</ul>",
      {"@context": "https://schema.org", "@type": "Dataset", "name": "OpenMillage", "description": f"Official property tax millage rates for counties, school districts, municipalities and independent special districts where sourced, with source links and file hashes. {coverage_sentence(cov)} Absent is not zero: a body with no row is not yet sourced.",
       "license": "https://creativecommons.org/licenses/by/4.0/", "creator": {"@type": "Organization", "name": "Hazey Data"}, "url": BASE + "/"},
      f"Official Florida 2025 property tax millage rates for counties, school districts, municipalities and independent special districts where sourced, each with its government source link and file hash. {coverage_sentence(cov)} Absent is not zero.")
