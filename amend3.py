@@ -10,7 +10,7 @@ import site_chrome as sc
 from analytics import GOATCOUNTER_TAG
 
 CFG = json.load(open(os.environ.get("AMEND3_CONFIG", "amend3_config.json")))
-BASE = os.environ.get("SITE_BASE", "https://hazeydata.github.io/openmillage-site").rstrip("/")
+BASE = os.environ.get("SITE_BASE", "https://openmillage.com").rstrip("/")
 PATH = "/" + BASE.split("/", 3)[3] if BASE.count("/") > 2 else ""
 OUT = os.environ.get("OUT", "docs"); SLUG = CFG["slug"].strip("/")
 E = lambda s: html.escape(str(s), quote=True)
