@@ -3,7 +3,7 @@
 import json, os, re, html, datetime
 from analytics import GOATCOUNTER_TAG
 import site_chrome as sc
-from sources import COMBINED, load_rows, data_updated, coverage, coverage_sentence, EXTRA_KEYS
+from sources import plural, COMBINED, load_rows, data_updated, coverage, coverage_sentence, EXTRA_KEYS
 BASE = os.environ.get("SITE_BASE", "https://openmillage.com").rstrip("/")
 PATH = "/" + BASE.split("/", 3)[3] if BASE.count("/") > 2 else ""
 OUT = "docs"
@@ -35,6 +35,8 @@ os.makedirs(OUT, exist_ok=True)
 cov = coverage(rows); COV = html.escape(coverage_sentence(cov))
 NO_ROWS = "No special-district rows published yet for this county."
 NYS = "not yet sourced"
+# Dated correction of earlier published copy (historical numbers, intentionally literal; exempt from the no-literal-count test).
+CORRECTION = "Correction, Oct 23, 2026: we earlier said 165 special districts across 45 counties. The numbers above match the baseline CSV."
 by = {}
 for r in rows: by.setdefault((r["state"], r["year"], r["county"]), []).append(r)
 urls = [BASE + "/"]
@@ -99,12 +101,12 @@ for (st, yr, co), rs in sorted(by.items()):
     page(p, f"{co} County, {st} property tax rates ({yr})",
          note + "".join(groups)
          + f"{sdh}{meta}<p>JSON: <a href='{PATH}/{api}'>{api}</a></p>", ds,
-         f"Official {yr} property tax millage rates for {len(rs)} levies in {co} County, {st}, each linked to its government source. Retrieved {ret}.", lead=HEAD_LEAD, trail=[("Counties", f"{PATH}/#counties"), (f"{co} County, {st}", None)])
-    links.append(f"<li><a href='{PATH}/{p[:-10]}'>{html.escape(co)} County, {st}</a> <span class=muted>({len(rs)} rates)</span>"
+         f"Official {yr} property tax millage rates for {plural(len(rs), 'levy', 'levies')} in {co} County, {st}, each linked to its government source. Retrieved {ret}.", lead=HEAD_LEAD, trail=[("Counties", f"{PATH}/#counties"), (f"{co} County, {st}", None)])
+    links.append(f"<li><a href='{PATH}/{p[:-10]}'>{html.escape(co)} County, {st}</a> <span class=muted>({plural(len(rs), 'rate')})</span>"
                  + (" <span class=badge>special districts not yet sourced</span>" if co in cov['not_yet_sourced'] else "") + "</li>")
-page("index.html", "Florida property tax millage rates 2025, each linked to its official source", f"<p class=lead>{len(rows)} official rates {html.escape(LEAD_SRC)}, retrieved {max(r['retrieved_at'] for r in rows)[:10]} (UTC). {sum(r['rate_kind']=='aggregate_effective' for r in rows)} rows are Florida DOR totals for districts smaller than a county, not any one body's adopted rate. {sum(r['body_type']=='special_district' for r in rows)} rows are independent special districts.</p>"
+page("index.html", "Florida property tax millage rates 2025, each linked to its official source", f"<p class=lead>{len(rows)} official rates {html.escape(LEAD_SRC)}, retrieved {max(r['retrieved_at'] for r in rows)[:10]} (UTC). {sum(r['rate_kind']=='aggregate_effective' for r in rows)} rows are Florida DOR totals for districts smaller than a county, not any one body's adopted rate. {cov['sd_rows_in_csv']} baseline rows are independent special districts. {sum(r['body_type']=='special_district' for r in rows) - cov['sd_rows_in_csv']} more, from county property appraisers, appear only on county pages.</p>"
      f"<p class=callout>Voting on Amendment 3 on {ELECTION}? <a href='{PATH}/{AMEND}/'>See the 2025 adopted millage baseline by county</a>.</p>"
-     f"<h2>How to read this</h2><p>{COV}</p><p>Independent special districts {NYS} (absent is not zero): {html.escape(', '.join(cov['not_yet_sourced']))}.</p>"
+     f"<h2>How to read this</h2><p>{COV}</p><p>Independent special districts {NYS} (absent is not zero): {html.escape(', '.join(cov['not_yet_sourced']))}.</p><p id=correction>{html.escape(CORRECTION)}</p>"
      f"<h2 id=counties>Counties</h2>"
      f"<p class=filter id=county-filter-wrap hidden><label for=county-filter>Filter counties</label><input type=search id=county-filter autocomplete=off aria-describedby=county-filter-count> <span id=county-filter-count class=muted role=status aria-live=polite></span></p>"
      f"<ul class=counties>{''.join(links)}</ul>" + FILTER_JS,

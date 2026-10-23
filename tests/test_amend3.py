@@ -182,8 +182,8 @@ ok(Dd(nums[0]) == Dd(bro[0]["rate"]) and [Dd(x) for x in nums[1:4]] == [comps["o
 sdc = [c for c, _ in counties if any(r["county"] == c for r in dist)]; sdm = [c for c, _ in counties if c not in sdc]
 line = re.search(r"<p>Special districts: .*?</p>", page).group(0)
 import sources
-nsd = sources.coverage(sources.load_rows())["with_rows"]
-ok(f"Special districts: {nsd} of 67 Florida counties have special-district rows. This page lists the {len(sdc)} read from" in line and all(html.escape(c) in line for c in sdm), f"AC4b special districts {len(sdc)} of 67, {len(sdm)} missing named")
+nsd = sources.coverage(sources.load_rows())["in_csv"]
+ok(nsd == len(sdc) and f"Special districts: {nsd} of 67 Florida counties have special-district rows in this baseline (" in line and "rows), read from" in line in line and all(html.escape(c) in line for c in sdm), f"AC4b special districts {len(sdc)} of 67, {len(sdm)} missing named")
 ok(len(sdc) == len({r["county"] for r in dist} & {c for c, _ in counties}), f"AC4b count equals counties with special-district rows ({len(sdc)})")
 ok(html.escape(A.CFG["tacd_index"]["url"], quote=True) in line, "AC4b count links the DOR TACD index")
 tl = dict(re.findall(r"([A-Z][A-Za-z.\- ]+?) \(<a href='([^']+)'>TACD</a>\)", line))
