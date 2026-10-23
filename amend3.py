@@ -141,7 +141,7 @@ def render_amend3(rows, districts, ballot, counties, sd_counties=None):
       + f"<p>Special districts: {len(sd_have)} of {len(names)} Florida counties have special-district rows in this baseline ({sum(r['body_type'] == 'special_district' for r in districts)} rows), read from each county's 2025 TACD file ({link(CFG['tacd_index']['url'], 'Florida Department of Revenue TACD index')}): "
       + ", ".join(f"{E(c)} ({link(sd_file[c], 'TACD')})" for c in sd_have)
       + (f"; not yet collected for: {', '.join(E(c) for c in sd_missing)}" if sd_missing else "") + "."
-      + (f" {len(others)} more ({sc.name_list(E(c) for c in others)}) have special-district rows from county property appraisers that are not in this baseline; see their county pages." if others else "") + "</p>"
+      + (f" {E(sources.alt_sentence(others))}" if others else "") + "</p>"
       + f"<p>Rows shown: {nt['county']} county, {nt['school_district']} school district, {nt['municipality']} municipal and {len(districts)} special-district rates ({link(srcs[0][1], 'Florida Department of Revenue')}).</p>"
       + jump + "".join(sections)
       + f"<p>Rows shown on this page: <a href='{PATH}/{api}.csv'>CSV</a> · <a href='{PATH}/{api}.json'>JSON</a>.</p>"

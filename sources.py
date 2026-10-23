@@ -113,10 +113,27 @@ def data_updated(rows):
     return datetime.datetime.fromisoformat(latest).astimezone(ZoneInfo("America/New_York")).date(), url
 
 
+def plural(n, one, many=None):
+    """'1 rate', '2 rates': the count followed by the noun, singular only when n == 1."""
+    return f"{n} {one if n == 1 else (many or one + 's')}"
+
+
+def join_names(xs):
+    xs = list(xs)
+    return xs[0] if len(xs) == 1 else ", ".join(xs[:-1]) + " and " + xs[-1]
+
+
+def alt_sentence(alt):
+    """Counties whose special-district rows come only from county property appraisers (not in the baseline CSV)."""
+    return (f"{join_names(alt)} also {'has' if len(alt) == 1 else 'have'} special-district rows from {'its' if len(alt) == 1 else 'their'} "
+            "property appraisers, shown on their county pages only." if len(alt) != 1 else
+            f"{alt[0]} also has special-district rows from its property appraiser, shown on its county page only.")
+
+
 def coverage_sentence(cov):
     """Counts match the published Amendment 3 baseline CSV (TACD special-district rows). Counties whose only special-district
     rows come from county property appraisers (alt sources, county pages/JSON only) are named separately, not counted."""
     alt = cov["alt_only"]
-    tail = (f" {len(alt)} more ({', '.join(alt)}) have special-district rows from county property appraisers on their county pages only." if alt else "")
+    tail = (f" {alt_sentence(alt)}" if alt else "")
     return (f"{cov['checked']} of {cov['total']} Florida counties checked against official sources; {cov['in_csv']} have special-district rows "
             f"in the Amendment 3 baseline CSV.{tail}")

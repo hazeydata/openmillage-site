@@ -9,7 +9,7 @@ def ok(cond, msg): print(("PASS " if cond else "FAIL ") + msg); cond or FAIL.app
 API = "docs/api/v1/fl/2025"
 def js(c): return json.load(open(f"{API}/{c}.json"))
 def pg(c): return open(f"docs/fl/2025/{c}-county/index.html", encoding="utf-8").read()
-SENT = "57 of 67 Florida counties checked against official sources; 43 have special-district rows in the Amendment 3 baseline CSV. 2 more (DeSoto, Orange) have special-district rows from county property appraisers on their county pages only."
+SENT = "57 of 67 Florida counties checked against official sources; 43 have special-district rows in the Amendment 3 baseline CSV. DeSoto and Orange also have special-district rows from their property appraisers, shown on their county pages only."
 NO_ROWS = "No special-district rows published yet for this county."
 NO_ROWS_COUNTIES = ["Bradford", "Citrus", "Franklin", "Glades", "Hardee", "Highlands", "Nassau", "Okeechobee", "Pasco", "Polk", "Wakulla", "Walton"]
 OPEN = ["Calhoun", "Clay", "Columbia", "Monroe", "Collier", "Sumter", "Gadsden", "Levy", "Taylor", "Liberty"]

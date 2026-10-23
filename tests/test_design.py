@@ -105,7 +105,7 @@ ah_txt = html.unescape(ah)
 ok(d_n == n, f"data/ count {d_n} equals sources.coverage count {n}")
 ok(f"Special districts: {d_n} of 67 Florida counties" in ah_txt, f"amendment page states '{d_n} of 67'")
 ok(f"have special-district rows in this baseline ({len([r for r in csv.DictReader(open(CFG['districts_csv'], newline='', encoding='utf-8')) if r['body_type'] == 'special_district'])} rows), read from each county's 2025 TACD file" in ah_txt, "amendment page states the baseline row count")
-ok(bool(_alt_c) and f"{len(_alt_c)} more ({d_names}) have special-district rows from county property appraisers that are not in this baseline" in ah_txt, f"amendment page names the {len(_alt_c)} alt-only counties ({d_names}) without counting them")
+ok(bool(_alt_c) and f"{d_names} also have special-district rows from their property appraisers, shown on their county pages only." in ah_txt, f"amendment page names the {len(_alt_c)} alt-only counties ({d_names}) without counting them")
 # Renderer tracks the data: re-render the sentence from perturbed inputs (catches literals that happen to match today's data)
 import amend3
 _rows = amend3.rows_from(CFG["rates_csv"]); _dist = amend3.rows_from(CFG["districts_csv"])
@@ -117,19 +117,29 @@ def _sent(dist, sdc):
 for _drop_alt, _drop_tacd in ((sorted(_alt_c)[:1], []), ([], sorted(_tacd_c)[:2])):
     _d = [r for r in _dist if r["county"] not in _drop_tacd]; _sdc = [c for c in _all if c not in _drop_alt]
     _t = _tacd_c - set(_drop_tacd); _o = sorted(set(_sdc) - _t); _s = _sent(_d, _sdc)
-    ok(f"Special districts: {len(_t)} of 67 " in _s and ((f"{len(_o)} more ({_join(_o)}) have" in _s) if _o else " more (" not in _s),
+    ok(f"Special districts: {len(_t)} of 67 " in _s and ((f"{_join(_o)} also ha" in _s) if _o else " also ha" not in _s),
        f"perturbed inputs (drop alt {_drop_alt}, drop TACD {_drop_tacd}) render {len(_t)} of 67 / {len(_o)} more: {_s[-160:]!r}")
 # OM-COPY-FIX: copy counts come from the published baseline CSV itself
 _pub = [r for r in csv.DictReader(open("docs/api/v1/fl/2025/amendment-3-baseline.csv", newline="", encoding="utf-8")) if r["body_type"] == "special_district"]
 _pub_c = {r["county"] for r in _pub}
 ok(len(_pub_c) == n and f"Special districts: {len(_pub_c)} of 67 Florida counties have special-district rows in this baseline ({len(_pub)} rows)" in ah_txt,
    f"amendment page matches published baseline CSV: {len(_pub)} special-district rows in {len(_pub_c)} counties")
-ok(f"{len(_pub)} rows in the Amendment 3 baseline CSV are independent special districts" in html.unescape(idx), f"home page states {len(_pub)} special-district rows in the baseline CSV")
+_api_sd = sum(r["body_type"] == "special_district" for r in rows)
+ok(f"{len(_pub)} baseline rows are independent special districts. {_api_sd - len(_pub)} more, from county property appraisers, appear only on county pages." in html.unescape(idx), f"home lead states {len(_pub)} baseline special-district rows and {_api_sd - len(_pub)} more")
+_corr = "Correction, Oct 23, 2026: we earlier said 165 special districts across 45 counties. The numbers above match the baseline CSV."
+_h = idx.index("<h2>How to read this</h2>"); _c = idx.index("<h2 id=counties>")
+ok(f"<p id=correction>{html.escape(_corr)}</p>" in idx[_h:_c], "correction line sits under 'How to read this' on the home page")
+# pluralization: any count of 1 reads 'rate'/'levy', never '(1 rates)' / '1 levies'
+_one = re.findall(r"\((\d+) (rates?)\)", idx)
+ok(_one and all((c == "1") == (w == "rate") for c, w in _one), f"county list pluralizes rate/rates by count: {sorted(set(_one))}")
+ok(not any(re.search(r"\b1 levies\b", rd(p)) for p in county_pages), "no '1 levies' in county page descriptions")
+import sources as _S
+ok(_S.plural(1, "rate") == "1 rate" and _S.plural(2, "rate") == "2 rates" and _S.plural(1, "levy", "levies") == "1 levy" and _S.plural(0, "levy", "levies") == "0 levies", "sources.plural singular only at 1")
 found = set()
 for p in pages + ["docs/llms.txt"]:
     found |= set(re.findall(r"(\d+) (?:of 67 Florida counties have|have) special-district rows in (?:this baseline|the Amendment 3 baseline CSV)", html.unescape(rd(p))))
 ok(found == {str(n)}, f"every stated count equals {n}: {sorted(found)}")
-src = rd("build.py") + rd("amend3.py") + rd("sources.py") + rd("site_chrome.py")
+src = rd("build.py").replace(_corr, "") + rd("amend3.py") + rd("sources.py") + rd("site_chrome.py")
 ok("45 have" not in src and "43 of" not in src and "165" not in src and "161" not in src, "no literal '45 have' / '43 of' in generator source")
 # --- Tobias #3: county pages group rows as County / School / Municipalities / Special districts
 GROUP_OF = {"county": "County", "school_district": "School", "municipality": "Municipalities", "special_district": "Special districts"}
