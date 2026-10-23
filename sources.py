@@ -97,7 +97,9 @@ def coverage(rows, state="FL", year="2025"):
     open_ = sorted(r["county"] for r in _csv(STATUS_FILE))
     with_rows = sorted({r["county"] for r in rows if r["state"] == state and r["year"] == year and r["body_type"] == "special_district"})
     checked = [c for c in counties if c not in open_]
-    return {"counties": counties, "checked": len(checked), "total": len(counties), "with_rows": len(with_rows),
+    in_csv = sorted({r["county"] for r in _csv(SD_FILE) if r["state"] == state and r["year"] == year and r["body_type"] == "special_district"})
+    return {"in_csv": len(in_csv), "sd_rows_in_csv": sum(1 for r in _csv(SD_FILE) if r["state"] == state and r["year"] == year and r["body_type"] == "special_district"), "counties_in_csv": in_csv, "alt_only": [c for c in with_rows if c not in in_csv],
+            "counties": counties, "checked": len(checked), "total": len(counties), "with_rows": len(with_rows),
             "no_rows": [c for c in checked if c not in with_rows], "not_yet_sourced": open_, "counties_with_rows": with_rows}
 
 
@@ -112,4 +114,9 @@ def data_updated(rows):
 
 
 def coverage_sentence(cov):
-    return f"{cov['checked']} of {cov['total']} Florida counties checked against official sources; {cov['with_rows']} have special-district rows."
+    """Counts match the published Amendment 3 baseline CSV (TACD special-district rows). Counties whose only special-district
+    rows come from county property appraisers (alt sources, county pages/JSON only) are named separately, not counted."""
+    alt = cov["alt_only"]
+    tail = (f" {len(alt)} more ({', '.join(alt)}) have special-district rows from county property appraisers on their county pages only." if alt else "")
+    return (f"{cov['checked']} of {cov['total']} Florida counties checked against official sources; {cov['in_csv']} have special-district rows "
+            f"in the Amendment 3 baseline CSV.{tail}")

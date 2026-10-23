@@ -138,10 +138,10 @@ def render_amend3(rows, districts, ballot, counties, sd_counties=None):
       f"<p>These are 2025 adopted rates. As of {asof_et.strftime('%B')} {asof_et.day}, {asof_et.year}, {asof_et.strftime('%H:%M')} ET (latest retrieval of a source file used on this page; the footer's site data date covers every page, {link(asof_src)}).</p>"
       f"<p>Coverage: {len(covered)} of {len(names)} counties ({link(county_src['url'], 'county list: ' + county_src['agency'])}; rates: {link(srcs[0][1], 'Florida Department of Revenue')}).</p>"
       + (f"<p>Not yet collected: {', '.join(E(c) for c in missing)}.</p>" if missing else "")
-      + f"<p>Special districts: {n_sd} of {len(names)} Florida counties have special-district rows. This page lists the {len(sd_have)} read from each county's 2025 TACD file ({link(CFG['tacd_index']['url'], 'Florida Department of Revenue TACD index')}): "
+      + f"<p>Special districts: {len(sd_have)} of {len(names)} Florida counties have special-district rows in this baseline ({sum(r['body_type'] == 'special_district' for r in districts)} rows), read from each county's 2025 TACD file ({link(CFG['tacd_index']['url'], 'Florida Department of Revenue TACD index')}): "
       + ", ".join(f"{E(c)} ({link(sd_file[c], 'TACD')})" for c in sd_have)
       + (f"; not yet collected for: {', '.join(E(c) for c in sd_missing)}" if sd_missing else "") + "."
-      + (f" The other {n_sd - len(sd_have)} ({sc.name_list(E(c) for c in others)}) come from county property appraisers; see their county pages." if others else "") + "</p>"
+      + (f" {len(others)} more ({sc.name_list(E(c) for c in others)}) have special-district rows from county property appraisers that are not in this baseline; see their county pages." if others else "") + "</p>"
       + f"<p>Rows shown: {nt['county']} county, {nt['school_district']} school district, {nt['municipality']} municipal and {len(districts)} special-district rates ({link(srcs[0][1], 'Florida Department of Revenue')}).</p>"
       + jump + "".join(sections)
       + f"<p>Rows shown on this page: <a href='{PATH}/{api}.csv'>CSV</a> · <a href='{PATH}/{api}.json'>JSON</a>.</p>"
