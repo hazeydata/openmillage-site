@@ -16,9 +16,9 @@ a{color:var(--link);overflow-wrap:anywhere;text-decoration:underline}
 :focus-visible{outline:3px solid var(--link);outline-offset:2px}
 .skip{position:absolute;left:-9999px;top:0}
 .skip:focus{left:.5rem;top:.5rem;z-index:10;background:var(--bg);padding:.5rem 1rem}
-header{display:flex;flex-wrap:wrap;align-items:center;gap:0 1.5rem;border-bottom:1px solid var(--border)}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:0 var(--s1,16px);border-bottom:1px solid var(--border)}
 header a,footer a.top{display:inline-block;padding:.65rem 0}
-header nav{display:flex;flex-wrap:wrap;gap:0 1.25rem}
+header nav{display:flex;flex-wrap:wrap;gap:0 var(--s1,16px)}
 .brand{font-weight:700;text-decoration:none;color:var(--fg)}
 footer{border-top:1px solid var(--border);margin-top:3rem;padding:.5rem 0 2rem;color:var(--muted);font-size:.9rem}
 .tablewrap{overflow-x:auto;max-width:100%}
@@ -87,6 +87,6 @@ def footer(PATH, lead="", updated=None):
     return (f"<footer>{up}<p>{lead}<a href='{PATH}/llms.txt'>llms.txt</a> · <a href='{PATH}/'>All counties</a></p>"
             "<p>Data: CC BY 4.0 (<a href='https://creativecommons.org/licenses/by/4.0/'>licence</a>). Published by Hazey Data.</p>" + redo.credit() + "</footer>")
 def tablewrap(aria, table): return f"<div class=tablewrap tabindex=0 role=region aria-label=\"{html.escape(aria)}\">{table}</div>"
-def body(PATH, title_html, inner, current=None, slug="fl/amendment-3", lead="", updated=None, trail=None):
+def body(PATH, title_html, inner, current=None, slug="fl/amendment-3", lead="", updated=None, trail=None, kicker=""):
     bc = crumbs(PATH, trail) if trail else ""
-    return f"<body>{SKIP}{header(PATH, current, slug)}{bc}<main id=main><h1>{title_html}</h1>{inner}</main>{footer(PATH, lead, updated)}</body>"
+    return f"<body>{SKIP}{header(PATH, current, slug)}{bc}<main id=main>{kicker}<h1>{title_html}</h1>{inner}</main>{footer(PATH, lead, updated)}</body>"

@@ -87,4 +87,32 @@ sm = rd("docs/sitemap.xml"); ok("https://openmillage.com/fl/history/alachua-coun
 ah3 = rd("docs/fl/2025/alachua-county/index.html")
 ok(ah3.index("class=stack") < ah3.index("<details class=all>") and "<summary>See all rates</summary>" in ah3, "county page: stack card before collapsed 'See all rates'")
 ok("--col:720px" in css and "--cyan:#5FC4D6" in css and "--bg:#03070F" in css, "layout tokens from layout-spec (720 col, #5FC4D6, #03070F)")
+
+# --- build14 review MUSTS (Tobias, 2026-10-23)
+am = rd("docs/fl/amendment-3/index.html")
+w = am.index("<h2 id=who-sets-what>")
+ok(am.find("<details class=all><summary>See all rates</summary>", w) > w and not re.search(r"<section id=", am[w:am.find("<details class=all>", w)]), "M1 amendment: every county section sits inside one 'See all rates' details after Who sets what")
+d0 = am.find("<details class=all>", w); d1 = am.find("</details><h2 id=get-the-data>", d0)
+ok(d1 > d0 and am.count("<section id=", d0, d1) == am.count("<section id="), "M1 amendment: all county sections are inside the collapse")
+ok("<h1>Florida 2025 adopted millage baseline</h1>" in am, "M2 amendment h1 is 'Florida 2025 adopted millage baseline'")
+ok(am.index("<figure class=hero") < am.index("<p class=label>") and am.index("<figure class=hero") < am.index("<blockquote class=official>"), "M2 amendment: p.label and blockquote.official come after figure.hero")
+ok(re.search(r"<main id=main><h1>[^<]+</h1><figure class=hero.*?</figure><div class=lede>", idx, re.S) is not None, "M3 home order is h1, figure.hero, .lede")
+ok(not re.search(r"<p class=lead>\d+ official rates", idx) and idx.index("<div class=lede>") < idx.index("<p class=sources>"), "M3 home: the '... official rates' paragraph is not between h1 and hero")
+c = idx.index("<h2 id=counties>")
+ok(idx.startswith("<details class=all><summary>See all counties</summary>", c + len("<h2 id=counties>Counties</h2>")) and idx.index("<ul class=counties>") > c and idx.index("</ul></details>", c) > idx.index("<ul class=counties>"), "M4 home: county list inside 'See all counties' details")
+ok("SpaceGrotesk" in css and "font-family:'Space Grotesk';font-weight:700" not in css, "nit: no Space Grotesk 700 @font-face")
+ok(re.search(r"<main id=main><p class=kicker>Ballot measure numbered 3 · <a [^>]+>November 3, 2026</a></p><h1>Florida 2025 adopted millage baseline</h1>", am) is not None, "AC13 amendment kicker precedes h1")
+import json as _j, glob as _g
+bad = []
+for f in _g.glob("docs/api/v1/fl/2025/*.json"):
+    if f.endswith("-baseline.json"): continue
+    rows = _j.load(open(f)); co = rows[0]["county"]; h = rd(f"docs/fl/2025/{os.path.basename(f)[:-5]}-county/index.html")
+    st = h[h.find("<div class=stack"):h.find("</div></div></div>", h.find("<div class=stack")) + 18]
+    for bt, w in (("municipality", "Cities"), ("special_district", "Special districts")):
+        n = sum(r["body_type"] == bt and r["rate_kind"] == "adopted" for r in rows)
+        if (f"{w} ({n})" not in st) if n else ("— no value in data" not in st): bad.append((co, bt))
+    if re.search(r">0(\.0+)? <", st): bad.append((co, "zero"))
+ok(not bad, f"AC6 every county stack has a row per layer in the data, absent layers say '— no value in data' ({bad[:3]})")
+_h = os.environ.get("OM_A3_HEIGHT_390")
+if _h: ok(int(_h) <= 1.5 * 3757, f"AC12 amendment height at 390 ({_h}px) within 1.5x of mock 3757px")
 print("FAILURES", len(FAIL)); sys.exit(1 if FAIL else 0)

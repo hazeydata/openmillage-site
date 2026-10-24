@@ -137,40 +137,45 @@ def render_amend3(rows, districts, ballot, counties, sd_counties=None):
     n_sd = len(sd_counties); others = sorted(set(sd_counties) - set(sd_have))
     md = CFG["millage_definition"]; api = f"api/v1/fl/2025/{SLUG.split('/')[-1]}-baseline"
     srcs = sorted({(r["source_agency"], r["source_url"]) for r in allrows})
+    edtxt = f"{ed.strftime('%B')} {ed.day}, {ed.year}"
+    kicker = f"<p class=kicker>Ballot measure numbered {ballot['ballot_number']} · {link(CFG['election_date_source'], edtxt)}</p>"
     body = (
-      f"<p class=label>{link(ballot['source_url'], 'Ballot Number ' + str(ballot['ballot_number']))}</p>"
-      f"<p>Florida Division of Elections, official ballot title and summary ({link(ballot['source_url'])}):</p>"
-      f"<blockquote class=official><p>&ldquo;{E(ballot['title'])}&rdquo;</p><p>&ldquo;{E(ballot['ballot_summary'])}&rdquo;</p><p>{link(ballot['source_url'])}</p></blockquote>"
       f"<p>Election date: {ed.strftime('%B')} {ed.day}, {ed.year} ({link(CFG['election_date_source'])}).</p>"
       + redo.chart("county-dots", "Dot plot: 2025 county and school board countywide rates for each Florida county")
       + "<h2 id=before-you-vote>Before you vote</h2>" + redo.intro("Before you vote (ballot measure numbered 3 page)").replace("the 2025 adopted rates", f"the {link(srcs[0][1], '2025 adopted rates')}", 1)
+      + (
+      f"<p class=label>{link(ballot['source_url'], 'Ballot Number ' + str(ballot['ballot_number']))}</p>"
+      f"<p>Florida Division of Elections, official ballot title and summary ({link(ballot['source_url'])}):</p>"
+      f"<blockquote class=official><p>&ldquo;{E(ballot['title'])}&rdquo;</p><p>&ldquo;{E(ballot['ballot_summary'])}&rdquo;</p><p>{link(ballot['source_url'])}</p></blockquote>"
+      )
       + redo.stack("Example county: Alachua, 2025", title_html=f"Example county: Alachua, {link(srcs[0][1], '2025')}", layers=[(sc.display_name(r["taxing_body"]), f"{sc.label(r['body_type'])} · {sc.label(r['levy_component']).lower()}, {sc.label(r['levy_scope'])}", f"{float(r['rate']):.4f}", r["source_url"]) for r in group("Alachua")[:3]])
       + f"<h2>Adopted millage by county</h2>"
       f"<p>These are 2025 adopted rates. As of {asof_et.strftime('%B')} {asof_et.day}, {asof_et.year}, {asof_et.strftime('%H:%M')} ET (latest retrieval of a source file used on this page; the footer's site data date covers every page, {link(asof_src)}).</p>"
       f"<p>Coverage: {len(covered)} of {len(names)} counties ({link(county_src['url'], 'county list: ' + county_src['agency'])}; rates: {link(srcs[0][1], 'Florida Department of Revenue')}).</p>"
       + (f"<p>Not yet collected: {', '.join(E(c) for c in missing)}.</p>" if missing else "")
+      + "<details class=all><summary>Coverage by county</summary>"
       + f"<p>Special districts: {len(sd_have)} of {len(names)} Florida counties have special-district rows in this baseline ({sum(r['body_type'] == 'special_district' for r in districts)} rows), read from each county's 2025 TACD file ({link(CFG['tacd_index']['url'], 'Florida Department of Revenue TACD index')}): "
       + ", ".join(f"{E(c)} ({link(sd_file[c], 'TACD')})" for c in sd_have)
       + (f"; not yet collected for: {', '.join(E(c) for c in sd_missing)}" if sd_missing else "") + "."
       + (f" {E(sources.alt_sentence(others))}" if others else "") + "</p>"
-      + f"<p>Rows shown: {nt['county']} county, {nt['school_district']} school district, {nt['municipality']} municipal and {len(districts)} special-district rates ({link(srcs[0][1], 'Florida Department of Revenue')}).</p>"
+      + f"<p>Rows shown: {nt['county']} county, {nt['school_district']} school district, {nt['municipality']} municipal and {len(districts)} special-district rates ({link(srcs[0][1], 'Florida Department of Revenue')}).</p>" + "</details>"
       + "<h2 id=who-sets-what>Who sets what</h2>" + who_sets_what()
-      + jump + "".join(sections)
-      + f"<p>Rows shown on this page: <a href='{PATH}/{api}.csv'>CSV</a> · <a href='{PATH}/{api}.json'>JSON</a>.</p>"
+      + "<details class=all><summary>See all rates</summary>" + jump + "".join(sections) + "</details>"
       + redo.getdata(f"<a href='{PATH}/{api}.csv'>CSV</a> · <a href='{PATH}/{api}.json'>JSON</a>")
       + f"<h2>Questions</h2><dl><dt>What is millage?</dt><dd>{E(md['agency'])}: <q>{E(md['text'])}</q> {link(md['url'])}</dd>"
       f"<dt>Where do these rates come from?</dt><dd>Each value on this page links to the official document it was read from.</dd></dl>")
     title = ballot["title"]
     page = (f"<!doctype html><html lang=en><head><meta charset=utf-8><title>{E(title)}: Florida 2025 adopted millage baseline</title>"
             f"<link rel=canonical href='{BASE}/{SLUG}/'>{sc.head_extra(PATH)}{GOATCOUNTER_TAG}</head>"
-            f"{sc.body(PATH, E(title), body, 'amend', SLUG, '', sources.data_updated(sources.load_rows()), [('2025 adopted millage baseline', None)])}</html>\n")
+            f"{sc.body(PATH, H1, body, 'amend', SLUG, '', sources.data_updated(sources.load_rows()), [('2025 adopted millage baseline', None)], kicker=kicker)}</html>\n")
     return page, allrows
 
+H1 = "Florida 2025 adopted millage baseline"
 BLOCK = re.compile(r"<(tr|p|li|dd|dt|h1|h2|h3|summary|caption|title)\b[^>]*>(.*?)</\1>", re.S)  # a table row is one block: its rate cell carries the link
 def strip_official(h): return re.sub(r"<blockquote class=official>.*?</blockquote>|<q>.*?</q>", " ", h, flags=re.S)
 def check(page):
     errs = []
-    body = page.split("<body>", 1)[1]
+    body = page.split("<body>", 1)[1].replace(f"<h1>{H1}</h1>", "")  # fixed layout title (meta 9911d28); 2025 is the data year sourced on every row
     for q in re.findall(r"<blockquote class=official>(.*?)</blockquote>", body, re.S):
         if not re.search(r"<a href='https?://", q): errs.append("official quote without source link")
     for tag, inner in BLOCK.findall(re.sub(r"<blockquote class=official>.*?</blockquote>", " ", body, flags=re.S)):
@@ -189,7 +194,7 @@ def check(page):
     if len(ft) != 1: errs.append(f"footer date: expected one 'Site data updated' <time>, found {len(ft)}")
     elif ft[0] != (want.isoformat(), f"{want.strftime('%B')} {want.day}, {want.year}"): errs.append(f"footer date {ft[0]} is not the data date {want}")
     body = re.sub(r"(Site data updated )<time datetime=[0-9-]+>[^<]*</time>", r"\1", body)
-    if re.search(r"\b20(2[6-9]|[3-9]\d)\b", re.sub(r"<[^>]+>", " ", re.sub(r"<blockquote class=official>.*?</blockquote>|<table>.*?</table>|Election date:.*?</p>|As of .*?</p>", " ", body, flags=re.S))):
+    if re.search(r"\b20(2[6-9]|[3-9]\d)\b", re.sub(r"<[^>]+>", " ", re.sub(r"<blockquote class=official>.*?</blockquote>|<table>.*?</table>|Election date:.*?</p>|<p class=kicker>.*?</p>|As of .*?</p>", " ", body, flags=re.S))):
         errs.append("future-year number outside official quote / election date / as-of date")
     return errs
 

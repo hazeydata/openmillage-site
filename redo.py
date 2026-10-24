@@ -75,7 +75,7 @@ def chart(name, label, attrs="", caption=""):
 def stack(title, layers, title_html=None):
     """B 'Rate stack': one layer per taxing authority, no total (a total depends on the parcel)."""
     return (f"<div class=stack role=group aria-label='{E(title)}'><h3>{title_html or E(title)}</h3>" + "".join(
-        f"<div class=layer><div class=who>{E(w)}<small>{E(sub)}</small></div><div class=r>{E(r)} <a href='{E(u)}' aria-label='Source for {E(w)}'>source</a></div></div>"
+        f"<div class=layer><div class=who>{E(w)}<small>{E(sub)}</small></div><div class=r>{E(r)}{f" <a href='{E(u)}' aria-label='Source for {E(w)}'>source</a>" if u else ""}</div></div>"
         for w, sub, r, u in layers) + "</div>")
 
 def copy_assets(out):
@@ -83,7 +83,7 @@ def copy_assets(out):
     for f in sorted(os.listdir(FONT_DIR)): shutil.copyfile(os.path.join(FONT_DIR, f), f"{out}/fonts/{f}")
     open(f"{out}/redo.css", "w").write(CSS)
 
-FONTS = [("Inter", 400, "Inter-400.ttf"), ("Inter", 600, "Inter-600.ttf"), ("Inter", 700, "Inter-700.ttf"), ("Space Grotesk", 600, "SpaceGrotesk-600.ttf"), ("Space Grotesk", 700, "SpaceGrotesk-600.ttf")]
+FONTS = [("Inter", 400, "Inter-400.ttf"), ("Inter", 600, "Inter-600.ttf"), ("Inter", 700, "Inter-700.ttf"), ("Space Grotesk", 600, "SpaceGrotesk-600.ttf")]
 def _ff(PATH=""): return "".join(f"@font-face{{font-family:'{f}';font-weight:{w};font-style:normal;font-display:swap;src:url(fonts/{n}) format('truetype')}}\n" for f, w, n in FONTS)
 CSS = _ff() + """:root{--bg:#03070F;--surface:#0A1628;--raised:#13243D;--line:#1E3352;--text:#E8EEF5;--muted:#9FB3C8;--cyan:#5FC4D6;--acc:#155140;
 --font-head:'Space Grotesk',system-ui,sans-serif;--font-body:Inter,system-ui,sans-serif;
@@ -110,6 +110,9 @@ ul.how{padding-left:1.2em;margin:0 0 var(--s2)}ul.how li{margin-bottom:var(--s1)
 .layer .who small{display:block;color:var(--muted);font-size:var(--fs--1)}
 .layer .r{font:700 var(--fs2) var(--font-head);text-align:right}.layer .r a{font:400 var(--fs--1) var(--font-body);margin-left:var(--s0)}
 details.all{margin:var(--s3) 0;border-top:1px solid var(--line);padding-top:var(--s2)}
+blockquote.official p:first-child{text-transform:none;font-size:var(--fs0)}
+.stack+p.muted{margin-top:var(--s1)}
+.kicker{font:600 var(--fs--1) var(--font-head);color:var(--muted);letter-spacing:.04em;margin:var(--s4) 0 0}.kicker+h1{margin-top:var(--s0)}
 details.all>summary{cursor:pointer;font-size:var(--fs1);font-weight:600;color:var(--cyan)}
 table{font-size:var(--fs--1)}
 .callout{background:var(--surface);border-color:var(--line);border-left-color:var(--cyan);border-radius:var(--radius)}

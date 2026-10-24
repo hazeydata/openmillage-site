@@ -113,6 +113,11 @@ for (st, yr, co), rs in sorted(by.items()):
     meta = "<p>Source: " + "; ".join(f"{html.escape(a)} (<a href='{html.escape(u)}' aria-label='{html.escape('Source file from ' + a)}'>source file</a>)" for a, u in srcs) + f". Retrieved {ret} (UTC).</p>"
     cw = [r for r in base if r['levy_scope'] == 'countywide' and r['rate_kind'] == 'adopted' and r['body_type'] in ('county', 'school_district')]
     layers = [(sc.display_name(r['taxing_body']), f"{sc.label(r['body_type'])} · {sc.label(r['levy_component']).lower()}, countywide", f"{float(r['rate']):.4f}", r['source_url']) for r in cw]
+    for bt, who, sub in (("municipality", "Cities", "Municipality · set by each city commission; applies only inside that city"),
+                         ("special_district", "Special districts", "Special district · set by each district board; applies only inside that district")):
+        lr = sorted((r for r in rs if r['body_type'] == bt and r['rate_kind'] == 'adopted'), key=lambda r: float(r['rate']))
+        layers.append((f"{who} ({len(lr)})", sub, f"{float(lr[0]['rate']):.4f}–{float(lr[-1]['rate']):.4f}" if len(lr) > 1 else f"{float(lr[0]['rate']):.4f}", lr[0]['source_url'])
+                      if lr else (who, sub, "— no value in data", None))
     hist = [(lv, f"{PATH}/{hist_path(co, lv)[:-10]}") for lv in HIST_LEVELS if (co, lv) in HIST]
     top = ((redo.chart("alachua-bar", "Bar chart: Alachua County 2025 county and school board operating rates, side by side") if co == "Alachua" else "")
            + redo.intro("The stack (county pages)") + (redo.stack(f"{co} County, {yr} adopted rates", layers) if layers else "")
@@ -148,14 +153,14 @@ for (co, lv), hrs in sorted(HIST.items()):
          lead=HEAD_LEAD, trail=[("Counties", f"{PATH}/#counties"), (f"{co} County, FL", f"{PATH}/fl/2025/{slug(co)}-county/"), (f"History: {HIST_LEVELS[lv]}", None)])
 AL = sorted([r for r in rows if r["county"] == "Alachua" and r["levy_scope"] == "countywide" and r["rate_kind"] == "adopted" and r["body_type"] in ("county", "school_district")], key=lambda r: r["body_type"])
 HOME_STACK = redo.stack("Example: Alachua County, 2025 adopted rates", [(sc.display_name(r["taxing_body"]), f"{sc.label(r['body_type'])} · {sc.label(r['levy_component']).lower()}, countywide", f"{float(r['rate']):.4f}", r["source_url"]) for r in AL])
-HOME_REDO = (redo.chart("county-dots", "Dot plot: 2025 county and school board countywide rates for each Florida county") + redo.lede()
-             + redo.intro("The stack (home page)") + HOME_STACK + "<p class=muted>One layer per taxing authority. Not a total: add only the layers that apply to your parcel.</p>" + redo.howto())
-page("index.html", "Florida property tax millage rates 2025, each linked to its official source", f"<p class=lead>{len(rows)} official rates {html.escape(LEAD_SRC)}, retrieved {max(r['retrieved_at'] for r in rows)[:10]} (UTC). {sum(r['rate_kind']=='aggregate_effective' for r in rows)} rows are Florida DOR totals for districts smaller than a county, not any one body's adopted rate. {cov['sd_rows_in_csv']} baseline rows are independent special districts. {sum(r['body_type']=='special_district' for r in rows) - cov['sd_rows_in_csv']} more, from county property appraisers, appear only on county pages.</p>"
+HOME_HERO = redo.chart("county-dots", "Dot plot: 2025 county and school board countywide rates for each Florida county") + redo.lede()
+HOME_REDO = (redo.intro("The stack (home page)") + HOME_STACK + "<p class=muted>One layer per taxing authority. Not a total: add only the layers that apply to your parcel.</p>" + redo.howto())
+page("index.html", "Florida property tax millage rates 2025, each linked to its official source", HOME_HERO + f"<p class=sources>{len(rows)} official rates {html.escape(LEAD_SRC)}, retrieved {max(r['retrieved_at'] for r in rows)[:10]} (UTC). {sum(r['rate_kind']=='aggregate_effective' for r in rows)} rows are Florida DOR totals for districts smaller than a county, not any one body's adopted rate. {cov['sd_rows_in_csv']} baseline rows are independent special districts. {sum(r['body_type']=='special_district' for r in rows) - cov['sd_rows_in_csv']} more, from county property appraisers, appear only on county pages.</p>"
      f"<p class=callout>Voting on Amendment 3 on {ELECTION}? <a href='{PATH}/{AMEND}/'>See the 2025 adopted millage baseline by county</a>.</p>"
      + HOME_REDO + f"<h2>How to read this</h2><p>{COV}</p><p>Independent special districts {NYS} (absent is not zero): {html.escape(', '.join(cov['not_yet_sourced']))}.</p><p id=correction>{html.escape(CORRECTION)}</p>"
      f"<h2 id=counties>Counties</h2>"
-     f"<p class=filter id=county-filter-wrap hidden><label for=county-filter>Filter counties</label><input type=search id=county-filter autocomplete=off aria-describedby=county-filter-count> <span id=county-filter-count class=muted role=status aria-live=polite></span></p>"
-     f"<ul class=counties>{''.join(links)}</ul>" + FILTER_JS
+     "<details class=all><summary>See all counties</summary>" f"<p class=filter id=county-filter-wrap hidden><label for=county-filter>Filter counties</label><input type=search id=county-filter autocomplete=off aria-describedby=county-filter-count> <span id=county-filter-count class=muted role=status aria-live=polite></span></p>"
+     f"<ul class=counties>{''.join(links)}</ul></details>" + FILTER_JS
      + redo.getdata(f"<a href='{PATH}/api/v1/fl/2025/{AMEND.split('/')[-1]}-baseline.csv'>CSV</a> · <a href='{PATH}/api/v1/fl/2025/{AMEND.split('/')[-1]}-baseline.json'>JSON</a>"),
      {"@context": "https://schema.org", "@type": "Dataset", "name": "OpenMillage", "description": f"Official property tax millage rates for counties, school districts, municipalities and independent special districts where sourced, with source links and file hashes. {coverage_sentence(cov)} Absent is not zero: a body with no row is not yet sourced.",
       "license": "https://creativecommons.org/licenses/by/4.0/", "creator": {"@type": "Organization", "name": "Hazey Data"}, "url": BASE + "/"},

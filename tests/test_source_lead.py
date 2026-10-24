@@ -39,7 +39,7 @@ expected = f"{len(prim_rows)} official rates from {join(types)}" + (
     f" (additional source{'s' if len(extras) > 1 else ''}: {join(extras)})" if extras else "") + ", retrieved "
 
 idx = open("docs/index.html", encoding="utf-8").read()
-m = re.search(r"<p class=lead>(\d+ official rates [^<]*)</p>", idx)
+m = re.search(r"<p class=sources>(\d+ official rates [^<]*)</p>", idx)
 ok(bool(m), "homepage lead paragraph present")
 lead = html.unescape(m.group(1)) if m else ""
 print("lead:", lead)

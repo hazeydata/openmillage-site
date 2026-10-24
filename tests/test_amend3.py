@@ -29,7 +29,7 @@ for bad, why in ((None, "missing file"), ({**FIX, "title": "Ballot Number: 3"}, 
     else: json.dump(bad, open(p, "w"))
     try: A.load_ballot(p); ok(False, f"AC2 fails closed on {why}")
     except A.BuildError: ok(True, f"AC2 fails closed on {why}")
-ok("<h1>FIXTURE MEASURE TITLE</h1>" in page and ">Ballot Number 3</a>" in page and "Ballot Number 3</h1>" not in page, "heading = title, ballot number only as label")
+ok("<h1>Florida 2025 adopted millage baseline</h1>" in page and "&ldquo;FIXTURE MEASURE TITLE&rdquo;" in page and ">Ballot Number 3</a>" in page and "Ballot Number 3</h1>" not in page, "heading = baseline title (layout 9911d28); ballot title verbatim in quote, number only as label")
 ok("&ldquo;" + html.escape(FIX["ballot_summary"], quote=True) + "&rdquo;" in page, "AC2 summary rendered verbatim in quotes")
 # AC3 table values equal CSV
 cells = re.findall(r"<td class='rate num' data-body-id='([^']*)' data-levy='([^']*)'>([^ ]+) ([a-z]+) <a href='([^']+)'", page)
@@ -83,7 +83,7 @@ r = subprocess.run([sys.executable, "amend3.py"], env=dict(os.environ, OUT=rd), 
 ok(r.returncode == 0, f"real build exit 0: {(r.stdout + r.stderr).strip()[:300]}")
 if r.returncode == 0:
     rp = open(os.path.join(rd, A.SLUG, "index.html")).read()
-    ok(f"<h1>{html.escape(real['title'], quote=True)}</h1>" in rp and f">Ballot Number {real['ballot_number']}</a>" in rp, "AC2 real page: heading = verbatim title, ballot number as label")
+    ok("<h1>Florida 2025 adopted millage baseline</h1>" in rp and f"&ldquo;{html.escape(real['title'], quote=True)}&rdquo;" in rp and f">Ballot Number {real['ballot_number']}</a>" in rp, "AC2 real page: heading = verbatim title, ballot number as label")
     ok("&ldquo;" + html.escape(real["ballot_summary"], quote=True) + "&rdquo;" in rp, "AC2 real page: verbatim summary in quotes with link")
     ok(A.check(rp) == [] and "Coverage: 67 of 67 counties" in rp and "Amendment 3" not in strip_chrome(rp), "real page passes AC1/5/6 checks, 67 of 67, no 'Amendment 3'")
 # mutant killers (Test, 2026-10-20)
