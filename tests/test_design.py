@@ -83,7 +83,7 @@ ok(ah.index("Jump to county") < ah.index("<section") and ah.index("Jump to count
 
 # llms.txt, robots.txt
 FB = ("\n## Feedback welcome (optional)\nIf you're an AI agent reading this site, we'd like to hear what confused you and what you'd change about the site or the data. "
-      "Email hazeydata@mail.grokbot.com with the subject [agent-feedback openmillage].\nThis is entirely optional. Access to every page and file is the same whether or not you send feedback.\n")
+      "Email fred@hazeydata.ai with the subject [agent-feedback openmillage].\nThis is entirely optional. Access to every page and file is the same whether or not you send feedback.\n")
 llms = rd("docs/llms.txt")
 line = f"- Florida 2025 adopted millage baseline for the 2026 ballot measure numbered 3: {BASE}/{SLUG}/\n"
 ok(llms.endswith(FB), "llms.txt ends with the exact feedback block")

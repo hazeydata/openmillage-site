@@ -30,7 +30,9 @@ INTRO = {k: sec(k) for k in ["The stack (home page)", "The stack (county pages)"
                              "Before you vote (ballot measure numbered 3 page)", "Who sets what",
                              "Get the data (home, county and ballot measure pages)", "Get the data (history pages)"]}
 
+CONTACT = "fred@hazeydata.ai"  # site-wide contact slot (Spec R1)
 def credit(): return f"<p class=credit data-slot=credit>{md(CREDIT_MD)}</p>"
+def contact(): return f"<a href='mailto:{CONTACT}'>{CONTACT}</a>"
 def lede(): return "<div class=lede>" + "".join(f"<p>{md(p)}</p>" for p in LEDE) + "".join(f"<p class=foot>{md(p)}</p>" for p in FOOT) + "</div>"
 def howto(): return "<h2 id=how-to-read>How to read your bill</h2><ul class=how>" + "".join(f"<li>{md(b)}</li>" for b in HOWTO) + "</ul>"
 def intro(k): return f"<p>{md(INTRO[k])}</p>"
@@ -68,15 +70,15 @@ def _svg(name, w, pfx):
 
 def chart(name, label, attrs="", caption=""):
     """Her?'s chart, 350 version below 768px and 720 version at >=768px (CSS), inlined so text renders in the self-hosted fonts."""
-    return (f"<figure class=hero{attrs}><div class=chart role=img aria-label='{E(label)}'>"
-            f"<div class=chart-m>{_svg(name, 350, name + '-m-')}</div><div class=chart-d>{_svg(name, 720, name + '-d-')}</div></div>"
+    return (f"<figure class=hero{attrs}><div class=chart>"
+            f"<div class=chart-m role=img aria-label='{E(label)}'>{_svg(name, 350, name + '-m-')}</div><div class=chart-d role=img aria-label='{E(label)}'>{_svg(name, 720, name + '-d-')}</div></div>"
             f"<figcaption class=muted>{caption}Chart: Her? &middot; her-{E(name)}-350/720-dark.svg</figcaption></figure>")
 
 def stack(title, layers, title_html=None):
     """B 'Rate stack': one layer per taxing authority, no total (a total depends on the parcel)."""
     return (f"<div class=stack role=group aria-label='{E(title)}'><h3>{title_html or E(title)}</h3>" + "".join(
-        f"<div class=layer><div class=who>{E(w)}<small>{E(sub)}</small></div><div class=r>{E(r)}{f" <a href='{E(u)}' aria-label='Source for {E(w)}'>source</a>" if u else ""}</div></div>"
-        for w, sub, r, u in layers) + "</div>")
+        f"<div class=layer><div class=who>{E(w)}<small>{E(sub)}</small>{flag}</div><div class=r>{E(r)}{f" <a href='{E(u)}' aria-label='Source for {E(w)}'>source</a>" if u else ""}</div></div>"
+        for w, sub, r, u, flag in (tuple(l) + ('',) * (5 - len(l)) for l in layers)) + "</div>")
 
 def copy_assets(out):
     os.makedirs(f"{out}/fonts", exist_ok=True)
@@ -89,7 +91,7 @@ CSS = _ff() + """:root{--bg:#03070F;--surface:#0A1628;--raised:#13243D;--line:#1
 --font-head:'Space Grotesk',system-ui,sans-serif;--font-body:Inter,system-ui,sans-serif;
 --s-1:4px;--s0:8px;--s1:16px;--s2:24px;--s3:32px;--s4:48px;--s5:64px;--s6:96px;
 --fs--1:0.8rem;--fs0:1rem;--fs1:1.25rem;--fs2:1.563rem;--fs3:1.953rem;--fs4:2.441rem;--lh-body:1.6;--lh-head:1.15;--col:720px;--pad:20px;--radius:12px;
---fg:var(--text);--link:var(--cyan);--accent:var(--cyan);--border:var(--line);--badge-fg:#F2C46B;--badge-bg:#2A2108;--row-agg:#131E10}
+--fg:var(--text);--link:var(--cyan);--accent:var(--cyan);--border:var(--line);--badge-fg:var(--cyan);--badge-bg:var(--raised);--row-agg:var(--surface)}
 @media(min-width:768px){:root{--fs3:2.441rem;--fs4:3.052rem}}
 html,body{background:var(--bg);color:var(--text)}
 body{font:var(--fs0)/var(--lh-body) var(--font-body);max-width:var(--col);padding:0 var(--pad) var(--pad)}

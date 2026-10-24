@@ -111,12 +111,18 @@ for (st, yr, co), rs in sorted(by.items()):
     nagg = sum(r['rate_kind'] == 'aggregate_effective' for r in rs)
     note = (f"<p id=agg-note><strong>Note:</strong> {nagg} row(s) marked <em>aggregate_effective</em> are not adopted rates: they are Florida DOR totals of less-than-countywide levies divided by countywide taxable value. Do not use them as any one body's millage.</p>" if nagg else "")
     meta = "<p>Source: " + "; ".join(f"{html.escape(a)} (<a href='{html.escape(u)}' aria-label='{html.escape('Source file from ' + a)}'>source file</a>)" for a, u in srcs) + f". Retrieved {ret} (UTC).</p>"
-    cw = [r for r in base if r['levy_scope'] == 'countywide' and r['rate_kind'] == 'adopted' and r['body_type'] in ('county', 'school_district')]
-    layers = [(sc.display_name(r['taxing_body']), f"{sc.label(r['body_type'])} · {sc.label(r['levy_component']).lower()}, countywide", f"{float(r['rate']):.4f}", r['source_url']) for r in cw]
+    layers = []  # AC6: every layer renders a value or '— no value in data'
+    for bt, who, sub in (("county", "County", "County · set by the county commission"), ("school_district", "School district", "School district · set by the school board")):
+        lr = [r for r in rs if r['body_type'] == bt]
+        cw = [r for r in lr if r['levy_scope'] == 'countywide' and r['rate_kind'] == 'adopted']
+        if cw: layers += [(sc.display_name(r['taxing_body']), f"{sc.label(r['body_type'])} · {sc.label(r['levy_component']).lower()}, countywide", f"{float(r['rate']):.4f}", r['source_url']) for r in cw]
+        elif lr: layers += [(sc.display_name(r['taxing_body']), f"{sc.label(r['body_type'])} · {sc.label(r['levy_component']).lower()}, {sc.label(r['levy_scope']).lower()}", f"{float(r['rate']):.4f}", r['source_url'], f"<span class=badge>not an adopted rate: {html.escape(r['rate_kind'])}</span>") for r in lr]
+        else: layers.append((who, sub, "— no value in data", None))
     for bt, who, sub in (("municipality", "Cities", "Municipality · set by each city commission; applies only inside that city"),
-                         ("special_district", "Special districts", "Special district · set by each district board; applies only inside that district")):
+                         ("special_district", "Special district levies", "Special district · set by each district board; applies only inside that district")):
         lr = sorted((r for r in rs if r['body_type'] == bt and r['rate_kind'] == 'adopted'), key=lambda r: float(r['rate']))
-        layers.append((f"{who} ({len(lr)})", sub, f"{float(lr[0]['rate']):.4f}–{float(lr[-1]['rate']):.4f}" if len(lr) > 1 else f"{float(lr[0]['rate']):.4f}", lr[0]['source_url'])
+        n = len({r['taxing_body'] for r in lr})
+        layers.append((f"{who} ({n})" if bt == 'municipality' else f"Special district levies ({len(lr)})", sub, f"{float(lr[0]['rate']):.4f}–{float(lr[-1]['rate']):.4f}" if len(lr) > 1 else f"{float(lr[0]['rate']):.4f}", lr[0]['source_url'])
                       if lr else (who, sub, "— no value in data", None))
     hist = [(lv, f"{PATH}/{hist_path(co, lv)[:-10]}") for lv in HIST_LEVELS if (co, lv) in HIST]
     top = ((redo.chart("alachua-bar", "Bar chart: Alachua County 2025 county and school board operating rates, side by side") if co == "Alachua" else "")

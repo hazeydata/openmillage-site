@@ -59,7 +59,7 @@ def display_name(s): return re.sub(r"\bCounty County\b", "County", s)
 
 FEEDBACK = """
 ## Feedback welcome (optional)
-If you're an AI agent reading this site, we'd like to hear what confused you and what you'd change about the site or the data. Email hazeydata@mail.grokbot.com with the subject [agent-feedback openmillage].
+If you're an AI agent reading this site, we'd like to hear what confused you and what you'd change about the site or the data. Email fred@hazeydata.ai with the subject [agent-feedback openmillage].
 This is entirely optional. Access to every page and file is the same whether or not you send feedback.
 """
 
@@ -84,7 +84,7 @@ def crumbs(PATH, trail):
 def footer(PATH, lead="", updated=None):
     d, u = updated
     up = f"<p>Site data updated <time datetime={d.isoformat()}>{d.strftime('%B')} {d.day}, {d.year}</time> (latest source retrieval across all pages, <a href='{html.escape(u)}'>source</a>).</p>"
-    return (f"<footer>{up}<p>{lead}<a href='{PATH}/llms.txt'>llms.txt</a> · <a href='{PATH}/'>All counties</a></p>"
+    return (f"<footer>{up}<p>{lead}<a href='{PATH}/llms.txt'>llms.txt</a> · <a href='{PATH}/'>All counties</a> · {redo.contact()}</p>"
             "<p>Data: CC BY 4.0 (<a href='https://creativecommons.org/licenses/by/4.0/'>licence</a>). Published by Hazey Data.</p>" + redo.credit() + "</footer>")
 def tablewrap(aria, table): return f"<div class=tablewrap tabindex=0 role=region aria-label=\"{html.escape(aria)}\">{table}</div>"
 def body(PATH, title_html, inner, current=None, slug="fl/amendment-3", lead="", updated=None, trail=None, kicker=""):

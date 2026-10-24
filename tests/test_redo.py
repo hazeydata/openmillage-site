@@ -63,6 +63,9 @@ ok(line and want in line.group(1), "Alachua history-line slot holds the final 21
 ok(all("<p data-slot=history-line>" in rd(p) for p in hist), "every history page has the marked history-line slot")
 ok(not any(re.search(r"ON HOLD|\{\{KEY_NUMBER|Pending re-cut", rd(p)) for p in pages), "no ON HOLD boxes or KEY_NUMBER placeholders left")
 CREDIT = "<p class=credit data-slot=credit>Built by Fred Hazelton and his team of AI bots. Spot a problem? <a href='https://github.com/hazeydata/openmillage-site/issues'>Tell us</a> and we&#x27;ll fix it in public.</p>"
+CONTACT_A = "<a href='mailto:fred@hazeydata.ai'>fred@hazeydata.ai</a>"
+ok(all(CONTACT_A in re.search(r"<footer>.*?</footer>", rd(p), re.S).group(0) for p in pages), f"Spec R1: footer mailto fred@hazeydata.ai on every page ({len(pages)} pages)")
+ok("fred@hazeydata.ai" in rd("docs/llms.txt") and "mail.grokbot.com" not in rd("docs/llms.txt"), "Spec R1: llms.txt contact is fred@hazeydata.ai")
 ok(all(CREDIT in re.search(r"<footer>.*?</footer>", rd(p), re.S).group(0) for p in pages), f"credit line, with 'Tell us' linking to the site issues, in every footer ({len(pages)} pages)")
 idx = rd("docs/index.html")
 ok(CREDIT.replace(" class=credit data-slot=credit", "") in idx.split("<footer>")[0], "credit line is also the 4th lede paragraph on home")
@@ -103,16 +106,50 @@ ok(idx.startswith("<details class=all><summary>See all counties</summary>", c + 
 ok("SpaceGrotesk" in css and "font-family:'Space Grotesk';font-weight:700" not in css, "nit: no Space Grotesk 700 @font-face")
 ok(re.search(r"<main id=main><p class=kicker>Ballot measure numbered 3 · <a [^>]+>November 3, 2026</a></p><h1>Florida 2025 adopted millage baseline</h1>", am) is not None, "AC13 amendment kicker precedes h1")
 import json as _j, glob as _g
-bad = []
-for f in _g.glob("docs/api/v1/fl/2025/*.json"):
+def ac6(rows, h):
+    """Errors for one county page: each of the 4 layers renders a value or '— no value in data'."""
+    st = h[h.find("<div class=stack"):h.find("<p class=muted>One layer per taxing authority", h.find("<div class=stack"))]
+    names = re.findall(r"<div class=who>(.*?)<small>", st); errs = []
+    if not st: return ["no stack"]
+    for bt, ph in (("county", "County"), ("school_district", "School district")):
+        lr = [r for r in rows if r["body_type"] == bt]
+        if not lr:
+            if not re.search(rf"<div class=who>{ph}<small>[^<]*</small></div><div class=r>— no value in data", st): errs.append(f"{bt}: no placeholder")
+        lab = {"county": "County ·", "school_district": "School district ·"}[bt]
+        cw = [r for r in lr if r["levy_scope"] == "countywide" and r["rate_kind"] == "adopted"]
+        for r in (cw or lr):
+            pat = rf"<small>{lab}[^<]*</small>" + (rf"<span class=badge>not an adopted rate: {r['rate_kind']}</span>" if not cw else "") + rf"</div><div class=r>{re.escape(format(float(r['rate']), '.4f'))} <a href="
+            if not re.search(pat, st): errs.append(f"{bt}: {r['taxing_body']} {r['rate']} not rendered")
+    mu = {r["taxing_body"] for r in rows if r["body_type"] == "municipality" and r["rate_kind"] == "adopted"}
+    sdl = [r for r in rows if r["body_type"] == "special_district" and r["rate_kind"] == "adopted"]
+    if (f"Cities ({len(mu)})" if mu else "Cities<small>") not in st: errs.append("cities")
+    if (f"Special district levies ({len(sdl)})" if sdl else "Special district levies<small>") not in st: errs.append("special district levies")
+    if re.search(r"<div class=r>0(\.0+)?[ <]", st): errs.append("zero shown")
+    return errs
+bad = []; npages = 0
+for f in sorted(_g.glob("docs/api/v1/fl/2025/*.json")):
     if f.endswith("-baseline.json"): continue
-    rows = _j.load(open(f)); co = rows[0]["county"]; h = rd(f"docs/fl/2025/{os.path.basename(f)[:-5]}-county/index.html")
-    st = h[h.find("<div class=stack"):h.find("</div></div></div>", h.find("<div class=stack")) + 18]
-    for bt, w in (("municipality", "Cities"), ("special_district", "Special districts")):
-        n = sum(r["body_type"] == bt and r["rate_kind"] == "adopted" for r in rows)
-        if (f"{w} ({n})" not in st) if n else ("— no value in data" not in st): bad.append((co, bt))
-    if re.search(r">0(\.0+)? <", st): bad.append((co, "zero"))
-ok(not bad, f"AC6 every county stack has a row per layer in the data, absent layers say '— no value in data' ({bad[:3]})")
+    rows = _j.load(open(f)); npages += 1
+    e = ac6(rows, rd(f"docs/fl/2025/{os.path.basename(f)[:-5]}-county/index.html"))
+    if e: bad.append((os.path.basename(f), e))
+ok(npages == len(_g.glob("docs/fl/2025/*-county/index.html")) and not bad, f"AC6 all {npages} county and split pages render every layer, value or '— no value in data' ({bad[:3]})")
+_dr = _j.load(open("docs/api/v1/fl/2025/duval.json")); _dh = rd("docs/fl/2025/duval-county/index.html")
+ok(any(r["body_type"] == "county" for r in _dr) and "not an adopted rate: aggregate_effective" in _dh and "11.0123" in _dh, "AC6 Duval county row shown with the not-adopted flag")
+_mut = re.sub(r"<div class=layer><div class=who>Duval County[^<]*<small>.*?</div></div>", "", _dh, count=1, flags=re.S)
+ok(_mut != _dh and ac6(_dr, _mut), "AC6 mutant: dropping Duval's county row from the stack makes the check fail")
+for _sp in ("flagler-st-johns", "flagler-volusia", "gilchrist-levy", "manatee-sarasota"):
+    ok(rd(f"docs/fl/2025/{_sp}-county/index.html").count("— no value in data") >= 2, f"AC6 split page {_sp} shows county and school placeholders")
+# --- AC2: no raw hex in redo.css outside the token block (layout-spec)
+_root = re.search(r":root\{[^}]*\}", css).group(0)
+_spec = set(re.findall(r"#[0-9A-Fa-f]{6}", re.search(r":root\{[^\n]*", open("/workspace/tmp/om-redo-meta/cycles/2026-10-23-page-redo/layout-spec.md").read()).group(0))) if os.path.exists("/workspace/tmp/om-redo-meta/cycles/2026-10-23-page-redo/layout-spec.md") else None
+ok(not re.findall(r"#[0-9A-Fa-f]{3,8}\b", css.replace(_root, "")), "AC2 redo.css has no raw hex outside the :root token block")
+ok(set(re.findall(r"#[0-9A-Fa-f]{6}", _root)) == {"#03070F", "#0A1628", "#13243D", "#1E3352", "#E8EEF5", "#9FB3C8", "#5FC4D6", "#155140"} and (_spec is None or set(re.findall(r"#[0-9A-Fa-f]{6}", _root)) <= _spec), "AC2 token block hex = layout-spec tokens only")
+# --- AC4 (Spec R1): CSS swap, one SVG visible, hidden one display:none, unique ids, each with text alternative
+for _p in ("docs/index.html", "docs/fl/amendment-3/index.html", "docs/fl/2025/alachua-county/index.html"):
+    _x = rd(_p); _ids = re.findall(r"\sid=['\"]?([^'\" >]+)", _x)
+    ok(len(_ids) == len(set(_ids)), f"AC4 no duplicate ids in {_p}")
+    ok(all(re.search(r"role=img aria-label='[^']+'", m) for m in re.findall(r"<div class=chart-[md][^>]*>", _x)) and _x.count("<div class=chart-m") == _x.count("<div class=chart-d") >= 1, f"AC4 each chart copy has its own text alternative in {_p}")
+ok(".chart-d{display:none}" in css and "@media(min-width:768px){.chart-m{display:none}.chart-d{display:block}}" in css, "AC4 CSS: below 768 only chart-m, at >=768 only chart-d (hidden one display:none); rendered check at 390/767/768/1440 in tests/ac4_render.js")
 _h = os.environ.get("OM_A3_HEIGHT_390")
 if _h: ok(int(_h) <= 1.5 * 3757, f"AC12 amendment height at 390 ({_h}px) within 1.5x of mock 3757px")
 print("FAILURES", len(FAIL)); sys.exit(1 if FAIL else 0)
