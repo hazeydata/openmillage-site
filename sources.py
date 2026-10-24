@@ -123,17 +123,30 @@ def join_names(xs):
     return xs[0] if len(xs) == 1 else ", ".join(xs[:-1]) + " and " + xs[-1]
 
 
-def alt_sentence(alt):
-    """Counties whose special-district rows come only from county property appraisers (not in the baseline CSV)."""
-    return (f"{join_names(alt)} also {'has' if len(alt) == 1 else 'have'} special-district rows from {'its' if len(alt) == 1 else 'their'} "
-            "property appraisers, shown on their county pages only." if len(alt) != 1 else
-            f"{alt[0]} also has special-district rows from its property appraiser, shown on its county page only.")
+def alt_counts(alt, state="FL", year="2025"):
+    """{county: special-district rows} for the alt-only counties, counted from the alt-sources CSV."""
+    rows = [r for r in _csv(ALT_FILE) if r["state"] == state and r["year"] == year and r["body_type"] == "special_district"]
+    return {c: sum(1 for r in rows if r["county"] == c) for c in alt}
 
 
-def coverage_sentence(cov):
+def alt_sentence(counts):
+    """Body text: counties whose special-district rows come only from county property appraisers (not in the baseline CSV)."""
+    names = join_names([c + " (" + plural(n, "row") + ")" for c, n in counts.items()])
+    if len(counts) == 1:
+        return f"{names} has special-district rates from its county property appraiser. It's on that county page but not in the baseline CSV."
+    return f"{names} have special-district rates from their county property appraisers. They're on those county pages but not in the baseline CSV."
+
+
+def alt_meta_sentence(counts):
+    """Meta description / JSON-LD wording for the same counties."""
+    where = "its county page" if len(counts) == 1 else "their county pages"
+    return f"{join_names(list(counts))} special-district rows come from county appraisers and are on {where} only."
+
+
+def coverage_sentence(cov, meta=False):
     """Counts match the published Amendment 3 baseline CSV (TACD special-district rows). Counties whose only special-district
     rows come from county property appraisers (alt sources, county pages/JSON only) are named separately, not counted."""
-    alt = cov["alt_only"]
-    tail = (f" {alt_sentence(alt)}" if alt else "")
+    counts = alt_counts(cov["alt_only"])
+    tail = (" " + (alt_meta_sentence if meta else alt_sentence)(counts) if counts else "")
     return (f"{cov['checked']} of {cov['total']} Florida counties checked against official sources; {cov['in_csv']} have special-district rows "
             f"in the Amendment 3 baseline CSV.{tail}")

@@ -36,6 +36,9 @@ def contact(): return f"<a href='mailto:{CONTACT}'>{CONTACT}</a>"
 def lede(): return "<div class=lede>" + "".join(f"<p>{md(p)}</p>" for p in LEDE) + "".join(f"<p class=foot>{md(p)}</p>" for p in FOOT) + "</div>"
 def howto(): return "<h2 id=how-to-read>How to read your bill</h2><ul class=how>" + "".join(f"<li>{md(b)}</li>" for b in HOWTO) + "</ul>"
 def intro(k): return f"<p>{md(INTRO[k])}</p>"
+def who_lead():
+    """The 'Who sets what' intro minus its appraiser-rows sentence, which is generated from the alt-sources CSV instead (sources.alt_sentence)."""
+    return "<p>" + md(re.split(r" [A-Z]\w+ \(\d+ rows?\)", INTRO["Who sets what"])[0])
 def getdata(links, k="Get the data (home, county and ballot measure pages)"):
     return f"<h2 id=get-the-data>Get the data</h2>{intro(k)}<p class=muted>{links}</p>"
 
