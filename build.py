@@ -136,10 +136,19 @@ for (st, yr, co), rs in sorted(by.items()):
          f"Official {yr} property tax millage rates for {plural(len(rs), 'levy', 'levies')} in {co} County, {st}, each linked to its government source. Retrieved {ret}.", lead=HEAD_LEAD, trail=[("Counties", f"{PATH}/#counties"), (f"{co} County, {st}", None)])
     links.append(f"<li><a href='{PATH}/{p[:-10]}'>{html.escape(co)} County, {st}</a> <span class=muted>({plural(len(rs), 'rate')})</span>"
                  + (" <span class=badge>special districts not yet sourced</span>" if co in cov['not_yet_sourced'] else "") + "</li>")
+def locator_label(loc):
+    loc = loc or ""
+    m = re.fullmatch(r"sheet=(\d{4})!([A-Z]{1,3}\d{1,6})", loc)
+    if m: return f"Sheet {m.group(1)}, cell {m.group(2)}"
+    m = re.fullmatch(r"sheet=(\d{4});column=not_in_sheet", loc)
+    if m: return f"Sheet {m.group(1)} (not in sheet)"
+    m = re.fullmatch(r"scanned_pdf;page=(\d{1,5})(?:;[a-z_]+)*", loc)
+    if m: return f"Scanned PDF, page {m.group(1)}"
+    return "Source"
 def hist_tr(r):
     v = f"{r['millage']} mills" if r["status"] == "published" and r["millage"] != "" else f"— no value in data ({html.escape(sc.label(r['null_reason'] or r['status']))})"
     return (f"<tr><td>{r['year']}</td><td>{html.escape(sc.label(r['component']))}</td><td class=num>{v}</td>"
-            f"<td><a href='{html.escape(r['source_url'])}' aria-label='Source for {r['year']} {html.escape(sc.label(r['component']))}'>{html.escape(r['source_locator'] or 'source')}</a></td></tr>")
+            f"<td><a href='{html.escape(r['source_url'])}' data-locator='{html.escape(r['source_locator'] or '', quote=True)}' aria-label='Source for {r['year']} {html.escape(sc.label(r['component']))}'>{locator_label(r['source_locator'])}</a></td></tr>")
 for (co, lv), hrs in sorted(HIST.items()):
     hp = hist_path(co, lv); d = os.path.dirname(f"{OUT}/{hp}"); os.makedirs(d, exist_ok=True); urls.append(f"{BASE}/{hp[:-10]}")
     with open(f"{d}/index.csv", "w", newline="", encoding="utf-8") as f:

@@ -163,4 +163,10 @@ ok("aggregate_effective" in rd("docs/llms.txt") and any("aggregate_effective" in
 _L = {"marker": "Effective rate", "badge": "Effective rate, not one the county adopted", "note": "Rows marked Effective rate aren't rates any taxing body adopted."}
 ok(sc_.RATE_KIND_COPY["aggregate_effective"]["label"] == _L["marker"] == sc_.RATE_KIND_COPY["aggregate_effective"]["badge"] and sc_.RATE_KIND_COPY["aggregate_effective"]["stack_badge"] == _L["badge"] and sc_.RATE_KIND_COPY["aggregate_effective"]["note"] == _L["note"], "Lindsay final strings in the one lookup")
 ok(html.escape(_L["note"]) in _dh and html.escape(_L["badge"]) in _dh and "11.0123" in _dh, "Duval page: note, badge and 11.0123")
+_bad_loc = []
+for _p in hist:
+    for _m in re.finditer(r"<a\b[^>]*>(.*?)</a>", rd(_p), re.S):
+        _t = html.unescape(re.sub(r"<[^>]+>", "", _m.group(1)))
+        if "=" in _t or re.search(r"[A-Za-z_]+=[^;<]*;", _t): _bad_loc.append((_p, _t))
+ok(hist and not _bad_loc, f"history link text has no raw locator syntax ({len(_bad_loc)}: {_bad_loc[:3]})")
 print("FAILURES", len(FAIL)); sys.exit(1 if FAIL else 0)
