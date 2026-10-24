@@ -129,11 +129,6 @@ def alt_counts(alt, state="FL", year="2025"):
     return {c: sum(1 for r in rows if r["county"] == c) for c in alt}
 
 
-def alt_status(counts):
-    """Status line for counties with appraiser rows only."""
-    return "Appraiser rows only, not in baseline CSV: " + ", ".join(c + " (" + plural(n, "row") + ")" for c, n in counts.items()) + "."
-
-
 def alt_sentence(counts):
     """Body text: counties whose special-district rows come only from county property appraisers (not in the baseline CSV)."""
     names = join_names([c + " (" + plural(n, "row") + ")" for c, n in counts.items()])

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Appraiser-only counties (DeSoto, Orange) have their own status and are never listed as "not yet collected". Counts come from
+"""Appraiser-only counties (DeSoto, Orange) are named once in the coverage sentence and never listed as "not yet collected". Counts come from
 data/special/fl-2025-alt-sources.csv. Run from the repo root after build.py and amend3.py: python3 tests/test_desoto_orange.py"""
 import csv, html, os, re, sys, tempfile
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__))); sys.path.insert(0, ROOT); os.chdir(ROOT)
@@ -26,8 +26,9 @@ def check(h, label, counts):
     nyc = [m for m in re.findall(r"[Nn]ot yet (?:collected|sourced)[^.<]*", h)]
     ok(all(c not in m for m in nyc for c in names), f"{label}: {names} not in any 'not yet collected' list")
     para = cov_para(h) if "Special districts: " in h else h
-    status = "Appraiser rows only, not in baseline CSV: " + ", ".join(f"{c} ({n} row{'' if n == 1 else 's'})" for c, n in sorted(counts.items())) + "."
-    ok(status in para, f"{label}: status names them with CSV counts: {status}")
+    ok("Appraiser rows only" not in h and "not in baseline CSV:" not in h, f"{label}: separate status clause is absent (Lindsay 2:11 AM)")
+    sent = sources.alt_sentence(dict(sorted(counts.items())))
+    ok(h.count(sent) == 1 and sent in para, f"{label}: appraiser sentence appears exactly once, in the coverage paragraph")
     names_sentence = " and ".join(f"{c} ({n} row{'' if n == 1 else 's'})" for c, n in sorted(counts.items()))
     ok(names_sentence in para, f"{label}: body sentence counts match the CSV ({names_sentence})")
 

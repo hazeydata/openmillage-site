@@ -79,7 +79,9 @@ for needle in [redo.HEADLINE] + [re.sub(r"\[(.+?)\]\([^)]+\)", r"\1", p) for p i
 ok(f"<h1>{html.escape(redo.HEADLINE)}</h1>" in idx and redo.HEADLINE in src_copy, "home h1 is Lindsay's headline")
 ok(redo.INTRO["The stack (county pages)"] in plain(rd("docs/fl/2025/alachua-county/index.html")), "county page has the county stack intro verbatim")
 amd = plain(rd("docs/fl/amendment-3/index.html"))
-ok(redo.INTRO["Before you vote (ballot measure numbered 3 page)"] in amd and redo.INTRO["Who sets what"] in amd, "amendment page has 'Before you vote' and 'Who sets what' verbatim")
+_who_lead = plain(redo.who_lead() + "</p>").strip(); _alt = redo.INTRO["Who sets what"][len(_who_lead):].strip()
+ok(redo.INTRO["Before you vote (ballot measure numbered 3 page)"] in amd and _who_lead in amd and amd.count(_alt) == 1,
+   "amendment page has 'Before you vote' and the 'Who sets what' lead verbatim; the appraiser sentence once (Lindsay 2:11 AM)")
 
 # --- canonical URLs
 canon = [re.search(r"<link rel=canonical href='([^']+)'>", rd(p)) for p in pages]

@@ -93,12 +93,8 @@ FOOT = footnotes(CFG["footnotes_md"])
 def link(u, text="source"): return f"<a href='{E(u)}'>{E(text)}</a>"
 
 def who_sets_what():
-    """Lindsay's intro verbatim; the county names it mentions link to their canonical county pages (that link is the source for the counts)."""
-    counts = sources.alt_counts(sources.coverage(sources.load_rows())["alt_only"])
-    t = redo.who_lead()[3:] + (" " + sources.alt_sentence(counts) if counts else "")
-    for c in counts:
-        t = re.sub(r"\b" + c + r" \(", f"<a href='{redo.SITE}/fl/2025/{c.lower()}-county/'>{c}</a> (", t, count=1)
-    return f"<p>{t}</p>"
+    """Lindsay's intro verbatim, minus the appraiser-rows sentence: that is said once, in the coverage paragraph (Lindsay 2026-10-24 2:11 AM)."""
+    return redo.who_lead() + "</p>"
 
 def render_amend3(rows, districts, ballot, counties, sd_counties=None):
     if sd_counties is None: sd_counties = sources.coverage(sources.load_rows())["counties_with_rows"]
@@ -160,7 +156,7 @@ def render_amend3(rows, districts, ballot, counties, sd_counties=None):
       + f"<p>Special districts: {len(sd_have)} of {len(names)} Florida counties have special-district rows in this baseline ({sum(r['body_type'] == 'special_district' for r in districts)} rows), read from each county's 2025 TACD file ({link(CFG['tacd_index']['url'], 'Florida Department of Revenue TACD index')}): "
       + ", ".join(f"{E(c)} ({link(sd_file[c], 'TACD')})" for c in sd_have)
       + (f"; not yet collected for: {', '.join(E(c) for c in sd_missing)}" if sd_missing else "") + "."
-      + (f" {E(sources.alt_status(alt_n))} {E(sources.alt_sentence(alt_n))}" if alt_n else "") + "</p>"
+      + (f" {E(sources.alt_sentence(alt_n))}" if alt_n else "") + "</p>"
       + f"<p>Rows shown: {nt['county']} county, {nt['school_district']} school district, {nt['municipality']} municipal and {len(districts)} special-district rates ({link(srcs[0][1], 'Florida Department of Revenue')}).</p>" + "</details>"
       + "<h2 id=who-sets-what>Who sets what</h2>" + who_sets_what()
       + "<details class=all><summary>See all rates</summary>" + jump + "".join(sections) + "</details>"
