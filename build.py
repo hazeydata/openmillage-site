@@ -129,7 +129,7 @@ for (st, yr, co), rs in sorted(by.items()):
            + redo.intro("The stack (county pages)") + (redo.stack(f"{co} County, {yr} adopted rates", layers) if layers else "")
            + "<p class=muted>One layer per taxing authority. Not a total: add only the layers that apply to your parcel.</p>"
            + (("<p>History since 1996: " + " · ".join(f"<a href='{h}'>{HIST_LEVELS[lv]}</a>" for lv, h in hist) + "</p>") if hist else "")
-           + redo.howto() + "<h2 id=who-sets-what>Who sets what</h2>" + redo.intro("Who sets what").split(" DeSoto (")[0] + "</p>")
+           + redo.howto() + "<h2 id=who-sets-what>Who sets what</h2>" + redo.who_lead() + "</p>")
     page(p, f"{co} County, {st} property tax rates ({yr})",
          top + note + "<details class=all><summary>See all rates</summary>" + "".join(groups) + "</details>"
          + f"{sdh}{meta}<p>JSON: <a href='{PATH}/{api}'>{api}</a></p>" + redo.getdata(f"<a href='{PATH}/{api}'>JSON</a> · <a href='{PATH}/api/v1/fl/2025/{AMEND.split('/')[-1]}-baseline.csv'>CSV (all counties)</a>"), ds,
@@ -177,9 +177,9 @@ page("index.html", "Florida property tax millage rates 2025, each linked to its 
      "<details class=all><summary>See all counties</summary>" f"<p class=filter id=county-filter-wrap hidden><label for=county-filter>Filter counties</label><input type=search id=county-filter autocomplete=off aria-describedby=county-filter-count> <span id=county-filter-count class=muted role=status aria-live=polite></span></p>"
      f"<ul class=counties>{''.join(links)}</ul></details>" + FILTER_JS
      + redo.getdata(f"<a href='{PATH}/api/v1/fl/2025/{AMEND.split('/')[-1]}-baseline.csv'>CSV</a> · <a href='{PATH}/api/v1/fl/2025/{AMEND.split('/')[-1]}-baseline.json'>JSON</a>"),
-     {"@context": "https://schema.org", "@type": "Dataset", "name": "OpenMillage", "description": f"Official property tax millage rates for counties, school districts, municipalities and independent special districts where sourced, with source links and file hashes. {coverage_sentence(cov)} Absent is not zero: a body with no row is not yet sourced.",
+     {"@context": "https://schema.org", "@type": "Dataset", "name": "OpenMillage", "description": f"Official property tax millage rates for counties, school districts, municipalities and independent special districts where sourced, with source links and file hashes. {coverage_sentence(cov, meta=True)} Absent is not zero: a body with no row is not yet sourced.",
       "license": "https://creativecommons.org/licenses/by/4.0/", "creator": {"@type": "Organization", "name": "Hazey Data"}, "url": BASE + "/"},
-     f"Official Florida 2025 property tax millage rates for counties, school districts, municipalities and independent special districts where sourced, each with its government source link and file hash. {coverage_sentence(cov)} Absent is not zero.", current="counties", lead=HEAD_LEAD, h1=redo.HEADLINE)
+     f"Official Florida 2025 property tax millage rates for counties, school districts, municipalities and independent special districts where sourced, each with its government source link and file hash. {coverage_sentence(cov, meta=True)} Absent is not zero.", current="counties", lead=HEAD_LEAD, h1=redo.HEADLINE)
 today = datetime.date.today().isoformat()
 open(f"{OUT}/sitemap.xml", "w").write('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
     + "".join(f"<url><loc>{u}</loc><lastmod>{today}</lastmod></url>" for u in urls) + "</urlset>")

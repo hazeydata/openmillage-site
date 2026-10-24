@@ -105,7 +105,7 @@ ah_txt = html.unescape(ah)
 ok(d_n == n, f"data/ count {d_n} equals sources.coverage count {n}")
 ok(f"Special districts: {d_n} of 67 Florida counties" in ah_txt, f"amendment page states '{d_n} of 67'")
 ok(f"have special-district rows in this baseline ({len([r for r in csv.DictReader(open(CFG['districts_csv'], newline='', encoding='utf-8')) if r['body_type'] == 'special_district'])} rows), read from each county's 2025 TACD file" in ah_txt, "amendment page states the baseline row count")
-ok(bool(_alt_c) and f"{d_names} also have special-district rows from their property appraisers, shown on their county pages only." in ah_txt, f"amendment page names the {len(_alt_c)} alt-only counties ({d_names}) without counting them")
+ok(bool(_alt_c) and sources.alt_sentence(sources.alt_counts(sorted(_alt_c))) in ah_txt, f"amendment page names the {len(_alt_c)} alt-only counties ({d_names}) without counting them")
 # Renderer tracks the data: re-render the sentence from perturbed inputs (catches literals that happen to match today's data)
 import amend3
 _rows = amend3.rows_from(CFG["rates_csv"]); _dist = amend3.rows_from(CFG["districts_csv"])
@@ -117,7 +117,7 @@ def _sent(dist, sdc):
 for _drop_alt, _drop_tacd in ((sorted(_alt_c)[:1], []), ([], sorted(_tacd_c)[:2])):
     _d = [r for r in _dist if r["county"] not in _drop_tacd]; _sdc = [c for c in _all if c not in _drop_alt]
     _t = _tacd_c - set(_drop_tacd); _o = sorted(set(_sdc) - _t); _s = _sent(_d, _sdc)
-    ok(f"Special districts: {len(_t)} of 67 " in _s and ((f"{_join(_o)} also ha" in _s) if _o else " also ha" not in _s),
+    ok(f"Special districts: {len(_t)} of 67 " in _s and ((all(f"{c} (" in _s.split("Appraiser rows only")[1] for c in _o)) if _o else "Appraiser rows only" not in _s),
        f"perturbed inputs (drop alt {_drop_alt}, drop TACD {_drop_tacd}) render {len(_t)} of 67 / {len(_o)} more: {_s[-160:]!r}")
 # OM-COPY-FIX: copy counts come from the published baseline CSV itself
 _pub = [r for r in csv.DictReader(open("docs/api/v1/fl/2025/amendment-3-baseline.csv", newline="", encoding="utf-8")) if r["body_type"] == "special_district"]

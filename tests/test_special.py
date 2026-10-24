@@ -9,7 +9,7 @@ def ok(cond, msg): print(("PASS " if cond else "FAIL ") + msg); cond or FAIL.app
 API = "docs/api/v1/fl/2025"
 def js(c): return json.load(open(f"{API}/{c}.json"))
 def pg(c): return open(f"docs/fl/2025/{c}-county/index.html", encoding="utf-8").read()
-SENT = "57 of 67 Florida counties checked against official sources; 43 have special-district rows in the Amendment 3 baseline CSV. DeSoto and Orange also have special-district rows from their property appraisers, shown on their county pages only."
+SENT = "57 of 67 Florida counties checked against official sources; 43 have special-district rows in the Amendment 3 baseline CSV. DeSoto (1 row) and Orange (3 rows) have special-district rates from their county property appraisers. They're on those county pages but not in the baseline CSV."
 NO_ROWS = "No special-district rows published yet for this county."
 NO_ROWS_COUNTIES = ["Bradford", "Citrus", "Franklin", "Glades", "Hardee", "Highlands", "Nassau", "Okeechobee", "Pasco", "Polk", "Wakulla", "Walton"]
 OPEN = ["Calhoun", "Clay", "Columbia", "Monroe", "Collier", "Sumter", "Gadsden", "Levy", "Taylor", "Liberty"]
@@ -130,7 +130,7 @@ ok(len(now_or) == 20 and len(main_or) == 17 and any(r["body_type"] == "special_d
 
 sentence = sources.coverage_sentence(cov)
 pages = glob.glob("docs/fl/2025/*-county/index.html")
-ok(all(sentence in open(p).read() for p in pages + ["docs/index.html"]), f"AC12 computed coverage sentence on index and all {len(pages)} county pages")
+ok(all(html.escape(sentence) in open(p).read() for p in pages + ["docs/index.html"]), f"AC12 computed coverage sentence on index and all {len(pages)} county pages")
 ok(sentence == SENT and (cov["checked"], cov["total"], cov["with_rows"]) == (57, 67, 45) and cov["with_rows"] + len(cov["no_rows"]) == cov["checked"], f"AC12 computed sentence equals the ruled string: {sentence}")
 ok(cov["no_rows"] == NO_ROWS_COUNTIES, f"AC13 no-rows counties are the ruled 12: {cov['no_rows']}")
 ok(all(NO_ROWS in pg(c.lower()) and "0.0000" not in pg(c.lower()).split("Special districts</h2>")[1].split("<p>Source:")[0] for c in cov["no_rows"]),
@@ -147,7 +147,8 @@ pl = json.loads(re.search(r'<script type="application/ld\+json">(.*?)</script>',
 ok(cf[0]["source_url"] in ld["isBasedOn"] and pas[0]["additional_sources"][0]["source_url"] in pl["isBasedOn"], "AC16 JSON-LD isBasedOn includes special-district and additional source URLs")
 idx = open("docs/index.html").read(); llms = open("docs/llms.txt").read()
 idesc = json.loads(re.search(r'<script type="application/ld\+json">(.*?)</script>', idx).group(1))["description"]
-ok(all("independent special district" in t.lower() and sentence in t and "not zero" in t for t in (idesc, llms)), "AC16 index description and llms.txt mention special districts, coverage, absent is not zero")
+meta_sentence = sources.coverage_sentence(cov, meta=True)
+ok(all("independent special district" in t.lower() and s in t and "not zero" in t for t, s in ((idesc, meta_sentence), (llms, sentence))), "AC16 index description and llms.txt mention special districts, coverage, absent is not zero")
 ok(all(k in llms for k in sources.BASE_KEYS + sources.EXTRA_KEYS), "AC16 llms.txt names the 17 base keys and the additive keys")
 
 def snap(d):
@@ -158,7 +159,7 @@ def snap(d):
 tmp, r = build_copy(); t2, r2 = build_copy()
 ok(r.returncode == 0 and r2.returncode == 0 and snap(tmp) == snap(t2), f"AC19 two builds produce byte-identical docs/ ({len(snap(tmp))} files) apart from lastmod")
 shutil.rmtree(tmp); shutil.rmtree(t2)
-po = pg("polk"); i = [po.find(s) for s in ("Special districts</h2>", sentence, NO_ROWS)]
+po = pg("polk"); i = [po.find(s) for s in ("Special districts</h2>", html.escape(sentence), NO_ROWS)]
 ok(-1 not in i and i == sorted(i), "visual: Polk order is heading, coverage, empty-state line")
 BANNED = re.compile(r"\b(CEO|rulings?|R6)\b", re.I)
 hits = ["CEO ruling 2026-10-20", "CEO rulings", "Fred ruling", "(ruling 5)", "ceo", "Ruling", "rulings", "r6", "per R6."]

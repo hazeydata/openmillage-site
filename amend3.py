@@ -94,8 +94,9 @@ def link(u, text="source"): return f"<a href='{E(u)}'>{E(text)}</a>"
 
 def who_sets_what():
     """Lindsay's intro verbatim; the county names it mentions link to their canonical county pages (that link is the source for the counts)."""
-    t = redo.md(redo.INTRO["Who sets what"])
-    for c in ("DeSoto", "Orange"):
+    counts = sources.alt_counts(sources.coverage(sources.load_rows())["alt_only"])
+    t = redo.who_lead()[3:] + (" " + sources.alt_sentence(counts) if counts else "")
+    for c in counts:
         t = re.sub(r"\b" + c + r" \(", f"<a href='{redo.SITE}/fl/2025/{c.lower()}-county/'>{c}</a> (", t, count=1)
     return f"<p>{t}</p>"
 
@@ -104,7 +105,9 @@ def render_amend3(rows, districts, ballot, counties, sd_counties=None):
     names = [c for c, _ in counties]
     have = {r["county"] for r in rows}
     covered = [c for c in names if c in have]; missing = [c for c in names if c not in have]
-    sd_have = [c for c in names if any(r["county"] == c for r in districts)]; sd_missing = [c for c in names if c not in sd_have]
+    sd_have = [c for c in names if any(r["county"] == c for r in districts)]
+    others = sorted(set(sd_counties) - set(sd_have)); alt_n = sources.alt_counts(others)  # appraiser rows only: own status, not "missing"
+    sd_missing = [c for c in names if c not in sd_have and c not in others]
     sd_file = {c: SRC_BY_COUNTY[c] for c in sd_have}
     nt = {k: sum(r["body_type"] == k for r in rows) for k in ("county", "school_district", "municipality")}
     allrows = rows + districts
@@ -134,7 +137,7 @@ def render_amend3(rows, districts, ballot, counties, sd_counties=None):
         sid = E(re.sub(r'[^a-z0-9]+', '-', c.lower()).strip('-')); slugs.append((sid, c))
         sections.append(f"<section id='{sid}'><h3>{E(c)}</h3>{table('Adopted rates in ' + c, ''.join(tr(r) for r in rs))}{det}{fn}<a class=top href='#main'>Back to top</a></section>")
     jump = "<nav aria-label=\"Jump to county\" class=jump><ul>" + "".join(f"<li><a href='#{sid}'>{E(c)}</a></li>" for sid, c in slugs) + "</ul></nav>"
-    n_sd = len(sd_counties); others = sorted(set(sd_counties) - set(sd_have))
+    n_sd = len(sd_counties)
     md = CFG["millage_definition"]; api = f"api/v1/fl/2025/{SLUG.split('/')[-1]}-baseline"
     srcs = sorted({(r["source_agency"], r["source_url"]) for r in allrows})
     edtxt = f"{ed.strftime('%B')} {ed.day}, {ed.year}"
@@ -157,7 +160,7 @@ def render_amend3(rows, districts, ballot, counties, sd_counties=None):
       + f"<p>Special districts: {len(sd_have)} of {len(names)} Florida counties have special-district rows in this baseline ({sum(r['body_type'] == 'special_district' for r in districts)} rows), read from each county's 2025 TACD file ({link(CFG['tacd_index']['url'], 'Florida Department of Revenue TACD index')}): "
       + ", ".join(f"{E(c)} ({link(sd_file[c], 'TACD')})" for c in sd_have)
       + (f"; not yet collected for: {', '.join(E(c) for c in sd_missing)}" if sd_missing else "") + "."
-      + (f" {E(sources.alt_sentence(others))}" if others else "") + "</p>"
+      + (f" {E(sources.alt_status(alt_n))} {E(sources.alt_sentence(alt_n))}" if alt_n else "") + "</p>"
       + f"<p>Rows shown: {nt['county']} county, {nt['school_district']} school district, {nt['municipality']} municipal and {len(districts)} special-district rates ({link(srcs[0][1], 'Florida Department of Revenue')}).</p>" + "</details>"
       + "<h2 id=who-sets-what>Who sets what</h2>" + who_sets_what()
       + "<details class=all><summary>See all rates</summary>" + jump + "".join(sections) + "</details>"
