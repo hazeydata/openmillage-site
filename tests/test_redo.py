@@ -141,9 +141,8 @@ for _sp in ("flagler-st-johns", "flagler-volusia", "gilchrist-levy", "manatee-sa
     ok(rd(f"docs/fl/2025/{_sp}-county/index.html").count("— no value in data") >= 2, f"AC6 split page {_sp} shows county and school placeholders")
 # --- AC2: no raw hex in redo.css outside the token block (layout-spec)
 _root = re.search(r":root\{[^}]*\}", css).group(0)
-_spec = set(re.findall(r"#[0-9A-Fa-f]{6}", re.search(r":root\{[^\n]*", open("/workspace/tmp/om-redo-meta/cycles/2026-10-23-page-redo/layout-spec.md").read()).group(0))) if os.path.exists("/workspace/tmp/om-redo-meta/cycles/2026-10-23-page-redo/layout-spec.md") else None
 ok(not re.findall(r"#[0-9A-Fa-f]{3,8}\b", css.replace(_root, "")), "AC2 redo.css has no raw hex outside the :root token block")
-ok(set(re.findall(r"#[0-9A-Fa-f]{6}", _root)) == {"#03070F", "#0A1628", "#13243D", "#1E3352", "#E8EEF5", "#9FB3C8", "#5FC4D6", "#155140"} and (_spec is None or set(re.findall(r"#[0-9A-Fa-f]{6}", _root)) <= _spec), "AC2 token block hex = layout-spec tokens only")
+ok(set(re.findall(r"#[0-9A-Fa-f]{6}", _root)) == {"#03070F", "#0A1628", "#13243D", "#1E3352", "#E8EEF5", "#9FB3C8", "#5FC4D6", "#155140"}, "AC2 token block hex = the 8 layout-spec (meta 9911d28 layout-spec.md) tokens only")
 # --- AC4 (Spec R1): CSS swap, one SVG visible, hidden one display:none, unique ids, each with text alternative
 for _p in ("docs/index.html", "docs/fl/amendment-3/index.html", "docs/fl/2025/alachua-county/index.html"):
     _x = rd(_p); _ids = re.findall(r"\sid=['\"]?([^'\" >]+)", _x)
