@@ -92,7 +92,7 @@ CSS = _ff() + """:root{--bg:#03070F;--surface:#0A1628;--raised:#13243D;--line:#1
 --fg:var(--text);--link:var(--cyan);--accent:var(--cyan);--border:var(--line);--badge-fg:#F2C46B;--badge-bg:#2A2108;--row-agg:#131E10}
 @media(min-width:768px){:root{--fs3:2.441rem;--fs4:3.052rem}}
 html,body{background:var(--bg);color:var(--text)}
-body{font:var(--fs0)/var(--lh-body) var(--font-body);max-width:calc(var(--col) + 2*var(--pad));padding:0 var(--pad) var(--pad)}
+body{font:var(--fs0)/var(--lh-body) var(--font-body);max-width:var(--col);padding:0 var(--pad) var(--pad)}
 h1,h2,h3,.brand,summary{font-family:var(--font-head)}
 h1{font-size:var(--fs4);line-height:var(--lh-head);font-weight:700;margin:var(--s4) 0 var(--s2);letter-spacing:-.01em}
 h2{font-size:var(--fs2);line-height:var(--lh-head);margin:var(--s5) 0 var(--s1)}
