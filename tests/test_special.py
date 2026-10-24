@@ -17,7 +17,8 @@ CFTOD_SHA = "1f4e3b57663e35703d71d5338c0add294164c90813ef78275af7d978a9486a68"
 
 def build_copy(mutate=None):
     tmp = tempfile.mkdtemp()
-    for n in ("build.py", "sources.py", "amend3.py", "analytics.py", "site_chrome.py", "amend3_config.json"): shutil.copy(n, tmp)
+    for n in ("build.py", "sources.py", "amend3.py", "analytics.py", "site_chrome.py", "redo.py", "amend3_config.json"): shutil.copy(n, tmp)
+    for n in ("assets", "content"): shutil.copytree(n, os.path.join(tmp, n))
     shutil.copytree("data", os.path.join(tmp, "data"))
     if mutate: mutate(tmp)
     blocker = os.path.join(tmp, "nonet"); os.makedirs(blocker)
@@ -33,7 +34,7 @@ def append(path, line):
 lock = sources.read_lock()
 rows = sources.load_rows(lock)
 paths = {f["path"]: f for f in lock["files"]}
-ok(set(paths) == {sources.BASE_FILE, sources.SD_FILE, sources.ALT_FILE, sources.STATUS_FILE}, "AC1 lock lists the four openmillage copies")
+ok(set(paths) == {sources.BASE_FILE, sources.SD_FILE, sources.ALT_FILE, sources.STATUS_FILE, "data/history/fl_millage_history.csv"}, "AC1 lock lists the four openmillage copies plus the pinned history CSV")
 ok(all(f["repo"] == "hazeydata/openmillage" and re.fullmatch(r"[0-9a-f]{40}", f["commit"]) and re.fullmatch(r"[0-9a-f]{64}", f["sha256"]) for f in lock["files"]),
    "AC1 each lock entry has repo, 40-hex commit and 64-hex sha256")
 tmp, r = build_copy(lambda t: open(os.path.join(t, sources.SD_FILE), "a").write("\n"))
@@ -136,7 +137,9 @@ ok(all(NO_ROWS in pg(c.lower()) and "0.0000" not in pg(c.lower()).split("Special
    f"AC13 the {len(cov['no_rows'])} computed no-rows counties show the fixed string: {cov['no_rows']}")
 ok(sorted(cov["not_yet_sourced"]) == sorted(OPEN) and all("not yet sourced" in pg(c.lower()) and NO_ROWS not in pg(c.lower()) and "<th>Taxing body</th><th>Levy</th><th>Rate</th>" not in pg(c.lower()) for c in OPEN)
    and all(c in open("docs/index.html").read().split("<p>Independent special districts not yet sourced")[1].split("</p>")[0] for c in OPEN), "AC14 the 10 open counties are listed as not yet sourced on the index and their pages")
-ok("aggregate_effective</em> are not adopted rates" in oh and "aggregate_effective</em>" not in oh.split("Special districts</h2>")[1], "AC15 aggregate_effective note still renders")
+import site_chrome as _sc
+_t = html.escape(_sc.RATE_KIND_COPY['aggregate_effective']['note'])
+ok("<p id=agg-note>" in oh and _t in oh.split("<p id=agg-note>")[1].split("</p>")[0] and "<p id=agg-note>" not in oh.split("Special districts</h2>")[1], "AC15 aggregate_effective note still renders (copy from site_chrome.RATE_KIND_COPY)")
 ok(not re.search(r"(?i)<t[dh]>(total|sum)", oh.split("Special districts</h2>")[1].split("<p>Source:")[0]), "AC15 no special-district totals row")
 
 ld = json.loads(re.search(r'<script type="application/ld\+json">(.*?)</script>', oh).group(1))

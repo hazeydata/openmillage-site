@@ -36,7 +36,7 @@ def check_page(p):
     if re.search(r"<th(?![^>]*scope=col)[ >]", h): errs.append("th without scope=col")
     for raw in RAW:
         if raw in h: errs.append(f"raw enum {raw}")
-    if re.search(r">https?://", h) and "/fl/" in p and "amendment" not in p: errs.append("raw URL as link text")
+    if re.search(r">https?://", re.sub(r"<svg\b.*?</svg>", "", h, flags=re.S)) and "/fl/" in p and "amendment" not in p: errs.append("raw URL as link text")  # inline chart text (Her?'s SVG source notes) is not link text
     return errs
 bad = {p: e for p in pages if (e := check_page(p))}
 ok(not bad, f"all {len(pages)} pages pass the shared checks; failing: {dict(list(bad.items())[:3])}")
@@ -46,8 +46,8 @@ aggbad = []; notebad = []; metabad = []
 for p in county_pages:
     h = rd(p)
     for tr in re.findall(r"<tr[ >].*?</tr>", h, re.S):
-        if "aggregate" in tr.lower() or "Not an adopted rate" in tr:
-            if not (tr.startswith("<tr class=agg>") and "<span class=badge>Not an adopted rate</span>" in tr and "href='#agg-note'" in tr): aggbad.append(p)
+        if "aggregate" in tr.lower() or "Effective rate" in tr:
+            if not (tr.startswith("<tr class=agg>") and "<span class=badge>Effective rate</span>" in tr and "href='#agg-note'" in tr): aggbad.append(p)
     n = h.count("<tr class=agg>")
     if n and not (h.find("<p id=agg-note>") != -1 and h.find("<p id=agg-note>") < h.find("<table")): notebad.append(p)
     if "<p id=agg-note>" in h and n == 0: notebad.append(p)
@@ -64,9 +64,9 @@ ok("rows are aggregate_effective (DOR less-than-countywide totals)" not in idx, 
 ok("aggregate_effective" in rd("docs/llms.txt"), "llms.txt keeps aggregate_effective")
 ed = datetime.date.fromisoformat(json.load(open(CFG["ballot_json"]))["election_date"])
 callout = f"<p class=callout>Voting on Amendment 3 on {ed.strftime('%B')} {ed.day}, {ed.year}? <a href='{PATH}/{SLUG}/'>See the 2025 adopted millage baseline by county</a>.</p>"
-lead_end = idx.index("</p>", idx.index("<p class=lead>")) + 4
-ok(idx[lead_end:].startswith(callout), "home callout directly follows the lead, date from the ballot JSON")
-ok(re.search(r"<main id=main><h1>[^<]+</h1><p class=lead>", idx) and "<h2>How to read this</h2>" in idx and re.search(r"<h2 id=counties>Counties</h2><p class=filter id=county-filter-wrap hidden>.*?</p><ul class=counties>", idx), "home hierarchy: h1, lead, callout, How to read this, Counties")
+lead_end = idx.index("</p>", idx.index("<p class=sources>")) + 4
+ok(idx[lead_end:].startswith(callout), "home callout directly follows the sources paragraph, date from the ballot JSON")
+ok(re.search(r"<main id=main><h1>[^<]+</h1><figure class=hero", idx) and "<h2>How to read this</h2>" in idx and re.search(r"<h2 id=counties>Counties</h2><details class=all><summary>See all counties</summary><p class=filter id=county-filter-wrap hidden>.*?</p><ul class=counties>", idx), "home hierarchy: h1, hero, lede, sources, callout, How to read this, Counties")
 ok("<p>Independent special districts not yet sourced (absent is not zero): " in idx, "home keeps the not-yet-sourced paragraph")
 lis = re.findall(r"<li>(.*?)</li>", idx.split("<ul class=counties>")[1].split("</ul>")[0])
 badge = "<span class=badge>special districts not yet sourced</span>"
@@ -83,7 +83,7 @@ ok(ah.index("Jump to county") < ah.index("<section") and ah.index("Jump to count
 
 # llms.txt, robots.txt
 FB = ("\n## Feedback welcome (optional)\nIf you're an AI agent reading this site, we'd like to hear what confused you and what you'd change about the site or the data. "
-      "Email hazeydata@mail.grokbot.com with the subject [agent-feedback openmillage].\nThis is entirely optional. Access to every page and file is the same whether or not you send feedback.\n")
+      "Email fred@hazeydata.ai with the subject [agent-feedback openmillage].\nThis is entirely optional. Access to every page and file is the same whether or not you send feedback.\n")
 llms = rd("docs/llms.txt")
 line = f"- Florida 2025 adopted millage baseline for the 2026 ballot measure numbered 3: {BASE}/{SLUG}/\n"
 ok(llms.endswith(FB), "llms.txt ends with the exact feedback block")

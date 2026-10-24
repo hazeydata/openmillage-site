@@ -12,9 +12,9 @@ a{color:var(--link);overflow-wrap:anywhere;text-decoration:underline}
 :focus-visible{outline:3px solid var(--link);outline-offset:2px}
 .skip{position:absolute;left:-9999px;top:0}
 .skip:focus{left:.5rem;top:.5rem;z-index:10;background:var(--bg);padding:.5rem 1rem}
-header{display:flex;flex-wrap:wrap;align-items:center;gap:0 1.5rem;border-bottom:1px solid var(--border)}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:0 var(--s1,16px);border-bottom:1px solid var(--border)}
 header a,footer a.top{display:inline-block;padding:.65rem 0}
-header nav{display:flex;flex-wrap:wrap;gap:0 1.25rem}
+header nav{display:flex;flex-wrap:wrap;gap:0 var(--s1,16px)}
 .brand{font-weight:700;text-decoration:none;color:var(--fg)}
 footer{border-top:1px solid var(--border);margin-top:3rem;padding:.5rem 0 2rem;color:var(--muted);font-size:.9rem}
 .tablewrap{overflow-x:auto;max-width:100%}

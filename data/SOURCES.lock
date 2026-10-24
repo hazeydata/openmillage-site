@@ -27,6 +27,13 @@
    "commit": "cbac2ebf65166b2a38fe1291c3cf00c90a05c502",
    "source_path": "reference/tacd_county_status_open.csv",
    "sha256": "77c3f9499bbad2fab26baa882edbb665694cdfc04b797828ca2ce98ed9267e7e"
+  },
+  {
+   "path": "data/history/fl_millage_history.csv",
+   "repo": "hazeydata/openmillage",
+   "commit": "7c1a5259eb42384e64b957a6f809cb520f568ef8",
+   "source_path": "data/fl_millage_history.csv",
+   "sha256": "0d74a1f09ccc579bfe459ce0d309fc8c94139998d7775106a425e4f213041869"
   }
  ]
 }
