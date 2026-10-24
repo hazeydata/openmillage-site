@@ -51,10 +51,23 @@ LABELS = {
     "operating": "Operating", "operating_total": "Operating (total)", "debt_service": "Debt service",
     "mstu": "MSTU (municipal service taxing unit)", "dependent_special_district": "Dependent special district",
     "countywide": "countywide", "less_than_countywide": "less than countywide", "municipal": "municipal",
-    "adopted": "Adopted", "aggregate_effective": "DOR aggregate, not an adopted rate",
+    "adopted": "Adopted",
     "okeechobee_basin": "Okeechobee Basin", "everglades_construction": "Everglades Construction",
 }
-def label(v): return LABELS.get(v, str(v).replace("_", " "))
+# ONE place for every human-facing display of rate_kind (data, CSV, JSON and llms.txt keep the raw enum).
+# Copy slot: Lindsay's final strings go here (Weatherman HOLD on #14 @28ef0a99). {n} = row count.
+RATE_KIND_COPY = {  # Lindsay final, /workspace/writing-drafts/om-aggregate-label.md (2026-10-23)
+    "aggregate_effective": {
+        "label": "Effective rate",                                 # row marker, everywhere humans see it
+        "badge": "Effective rate",                                 # table badge (same marker)
+        "stack_badge": "Effective rate, not one the county adopted",  # rate-stack badge (Duval)
+        "note": "Rows marked Effective rate aren't rates any taxing body adopted.",  # county-page note
+    },
+}
+def rate_kind_copy(kind, form, **kw):
+    c = RATE_KIND_COPY[kind]
+    return c[form]
+def label(v): return RATE_KIND_COPY[v]["label"] if v in RATE_KIND_COPY else LABELS.get(v, str(v).replace("_", " "))
 def display_name(s): return re.sub(r"\bCounty County\b", "County", s)
 
 FEEDBACK = """

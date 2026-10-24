@@ -64,7 +64,7 @@ def sd_tr(r):
             f"<td>{src_link(r)} <code title='{r['sha256']}'>{r['sha256'][:8]}</code></td></tr>")
 def base_tr(r):
     agg = r['rate_kind'] == 'aggregate_effective'
-    kind = "<span class=badge>Not an adopted rate</span> <a href='#agg-note' aria-label='What this means'>?</a>" if agg else html.escape(sc.label(r['rate_kind']))
+    kind = f"<span class=badge>{html.escape(sc.rate_kind_copy('aggregate_effective', 'badge'))}</span> <a href='#agg-note' aria-label='What this means'>?</a>" if agg else html.escape(sc.label(r['rate_kind']))
     return (f"<tr{' class=agg' if agg else ''}><td>{html.escape(sc.display_name(r['taxing_body']))}</td><td>{html.escape(sc.label(r['body_type']))}</td>"
             f"<td>{html.escape(sc.label(r['levy_component']))} ({html.escape(sc.label(r['levy_scope']))})</td><td>{kind}</td>"
             f"<td class=num>{float(r['rate']):.4f} {r['unit']}</td><td>{src_link(r)}</td></tr>")
@@ -109,14 +109,14 @@ for (st, yr, co), rs in sorted(by.items()):
           "distribution": [{"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": f"{BASE}/{api}"}]}
     srcs = sorted({(r['source_agency'], r['source_url']) for r in rs}); ret = max(r['retrieved_at'] for r in rs)[:10]
     nagg = sum(r['rate_kind'] == 'aggregate_effective' for r in rs)
-    note = (f"<p id=agg-note><strong>Note:</strong> {nagg} row(s) marked <em>aggregate_effective</em> are not adopted rates: they are Florida DOR totals of less-than-countywide levies divided by countywide taxable value. Do not use them as any one body's millage.</p>" if nagg else "")
+    note = (f"<p id=agg-note>{html.escape(sc.rate_kind_copy('aggregate_effective', 'note'))}</p>" if nagg else "")
     meta = "<p>Source: " + "; ".join(f"{html.escape(a)} (<a href='{html.escape(u)}' aria-label='{html.escape('Source file from ' + a)}'>source file</a>)" for a, u in srcs) + f". Retrieved {ret} (UTC).</p>"
     layers = []  # AC6: every layer renders a value or '— no value in data'
     for bt, who, sub in (("county", "County", "County · set by the county commission"), ("school_district", "School district", "School district · set by the school board")):
         lr = [r for r in rs if r['body_type'] == bt]
         cw = [r for r in lr if r['levy_scope'] == 'countywide' and r['rate_kind'] == 'adopted']
         if cw: layers += [(sc.display_name(r['taxing_body']), f"{sc.label(r['body_type'])} · {sc.label(r['levy_component']).lower()}, countywide", f"{float(r['rate']):.4f}", r['source_url']) for r in cw]
-        elif lr: layers += [(sc.display_name(r['taxing_body']), f"{sc.label(r['body_type'])} · {sc.label(r['levy_component']).lower()}, {sc.label(r['levy_scope']).lower()}", f"{float(r['rate']):.4f}", r['source_url'], f"<span class=badge>not an adopted rate: {html.escape(r['rate_kind'])}</span>") for r in lr]
+        elif lr: layers += [(sc.display_name(r['taxing_body']), f"{sc.label(r['body_type'])} · {sc.label(r['levy_component']).lower()}, {sc.label(r['levy_scope']).lower()}", f"{float(r['rate']):.4f}", r['source_url'], f"<span class=badge>{html.escape(sc.rate_kind_copy(r['rate_kind'], 'stack_badge'))}</span>") for r in lr]
         else: layers.append((who, sub, "— no value in data", None))
     for bt, who, sub in (("municipality", "Cities", "Municipality · set by each city commission; applies only inside that city"),
                          ("special_district", "Special district levies", "Special district · set by each district board; applies only inside that district")):

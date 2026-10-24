@@ -4,6 +4,7 @@ python3 tests/test_redo.py"""
 import csv, glob, hashlib, html, io, json, os, re, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__))); sys.path.insert(0, ROOT); os.chdir(ROOT)
 import redo, sources
+import site_chrome as sc_
 FAIL = []
 def ok(cond, msg): print(("PASS " if cond else "FAIL ") + msg); cond or FAIL.append(msg)
 def rd(p): return open(p, encoding="utf-8").read()
@@ -118,7 +119,7 @@ def ac6(rows, h):
         lab = {"county": "County ·", "school_district": "School district ·"}[bt]
         cw = [r for r in lr if r["levy_scope"] == "countywide" and r["rate_kind"] == "adopted"]
         for r in (cw or lr):
-            pat = rf"<small>{lab}[^<]*</small>" + (rf"<span class=badge>not an adopted rate: {r['rate_kind']}</span>" if not cw else "") + rf"</div><div class=r>{re.escape(format(float(r['rate']), '.4f'))} <a href="
+            pat = rf"<small>{lab}[^<]*</small>" + (rf"<span class=badge>{re.escape(html.escape(sc_.rate_kind_copy(r['rate_kind'], 'stack_badge')))}</span>" if not cw else "") + rf"</div><div class=r>{re.escape(format(float(r['rate']), '.4f'))} <a href="
             if not re.search(pat, st): errs.append(f"{bt}: {r['taxing_body']} {r['rate']} not rendered")
     mu = {r["taxing_body"] for r in rows if r["body_type"] == "municipality" and r["rate_kind"] == "adopted"}
     sdl = [r for r in rows if r["body_type"] == "special_district" and r["rate_kind"] == "adopted"]
@@ -134,7 +135,7 @@ for f in sorted(_g.glob("docs/api/v1/fl/2025/*.json")):
     if e: bad.append((os.path.basename(f), e))
 ok(npages == len(_g.glob("docs/fl/2025/*-county/index.html")) and not bad, f"AC6 all {npages} county and split pages render every layer, value or '— no value in data' ({bad[:3]})")
 _dr = _j.load(open("docs/api/v1/fl/2025/duval.json")); _dh = rd("docs/fl/2025/duval-county/index.html")
-ok(any(r["body_type"] == "county" for r in _dr) and "not an adopted rate: aggregate_effective" in _dh and "11.0123" in _dh, "AC6 Duval county row shown with the not-adopted flag")
+ok(any(r["body_type"] == "county" for r in _dr) and f"<span class=badge>{html.escape(sc_.rate_kind_copy('aggregate_effective', 'stack_badge'))}</span>" in _dh and "11.0123" in _dh, "AC6 Duval county row shown with the not-adopted flag")
 _mut = re.sub(r"<div class=layer><div class=who>Duval County[^<]*<small>.*?</div></div>", "", _dh, count=1, flags=re.S)
 ok(_mut != _dh and ac6(_dr, _mut), "AC6 mutant: dropping Duval's county row from the stack makes the check fail")
 for _sp in ("flagler-st-johns", "flagler-volusia", "gilchrist-levy", "manatee-sarasota"):
@@ -151,4 +152,15 @@ for _p in ("docs/index.html", "docs/fl/amendment-3/index.html", "docs/fl/2025/al
 ok(".chart-d{display:none}" in css and "@media(min-width:768px){.chart-m{display:none}.chart-d{display:block}}" in css, "AC4 CSS: below 768 only chart-m, at >=768 only chart-d (hidden one display:none); rendered check at 390/767/768/1440 in tests/ac4_render.js")
 _h = os.environ.get("OM_A3_HEIGHT_390")
 if _h: ok(int(_h) <= 1.5 * 3757, f"AC12 amendment height at 390 ({_h}px) within 1.5x of mock 3757px")
+# --- Weatherman HOLD: no raw rate_kind enum in the visible text of any built HTML page
+_vis = []
+for _p in glob.glob("docs/**/*.html", recursive=True):
+    _t = re.sub(r"<script.*?</script>|<style.*?</style>", " ", rd(_p), flags=re.S)
+    _t = html.unescape(re.sub(r"<[^>]+>", " ", _t))
+    if "aggregate_effective" in _t or "aggregate effective" in _t.lower(): _vis.append(_p)
+ok(not _vis, f"no 'aggregate_effective' in visible text of any built page ({len(_vis)}: {_vis[:3]})")
+ok("aggregate_effective" in rd("docs/llms.txt") and any("aggregate_effective" in rd(f) for f in glob.glob("docs/api/v1/fl/2025/*.json")), "data/API and llms.txt keep the raw enum")
+_L = {"marker": "Effective rate", "badge": "Effective rate, not one the county adopted", "note": "Rows marked Effective rate aren't rates any taxing body adopted."}
+ok(sc_.RATE_KIND_COPY["aggregate_effective"]["label"] == _L["marker"] == sc_.RATE_KIND_COPY["aggregate_effective"]["badge"] and sc_.RATE_KIND_COPY["aggregate_effective"]["stack_badge"] == _L["badge"] and sc_.RATE_KIND_COPY["aggregate_effective"]["note"] == _L["note"], "Lindsay final strings in the one lookup")
+ok(html.escape(_L["note"]) in _dh and html.escape(_L["badge"]) in _dh and "11.0123" in _dh, "Duval page: note, badge and 11.0123")
 print("FAILURES", len(FAIL)); sys.exit(1 if FAIL else 0)

@@ -46,8 +46,8 @@ aggbad = []; notebad = []; metabad = []
 for p in county_pages:
     h = rd(p)
     for tr in re.findall(r"<tr[ >].*?</tr>", h, re.S):
-        if "aggregate" in tr.lower() or "Not an adopted rate" in tr:
-            if not (tr.startswith("<tr class=agg>") and "<span class=badge>Not an adopted rate</span>" in tr and "href='#agg-note'" in tr): aggbad.append(p)
+        if "aggregate" in tr.lower() or "Effective rate" in tr:
+            if not (tr.startswith("<tr class=agg>") and "<span class=badge>Effective rate</span>" in tr and "href='#agg-note'" in tr): aggbad.append(p)
     n = h.count("<tr class=agg>")
     if n and not (h.find("<p id=agg-note>") != -1 and h.find("<p id=agg-note>") < h.find("<table")): notebad.append(p)
     if "<p id=agg-note>" in h and n == 0: notebad.append(p)
