@@ -55,8 +55,8 @@ LABELS = {
     "okeechobee_basin": "Okeechobee Basin", "everglades_construction": "Everglades Construction",
 }
 # ONE place for every human-facing display of rate_kind (data, CSV, JSON and llms.txt keep the raw enum).
-# Copy slot: Lindsay's final strings go here (Weatherman HOLD on #14 @28ef0a99). {n} = row count.
-RATE_KIND_COPY = {  # Lindsay final, /workspace/writing-drafts/om-aggregate-label.md (2026-10-23)
+# Copy slot: Lindsay's final strings go here (Weatherman HOLD on #14 @28ef0a99).
+RATE_KIND_COPY = {  # Lindsay final, om-aggregate-label.md writing draft (2026-10-23)
     "aggregate_effective": {
         "label": "Effective rate",                                 # row marker, everywhere humans see it
         "badge": "Effective rate",                                 # table badge (same marker)

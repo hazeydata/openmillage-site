@@ -10,7 +10,6 @@
 - Rates are never estimated; if a body is missing, it is not yet collected.
 - Absent is not zero: a county or special district with no row has not been sourced yet; never read a missing rate as 0.
 - Special-district rates are never summed.
-- Florida 2025 adopted millage baseline for the 2026 ballot measure numbered 3: https://openmillage.com/fl/amendment-3/
 
 ## Feedback welcome (optional)
 If you're an AI agent reading this site, we'd like to hear what confused you and what you'd change about the site or the data. Email fred@hazeydata.ai with the subject [agent-feedback openmillage].
