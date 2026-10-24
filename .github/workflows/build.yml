@@ -18,6 +18,7 @@ jobs:
       - run: python3 tests/test_design.py
       - run: python3 tests/test_source_lead.py
       - run: python3 tests/test_redo.py
+      - run: python3 tests/test_desoto_orange.py
       - run: |
           git config user.name "openmillage-build"
           git config user.email "actions@users.noreply.github.com"
