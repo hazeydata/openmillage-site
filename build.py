@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """Static build: data/ (pinned by data/SOURCES.lock) -> docs/ (GitHub Pages). Per-county pages, JSON API, sitemap, llms.txt."""
-import json, os, re, html, datetime
+import csv, json, os, re, html, datetime
+import sources
 from analytics import GOATCOUNTER_TAG
 import site_chrome as sc
+import redo
 from sources import plural, COMBINED, load_rows, data_updated, coverage, coverage_sentence, EXTRA_KEYS
 BASE = os.environ.get("SITE_BASE", "https://openmillage.com").rstrip("/")
 PATH = "/" + BASE.split("/", 3)[3] if BASE.count("/") > 2 else ""
@@ -40,13 +42,13 @@ CORRECTION = "Correction, Oct 23, 2026: we earlier said 165 special districts ac
 by = {}
 for r in rows: by.setdefault((r["state"], r["year"], r["county"]), []).append(r)
 urls = [BASE + "/"]
-def page(path, title, body, jsonld=None, desc="", current=None, lead="", trail=None):
+def page(path, title, body, jsonld=None, desc="", current=None, lead="", trail=None, h1=None):
     os.makedirs(os.path.dirname(os.path.join(OUT, path)) or OUT, exist_ok=True)
     ld = f'<script type="application/ld+json">{json.dumps(jsonld)}</script>' if jsonld else ""
     open(os.path.join(OUT, path), "w").write(f"<!doctype html><html lang=en><head><meta charset=utf-8><title>{html.escape(title)}</title>"
       f"<meta name=description content='{html.escape(desc, quote=True)}'><link rel=canonical href='{BASE}/{path[:-10] if path.endswith('index.html') else path}'>"
-      f"{sc.head_extra(PATH)}{ld}{GOATCOUNTER_TAG}</head>{sc.body(PATH, html.escape(title), body, current, AMEND, lead, UPDATED, trail)}</html>")
-open(f"{OUT}/style.css", "w").write(sc.CSS)
+      f"{sc.head_extra(PATH)}{ld}{GOATCOUNTER_TAG}</head>{sc.body(PATH, html.escape(h1 or title), body, current, AMEND, lead, UPDATED, trail)}</html>")
+open(f"{OUT}/style.css", "w").write(sc.CSS); redo.copy_assets(OUT)
 GROUPS = [("County", "County", ("county",)), ("School", "School", ("school_district",)), ("Municipalities", "Municipal", ("municipality",))]  # (heading, caption word, body types)  # then Special districts (below)
 COLS = [("Taxing body", 0), ("Type", 0), ("Levy", 0), ("Rate kind", 0), ("Rate", 1), ("Source", 0)]
 HEAD_LEAD = "Official rates only, each row linked to its government source. "
@@ -72,6 +74,17 @@ FILTER_JS = ("<script>(function(){var w=document.getElementById('county-filter-w
   "o=document.getElementById('county-filter-count'),li=document.querySelectorAll('ul.counties li');if(!w||!i)return;w.hidden=false;"
   "function f(){var q=i.value.trim().toLowerCase(),n=0;li.forEach(function(e){var a=e.querySelector('a'),m=!q||a.textContent.toLowerCase().indexOf(q)>-1;e.hidden=!m;if(m)n++;});"
   "o.textContent=q?n+' of '+li.length+' counties':'';}i.addEventListener('input',f);f();})();</script>")
+# --- History body pages (spec items 15/17): /fl/history/<county>-county/<level>/ with index.csv and index.json beside each page.
+# Data: data/history/fl_millage_history.csv, pinned in data/SOURCES.lock to hazeydata/openmillage@7c1a525.
+HIST_FILE = "data/history/fl_millage_history.csv"
+HIST_PIN = next(f["commit"] for f in sources.read_lock()["files"] if f["path"] == HIST_FILE)
+HIST_LEVELS = {"county": "County", "school": "School board"}
+def hist_path(co, lv): return f"fl/history/{slug(co)}-county/{lv}/index.html"
+HIST_FIELDS = list(next(csv.reader(open(HIST_FILE, newline="", encoding="utf-8"))))
+HIST = {}
+for r in csv.DictReader(open(HIST_FILE, newline="", encoding="utf-8")):
+    if r["level"] in HIST_LEVELS: HIST.setdefault((r["entity_name"], r["level"]), []).append(r)
+for k in HIST: HIST[k].sort(key=lambda r: (r["year"], r["component"]))
 for (st, yr, co), rs in sorted(by.items()):
     p = f"{st.lower()}/{yr}/{slug(co)}-county/index.html"; urls.append(f"{BASE}/{p[:-10]}")
     base = [r for r in rs if r['body_type'] != 'special_district']; sds = [r for r in rs if r['body_type'] == 'special_district']
@@ -98,21 +111,55 @@ for (st, yr, co), rs in sorted(by.items()):
     nagg = sum(r['rate_kind'] == 'aggregate_effective' for r in rs)
     note = (f"<p id=agg-note><strong>Note:</strong> {nagg} row(s) marked <em>aggregate_effective</em> are not adopted rates: they are Florida DOR totals of less-than-countywide levies divided by countywide taxable value. Do not use them as any one body's millage.</p>" if nagg else "")
     meta = "<p>Source: " + "; ".join(f"{html.escape(a)} (<a href='{html.escape(u)}' aria-label='{html.escape('Source file from ' + a)}'>source file</a>)" for a, u in srcs) + f". Retrieved {ret} (UTC).</p>"
+    cw = [r for r in base if r['levy_scope'] == 'countywide' and r['rate_kind'] == 'adopted' and r['body_type'] in ('county', 'school_district')]
+    layers = [(sc.display_name(r['taxing_body']), f"{sc.label(r['body_type'])} · {sc.label(r['levy_component']).lower()}, countywide", f"{float(r['rate']):.4f}", r['source_url']) for r in cw]
+    hist = [(lv, f"{PATH}/{hist_path(co, lv)[:-10]}") for lv in HIST_LEVELS if (co, lv) in HIST]
+    top = ((redo.chart("alachua-bar", "Bar chart: Alachua County 2025 county and school board operating rates, side by side") if co == "Alachua" else "")
+           + redo.intro("The stack (county pages)") + (redo.stack(f"{co} County, {yr} adopted rates", layers) if layers else "")
+           + "<p class=muted>One layer per taxing authority. Not a total: add only the layers that apply to your parcel.</p>"
+           + (("<p>History since 1996: " + " · ".join(f"<a href='{h}'>{HIST_LEVELS[lv]}</a>" for lv, h in hist) + "</p>") if hist else "")
+           + redo.howto() + "<h2 id=who-sets-what>Who sets what</h2>" + redo.intro("Who sets what").split(" DeSoto (")[0] + "</p>")
     page(p, f"{co} County, {st} property tax rates ({yr})",
-         note + "".join(groups)
-         + f"{sdh}{meta}<p>JSON: <a href='{PATH}/{api}'>{api}</a></p>", ds,
+         top + note + "<details class=all><summary>See all rates</summary>" + "".join(groups) + "</details>"
+         + f"{sdh}{meta}<p>JSON: <a href='{PATH}/{api}'>{api}</a></p>" + redo.getdata(f"<a href='{PATH}/{api}'>JSON</a> · <a href='{PATH}/api/v1/fl/2025/{AMEND.split('/')[-1]}-baseline.csv'>CSV (all counties)</a>"), ds,
          f"Official {yr} property tax millage rates for {plural(len(rs), 'levy', 'levies')} in {co} County, {st}, each linked to its government source. Retrieved {ret}.", lead=HEAD_LEAD, trail=[("Counties", f"{PATH}/#counties"), (f"{co} County, {st}", None)])
     links.append(f"<li><a href='{PATH}/{p[:-10]}'>{html.escape(co)} County, {st}</a> <span class=muted>({plural(len(rs), 'rate')})</span>"
                  + (" <span class=badge>special districts not yet sourced</span>" if co in cov['not_yet_sourced'] else "") + "</li>")
+def hist_tr(r):
+    v = f"{r['millage']} mills" if r["status"] == "published" and r["millage"] != "" else f"— no value in data ({html.escape(sc.label(r['null_reason'] or r['status']))})"
+    return (f"<tr><td>{r['year']}</td><td>{html.escape(sc.label(r['component']))}</td><td class=num>{v}</td>"
+            f"<td><a href='{html.escape(r['source_url'])}' aria-label='Source for {r['year']} {html.escape(sc.label(r['component']))}'>{html.escape(r['source_locator'] or 'source')}</a></td></tr>")
+for (co, lv), hrs in sorted(HIST.items()):
+    hp = hist_path(co, lv); d = os.path.dirname(f"{OUT}/{hp}"); os.makedirs(d, exist_ok=True); urls.append(f"{BASE}/{hp[:-10]}")
+    with open(f"{d}/index.csv", "w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=HIST_FIELDS, lineterminator="\n"); w.writeheader(); w.writerows(hrs)
+    json.dump({"source": {"repo": "hazeydata/openmillage", "commit": HIST_PIN, "path": "data/fl_millage_history.csv"}, "county": co, "level": lv, "rows": hrs}, open(f"{d}/index.json", "w"), indent=1)
+    yrs = sorted({r["year"] for r in hrs}); line = redo.HISTORY_LINE.get(co); ch = redo.HISTORY_CHART.get(co)
+    chart_html = (redo.chart(ch[0], ch[1], f" id=history-chart data-slot=history-chart data-src='{PATH}/{hp[:-10]}index.json'", f"Re-cut on openmillage@{HIST_PIN[:7]} &middot; ") if ch
+                  else f"<figure class=hero id=history-chart data-slot=history-chart data-src='{PATH}/{hp[:-10]}index.json'></figure>")
+    other = [(l, f"{PATH}/{hist_path(co, l)[:-10]}") for l in HIST_LEVELS if l != lv and (co, l) in HIST]
+    page(hp, f"{co} County, FL {HIST_LEVELS[lv].lower()} millage history, {yrs[0]}–{yrs[-1]}",
+         chart_html + "<h2 id=over-time>Over time</h2>"
+         + f"<p data-slot=history-line>{redo.md(redo.OVER_GENERIC)}" + (f" {redo.md(line[0])}</p><p class=foot>{redo.md(line[1])}" if line else "") + "</p>"
+         + "<details class=all><summary>See all years</summary>" + table(f"{HIST_LEVELS[lv]} millage by year, {co} County", [("Year", 0), ("Component", 0), ("Millage", 1), ("Source", 0)], "".join(hist_tr(r) for r in hrs)) + "</details>"
+         + "".join(f"<p>Also: <a href='{h}'>{HIST_LEVELS[l]} history</a> · <a href='{PATH}/fl/2025/{slug(co)}-county/'>{html.escape(co)} County 2025 rates</a></p>" for l, h in other)
+         + redo.getdata(f"<a href='{PATH}/{hp[:-10]}index.csv'>CSV</a> · <a href='{PATH}/{hp[:-10]}index.json'>JSON</a> (openmillage@{HIST_PIN[:7]})"),
+         None, f"{HIST_LEVELS[lv]} millage in {co} County, Florida, by year since {yrs[0]}, each value linked to its official source file.",
+         lead=HEAD_LEAD, trail=[("Counties", f"{PATH}/#counties"), (f"{co} County, FL", f"{PATH}/fl/2025/{slug(co)}-county/"), (f"History: {HIST_LEVELS[lv]}", None)])
+AL = sorted([r for r in rows if r["county"] == "Alachua" and r["levy_scope"] == "countywide" and r["rate_kind"] == "adopted" and r["body_type"] in ("county", "school_district")], key=lambda r: r["body_type"])
+HOME_STACK = redo.stack("Example: Alachua County, 2025 adopted rates", [(sc.display_name(r["taxing_body"]), f"{sc.label(r['body_type'])} · {sc.label(r['levy_component']).lower()}, countywide", f"{float(r['rate']):.4f}", r["source_url"]) for r in AL])
+HOME_REDO = (redo.chart("county-dots", "Dot plot: 2025 county and school board countywide rates for each Florida county") + redo.lede()
+             + redo.intro("The stack (home page)") + HOME_STACK + "<p class=muted>One layer per taxing authority. Not a total: add only the layers that apply to your parcel.</p>" + redo.howto())
 page("index.html", "Florida property tax millage rates 2025, each linked to its official source", f"<p class=lead>{len(rows)} official rates {html.escape(LEAD_SRC)}, retrieved {max(r['retrieved_at'] for r in rows)[:10]} (UTC). {sum(r['rate_kind']=='aggregate_effective' for r in rows)} rows are Florida DOR totals for districts smaller than a county, not any one body's adopted rate. {cov['sd_rows_in_csv']} baseline rows are independent special districts. {sum(r['body_type']=='special_district' for r in rows) - cov['sd_rows_in_csv']} more, from county property appraisers, appear only on county pages.</p>"
      f"<p class=callout>Voting on Amendment 3 on {ELECTION}? <a href='{PATH}/{AMEND}/'>See the 2025 adopted millage baseline by county</a>.</p>"
-     f"<h2>How to read this</h2><p>{COV}</p><p>Independent special districts {NYS} (absent is not zero): {html.escape(', '.join(cov['not_yet_sourced']))}.</p><p id=correction>{html.escape(CORRECTION)}</p>"
+     + HOME_REDO + f"<h2>How to read this</h2><p>{COV}</p><p>Independent special districts {NYS} (absent is not zero): {html.escape(', '.join(cov['not_yet_sourced']))}.</p><p id=correction>{html.escape(CORRECTION)}</p>"
      f"<h2 id=counties>Counties</h2>"
      f"<p class=filter id=county-filter-wrap hidden><label for=county-filter>Filter counties</label><input type=search id=county-filter autocomplete=off aria-describedby=county-filter-count> <span id=county-filter-count class=muted role=status aria-live=polite></span></p>"
-     f"<ul class=counties>{''.join(links)}</ul>" + FILTER_JS,
+     f"<ul class=counties>{''.join(links)}</ul>" + FILTER_JS
+     + redo.getdata(f"<a href='{PATH}/api/v1/fl/2025/{AMEND.split('/')[-1]}-baseline.csv'>CSV</a> · <a href='{PATH}/api/v1/fl/2025/{AMEND.split('/')[-1]}-baseline.json'>JSON</a>"),
      {"@context": "https://schema.org", "@type": "Dataset", "name": "OpenMillage", "description": f"Official property tax millage rates for counties, school districts, municipalities and independent special districts where sourced, with source links and file hashes. {coverage_sentence(cov)} Absent is not zero: a body with no row is not yet sourced.",
       "license": "https://creativecommons.org/licenses/by/4.0/", "creator": {"@type": "Organization", "name": "Hazey Data"}, "url": BASE + "/"},
-     f"Official Florida 2025 property tax millage rates for counties, school districts, municipalities and independent special districts where sourced, each with its government source link and file hash. {coverage_sentence(cov)} Absent is not zero.", current="counties", lead=HEAD_LEAD)
+     f"Official Florida 2025 property tax millage rates for counties, school districts, municipalities and independent special districts where sourced, each with its government source link and file hash. {coverage_sentence(cov)} Absent is not zero.", current="counties", lead=HEAD_LEAD, h1=redo.HEADLINE)
 today = datetime.date.today().isoformat()
 open(f"{OUT}/sitemap.xml", "w").write('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
     + "".join(f"<url><loc>{u}</loc><lastmod>{today}</lastmod></url>" for u in urls) + "</urlset>")

@@ -1,0 +1,776 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="518.4pt" height="927.72pt" viewBox="0 0 518.4 927.72" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-10-23T11:19:28.824284</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.2, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 927.72 
+L 518.4 927.72 
+L 518.4 0 
+L 0 0 
+z
+" style="fill: #03070f"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 103.68 830.52 
+L 456.192 830.52 
+L 456.192 82.8 
+L 103.68 82.8 
+z
+" style="fill: #03070f"/>
+   </g>
+   <g id="line2d_1">
+    <path d="M 327.425242 830.52 
+L 327.425242 82.8 
+" clip-path="url(#p2d501af111)" style="fill: none; stroke-dasharray: 1.4,1.4; stroke-dashoffset: 0; stroke: #8796a8; stroke-width: 0.7"/>
+   </g>
+   <g id="matplotlib.axis_1">
+    <g id="xtick_1">
+     <g id="line2d_2">
+      <defs>
+       <path id="m2af78fc88f" d="M 0 0 
+L 0 3 
+" style="stroke: #8796a8; stroke-width: 0.6"/>
+      </defs>
+      <g>
+       <use xlink:href="#m2af78fc88f" x="133.056" y="830.52" style="fill: #8796a8; stroke: #8796a8; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="text_1">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: middle; fill: #e6edf5" x="133.056" y="845.73875" transform="rotate(-0 133.056 845.73875)">6</text>
+     </g>
+    </g>
+    <g id="xtick_2">
+     <g id="line2d_3">
+      <g>
+       <use xlink:href="#m2af78fc88f" x="191.808" y="830.52" style="fill: #8796a8; stroke: #8796a8; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="text_2">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: middle; fill: #e6edf5" x="191.808" y="845.73875" transform="rotate(-0 191.808 845.73875)">8</text>
+     </g>
+    </g>
+    <g id="xtick_3">
+     <g id="line2d_4">
+      <g>
+       <use xlink:href="#m2af78fc88f" x="250.56" y="830.52" style="fill: #8796a8; stroke: #8796a8; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="text_3">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: middle; fill: #e6edf5" x="250.56" y="845.73875" transform="rotate(-0 250.56 845.73875)">10</text>
+     </g>
+    </g>
+    <g id="xtick_4">
+     <g id="line2d_5">
+      <g>
+       <use xlink:href="#m2af78fc88f" x="309.312" y="830.52" style="fill: #8796a8; stroke: #8796a8; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="text_4">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: middle; fill: #e6edf5" x="309.312" y="845.73875" transform="rotate(-0 309.312 845.73875)">12</text>
+     </g>
+    </g>
+    <g id="xtick_5">
+     <g id="line2d_6">
+      <g>
+       <use xlink:href="#m2af78fc88f" x="368.064" y="830.52" style="fill: #8796a8; stroke: #8796a8; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="text_5">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: middle; fill: #e6edf5" x="368.064" y="845.73875" transform="rotate(-0 368.064 845.73875)">14</text>
+     </g>
+    </g>
+    <g id="xtick_6">
+     <g id="line2d_7">
+      <g>
+       <use xlink:href="#m2af78fc88f" x="426.816" y="830.52" style="fill: #8796a8; stroke: #8796a8; stroke-width: 0.6"/>
+      </g>
+     </g>
+     <g id="text_6">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: middle; fill: #e6edf5" x="426.816" y="845.73875" transform="rotate(-0 426.816 845.73875)">16</text>
+     </g>
+    </g>
+    <g id="text_7">
+     <text style="font-size: 9.5px; font-family: 'Inter', sans-serif; text-anchor: middle; fill: #e6edf5" x="279.936" y="861.112773" transform="rotate(-0 279.936 861.112773)">Mills (dollars per $1,000 of taxable value)</text>
+    </g>
+   </g>
+   <g id="matplotlib.axis_2">
+    <g id="ytick_1">
+     <g id="line2d_8"/>
+     <g id="text_8">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="827.113737" transform="rotate(-0 100.18 827.113737)">Monroe</text>
+     </g>
+    </g>
+    <g id="ytick_2">
+     <g id="line2d_9"/>
+     <g id="text_9">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="816.019968" transform="rotate(-0 100.18 816.019968)">Duval</text>
+     </g>
+    </g>
+    <g id="ytick_3">
+     <g id="line2d_10"/>
+     <g id="text_10">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="804.9262" transform="rotate(-0 100.18 804.9262)">Collier</text>
+     </g>
+    </g>
+    <g id="ytick_4">
+     <g id="line2d_11"/>
+     <g id="text_11">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="793.832431" transform="rotate(-0 100.18 793.832431)">Walton</text>
+     </g>
+    </g>
+    <g id="ytick_5">
+     <g id="line2d_12"/>
+     <g id="text_12">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="782.738663" transform="rotate(-0 100.18 782.738663)">Brevard</text>
+     </g>
+    </g>
+    <g id="ytick_6">
+     <g id="line2d_13"/>
+     <g id="text_13">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="771.644894" transform="rotate(-0 100.18 771.644894)">Lee</text>
+     </g>
+    </g>
+    <g id="ytick_7">
+     <g id="line2d_14"/>
+     <g id="text_14">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="760.551126" transform="rotate(-0 100.18 760.551126)">Okaloosa</text>
+     </g>
+    </g>
+    <g id="ytick_8">
+     <g id="line2d_15"/>
+     <g id="text_15">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="749.457357" transform="rotate(-0 100.18 749.457357)">Franklin</text>
+     </g>
+    </g>
+    <g id="ytick_9">
+     <g id="line2d_16"/>
+     <g id="text_16">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="738.363589" transform="rotate(-0 100.18 738.363589)">Indian River</text>
+     </g>
+    </g>
+    <g id="ytick_10">
+     <g id="line2d_17"/>
+     <g id="text_17">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="727.26982" transform="rotate(-0 100.18 727.26982)">Sarasota</text>
+     </g>
+    </g>
+    <g id="ytick_11">
+     <g id="line2d_18"/>
+     <g id="text_18">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="716.176052" transform="rotate(-0 100.18 716.176052)">Sumter</text>
+     </g>
+    </g>
+    <g id="ytick_12">
+     <g id="line2d_19"/>
+     <g id="text_19">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="705.082283" transform="rotate(-0 100.18 705.082283)">Marion</text>
+     </g>
+    </g>
+    <g id="ytick_13">
+     <g id="line2d_20"/>
+     <g id="text_20">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="693.988514" transform="rotate(-0 100.18 693.988514)">Seminole</text>
+     </g>
+    </g>
+    <g id="ytick_14">
+     <g id="line2d_21"/>
+     <g id="text_21">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="682.894746" transform="rotate(-0 100.18 682.894746)">Bay</text>
+     </g>
+    </g>
+    <g id="ytick_15">
+     <g id="line2d_22"/>
+     <g id="text_22">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="671.800977" transform="rotate(-0 100.18 671.800977)">Volusia</text>
+     </g>
+    </g>
+    <g id="ytick_16">
+     <g id="line2d_23"/>
+     <g id="text_23">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="660.707209" transform="rotate(-0 100.18 660.707209)">Palm Beach</text>
+     </g>
+    </g>
+    <g id="ytick_17">
+     <g id="line2d_24"/>
+     <g id="text_24">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="649.61344" transform="rotate(-0 100.18 649.61344)">Orange</text>
+     </g>
+    </g>
+    <g id="ytick_18">
+     <g id="line2d_25"/>
+     <g id="text_25">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="638.519672" transform="rotate(-0 100.18 638.519672)">Gulf</text>
+     </g>
+    </g>
+    <g id="ytick_19">
+     <g id="line2d_26"/>
+     <g id="text_26">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="627.425903" transform="rotate(-0 100.18 627.425903)">Pinellas</text>
+     </g>
+    </g>
+    <g id="ytick_20">
+     <g id="line2d_27"/>
+     <g id="text_27">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="616.332135" transform="rotate(-0 100.18 616.332135)">Lake</text>
+     </g>
+    </g>
+    <g id="ytick_21">
+     <g id="line2d_28"/>
+     <g id="text_28">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="605.238366" transform="rotate(-0 100.18 605.238366)">Santa Rosa</text>
+     </g>
+    </g>
+    <g id="ytick_22">
+     <g id="line2d_29"/>
+     <g id="text_29">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="594.144598" transform="rotate(-0 100.18 594.144598)">Miami-Dade</text>
+     </g>
+    </g>
+    <g id="ytick_23">
+     <g id="line2d_30"/>
+     <g id="text_30">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="583.050829" transform="rotate(-0 100.18 583.050829)">St. Johns</text>
+     </g>
+    </g>
+    <g id="ytick_24">
+     <g id="line2d_31"/>
+     <g id="text_31">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="571.95706" transform="rotate(-0 100.18 571.95706)">Martin</text>
+     </g>
+    </g>
+    <g id="ytick_25">
+     <g id="line2d_32"/>
+     <g id="text_32">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="560.863292" transform="rotate(-0 100.18 560.863292)">Clay</text>
+     </g>
+    </g>
+    <g id="ytick_26">
+     <g id="line2d_33"/>
+     <g id="text_33">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="549.769523" transform="rotate(-0 100.18 549.769523)">Hillsborough</text>
+     </g>
+    </g>
+    <g id="ytick_27">
+     <g id="line2d_34"/>
+     <g id="text_34">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="538.675755" transform="rotate(-0 100.18 538.675755)">Polk</text>
+     </g>
+    </g>
+    <g id="ytick_28">
+     <g id="line2d_35"/>
+     <g id="text_35">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="527.581986" transform="rotate(-0 100.18 527.581986)">Escambia</text>
+     </g>
+    </g>
+    <g id="ytick_29">
+     <g id="line2d_36"/>
+     <g id="text_36">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="516.488218" transform="rotate(-0 100.18 516.488218)">Hendry</text>
+     </g>
+    </g>
+    <g id="ytick_30">
+     <g id="line2d_37"/>
+     <g id="text_37">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="505.394449" transform="rotate(-0 100.18 505.394449)">DeSoto</text>
+     </g>
+    </g>
+    <g id="ytick_31">
+     <g id="line2d_38"/>
+     <g id="text_38">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="494.300681" transform="rotate(-0 100.18 494.300681)">Broward</text>
+     </g>
+    </g>
+    <g id="ytick_32">
+     <g id="line2d_39"/>
+     <g id="text_39">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="483.206912" transform="rotate(-0 100.18 483.206912)">Manatee</text>
+     </g>
+    </g>
+    <g id="ytick_33">
+     <g id="line2d_40"/>
+     <g id="text_40">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="472.113144" transform="rotate(-0 100.18 472.113144)">Osceola</text>
+     </g>
+    </g>
+    <g id="ytick_34">
+     <g id="line2d_41"/>
+     <g id="text_41">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="461.019375" transform="rotate(-0 100.18 461.019375)">Baker</text>
+     </g>
+    </g>
+    <g id="ytick_35">
+     <g id="line2d_42"/>
+     <g id="text_42">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="449.925606" transform="rotate(-0 100.18 449.925606)">Charlotte</text>
+     </g>
+    </g>
+    <g id="ytick_36">
+     <g id="line2d_43"/>
+     <g id="text_43">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="438.831838" transform="rotate(-0 100.18 438.831838)">Jefferson</text>
+     </g>
+    </g>
+    <g id="ytick_37">
+     <g id="line2d_44"/>
+     <g id="text_44">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="427.738069" transform="rotate(-0 100.18 427.738069)">Taylor</text>
+     </g>
+    </g>
+    <g id="ytick_38">
+     <g id="line2d_45"/>
+     <g id="text_45">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="416.644301" transform="rotate(-0 100.18 416.644301)">Nassau</text>
+     </g>
+    </g>
+    <g id="ytick_39">
+     <g id="line2d_46"/>
+     <g id="text_46">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="405.550532" transform="rotate(-0 100.18 405.550532)">Highlands</text>
+     </g>
+    </g>
+    <g id="ytick_40">
+     <g id="line2d_47"/>
+     <g id="text_47">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="394.456764" transform="rotate(-0 100.18 394.456764)">Hernando</text>
+     </g>
+    </g>
+    <g id="ytick_41">
+     <g id="line2d_48"/>
+     <g id="text_48">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="383.362995" transform="rotate(-0 100.18 383.362995)">Columbia</text>
+     </g>
+    </g>
+    <g id="ytick_42">
+     <g id="line2d_49"/>
+     <g id="text_49">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="372.269227" transform="rotate(-0 100.18 372.269227)">Hardee</text>
+     </g>
+    </g>
+    <g id="ytick_43">
+     <g id="line2d_50"/>
+     <g id="text_50">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="361.175458" transform="rotate(-0 100.18 361.175458)">Okeechobee</text>
+     </g>
+    </g>
+    <g id="ytick_44">
+     <g id="line2d_51"/>
+     <g id="text_51">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="350.08169" transform="rotate(-0 100.18 350.08169)">Jackson</text>
+     </g>
+    </g>
+    <g id="ytick_45">
+     <g id="line2d_52"/>
+     <g id="text_52">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="338.987921" transform="rotate(-0 100.18 338.987921)">St. Lucie</text>
+     </g>
+    </g>
+    <g id="ytick_46">
+     <g id="line2d_53"/>
+     <g id="text_53">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="327.894152" transform="rotate(-0 100.18 327.894152)">Wakulla</text>
+     </g>
+    </g>
+    <g id="ytick_47">
+     <g id="line2d_54"/>
+     <g id="text_54">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="316.800384" transform="rotate(-0 100.18 316.800384)">Flagler</text>
+     </g>
+    </g>
+    <g id="ytick_48">
+     <g id="line2d_55"/>
+     <g id="text_55">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="305.706615" transform="rotate(-0 100.18 305.706615)">Leon</text>
+     </g>
+    </g>
+    <g id="ytick_49">
+     <g id="line2d_56"/>
+     <g id="text_56">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="294.612847" transform="rotate(-0 100.18 294.612847)">Citrus</text>
+     </g>
+    </g>
+    <g id="ytick_50">
+     <g id="line2d_57"/>
+     <g id="text_57">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="283.519078" transform="rotate(-0 100.18 283.519078)">Washington</text>
+     </g>
+    </g>
+    <g id="ytick_51">
+     <g id="line2d_58"/>
+     <g id="text_58">
+      <text style="font-weight: 600; font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #5fc4d6" x="100.18" y="272.42531" transform="rotate(-0 100.18 272.42531)">Alachua</text>
+     </g>
+    </g>
+    <g id="ytick_52">
+     <g id="line2d_59"/>
+     <g id="text_59">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="261.331541" transform="rotate(-0 100.18 261.331541)">Pasco</text>
+     </g>
+    </g>
+    <g id="ytick_53">
+     <g id="line2d_60"/>
+     <g id="text_60">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="250.237773" transform="rotate(-0 100.18 250.237773)">Madison</text>
+     </g>
+    </g>
+    <g id="ytick_54">
+     <g id="line2d_61"/>
+     <g id="text_61">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="239.144004" transform="rotate(-0 100.18 239.144004)">Levy</text>
+     </g>
+    </g>
+    <g id="ytick_55">
+     <g id="line2d_62"/>
+     <g id="text_62">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="228.050236" transform="rotate(-0 100.18 228.050236)">Hamilton</text>
+     </g>
+    </g>
+    <g id="ytick_56">
+     <g id="line2d_63"/>
+     <g id="text_63">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="216.956467" transform="rotate(-0 100.18 216.956467)">Suwannee</text>
+     </g>
+    </g>
+    <g id="ytick_57">
+     <g id="line2d_64"/>
+     <g id="text_64">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="205.862698" transform="rotate(-0 100.18 205.862698)">Gadsden</text>
+     </g>
+    </g>
+    <g id="ytick_58">
+     <g id="line2d_65"/>
+     <g id="text_65">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="194.76893" transform="rotate(-0 100.18 194.76893)">Glades</text>
+     </g>
+    </g>
+    <g id="ytick_59">
+     <g id="line2d_66"/>
+     <g id="text_66">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="183.675161" transform="rotate(-0 100.18 183.675161)">Liberty</text>
+     </g>
+    </g>
+    <g id="ytick_60">
+     <g id="line2d_67"/>
+     <g id="text_67">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="172.581393" transform="rotate(-0 100.18 172.581393)">Holmes</text>
+     </g>
+    </g>
+    <g id="ytick_61">
+     <g id="line2d_68"/>
+     <g id="text_68">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="161.487624" transform="rotate(-0 100.18 161.487624)">Gilchrist</text>
+     </g>
+    </g>
+    <g id="ytick_62">
+     <g id="line2d_69"/>
+     <g id="text_69">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="150.393856" transform="rotate(-0 100.18 150.393856)">Calhoun</text>
+     </g>
+    </g>
+    <g id="ytick_63">
+     <g id="line2d_70"/>
+     <g id="text_70">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="139.300087" transform="rotate(-0 100.18 139.300087)">Bradford</text>
+     </g>
+    </g>
+    <g id="ytick_64">
+     <g id="line2d_71"/>
+     <g id="text_71">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="128.206319" transform="rotate(-0 100.18 128.206319)">Lafayette</text>
+     </g>
+    </g>
+    <g id="ytick_65">
+     <g id="line2d_72"/>
+     <g id="text_72">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="117.11255" transform="rotate(-0 100.18 117.11255)">Dixie</text>
+     </g>
+    </g>
+    <g id="ytick_66">
+     <g id="line2d_73"/>
+     <g id="text_73">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="106.018782" transform="rotate(-0 100.18 106.018782)">Union</text>
+     </g>
+    </g>
+    <g id="ytick_67">
+     <g id="line2d_74"/>
+     <g id="text_74">
+      <text style="font-size: 9px; font-family: 'Inter', sans-serif; text-anchor: end; fill: #e6edf5" x="100.18" y="94.925013" transform="rotate(-0 100.18 94.925013)">Putnam</text>
+     </g>
+    </g>
+   </g>
+   <g id="patch_3">
+    <path d="M 122.477702 830.52 
+L 415.265357 830.52 
+" style="fill: none; stroke: #8796a8; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="PathCollection_1">
+    <defs>
+     <path id="C0_0_8d92d79c2e" d="M 0 2.236068 
+C 0.593012 2.236068 1.161816 2.000462 1.581139 1.581139 
+C 2.000462 1.161816 2.236068 0.593012 2.236068 -0 
+C 2.236068 -0.593012 2.000462 -1.161816 1.581139 -1.581139 
+C 1.161816 -2.000462 0.593012 -2.236068 0 -2.236068 
+C -0.593012 -2.236068 -1.161816 -2.000462 -1.581139 -1.581139 
+C -2.000462 -1.161816 -2.236068 -0.593012 -2.236068 0 
+C -2.236068 0.593012 -2.000462 1.161816 -1.581139 1.581139 
+C -1.161816 2.000462 -0.593012 2.236068 0 2.236068 
+z
+"/>
+    </defs>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="122.477702" y="822.754362" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="143.04384" y="811.660593" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="176.940806" y="800.566825" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="185.34528" y="789.473056" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="212.541581" y="778.379288" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="223.572269" y="767.285519" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="227.288333" y="756.191751" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="228.17255" y="745.097982" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="231.803424" y="734.004214" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="235.260979" y="722.910445" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="244.743552" y="711.816677" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="260.54784" y="700.722908" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="268.893562" y="689.629139" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="273.273523" y="678.535371" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="275.494349" y="667.441602" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="275.647104" y="656.347834" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="276.519571" y="645.254065" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="277.644672" y="634.160297" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="277.706362" y="623.066528" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="284.35415" y="611.97276" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="290.775744" y="600.878991" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="298.269562" y="589.785223" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="298.510445" y="578.691454" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="301.627238" y="567.597685" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="303.997882" y="556.503917" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="305.234611" y="545.410148" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="307.102925" y="534.31638" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="308.107584" y="523.222611" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="312.719616" y="512.128843" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="313.674336" y="501.035074" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="313.727213" y="489.941306" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="319.199962" y="478.847537" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="325.645056" y="467.753769" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="327.425242" y="456.66" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="330.91511" y="445.566231" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="333.46201" y="434.472463" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="335.15113" y="423.378694" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="336.828499" y="412.284926" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="337.277952" y="401.191157" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="340.703194" y="390.097389" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="343.505664" y="379.00362" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="343.740672" y="367.909852" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="344.093184" y="356.816083" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="347.882688" y="345.722315" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="348.202886" y="334.628546" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="348.293952" y="323.534777" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="354.227904" y="312.441009" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="358.67543" y="301.34724" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="359.18951" y="290.253472" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="363.07008" y="279.159703" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="363.686976" y="268.065935" style="fill: #5fc4d6"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="365.038272" y="256.972166" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="368.404762" y="245.878398" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="370.472832" y="234.784629" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="371.900506" y="223.690861" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="374.37984" y="212.597092" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="375.349248" y="201.503323" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="377.631763" y="190.409555" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="385.807104" y="179.315786" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="386.441626" y="168.222018" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="391.582426" y="157.128249" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="401.053248" y="146.034481" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="408.191616" y="134.940712" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="408.779136" y="123.846944" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="409.48416" y="112.753175" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="410.776704" y="101.659407" style="fill: #8796a8"/>
+    </g>
+    <g clip-path="url(#p2d501af111)">
+     <use xlink:href="#C0_0_8d92d79c2e" x="415.265357" y="90.565638" style="fill: #8796a8"/>
+    </g>
+   </g>
+   <g id="text_75">
+    <text style="font-size: 9.5px; font-family: 'Inter', sans-serif; fill: #e6edf5" transform="translate(298.057624 62.357606)">State median</text>
+    <text style="font-size: 9.5px; font-family: 'Inter', sans-serif; fill: #e6edf5" transform="translate(304.050788 73.852235)">12.62 mills</text>
+   </g>
+   <g id="text_76">
+    <text style="font-weight: 600; font-size: 9.5px; font-family: 'Inter', sans-serif; text-anchor: start; fill: #5fc4d6" x="371.030976" y="271.521745" transform="rotate(-0 371.030976 271.521745)">13.85</text>
+   </g>
+   <g id="text_77">
+    <text style="font-size: 9.5px; font-family: 'Inter', sans-serif; text-anchor: start; fill: #e6edf5" x="129.821702" y="826.210173" transform="rotate(-0 129.821702 826.210173)">5.64</text>
+   </g>
+   <g id="text_78">
+    <text style="font-size: 9.5px; font-family: 'Inter', sans-serif; text-anchor: start; fill: #e6edf5" x="422.609357" y="94.021449" transform="rotate(-0 422.609357 94.021449)">15.61</text>
+   </g>
+   <g id="text_79">
+    <text style="font-size: 9.5px; font-family: 'Inter', sans-serif; text-anchor: start; fill: #e6edf5" x="150.38784" y="815.116404" transform="rotate(-0 150.38784 815.116404)">6.34 Duval: see note</text>
+   </g>
+  </g>
+  <g id="text_80">
+   <text style="font-weight: 600; font-size: 10.5px; font-family: 'Space Grotesk'; text-anchor: start; fill: #e6edf5" x="20.736" y="18.972" transform="rotate(-0 20.736 18.972)">Florida's countywide rates run from 5.6 mills in Monroe to 15.6 mills in Putnam</text>
+  </g>
+  <g id="text_81">
+   <text style="font-size: 9.5px; font-family: 'Inter', sans-serif; fill: #8796a8" transform="translate(20.736 39.443125)">2025 adopted rates, county and school board levies that apply countywide. Unincorporated homestead</text>
+   <text style="font-size: 9.5px; font-family: 'Inter', sans-serif; fill: #8796a8" transform="translate(20.736 50.937754)">parcel; city rates not included.</text>
+  </g>
+  <g id="text_82">
+   <text style="font-size: 9.5px; font-family: 'Inter', sans-serif; fill: #8796a8" transform="translate(20.736 885.184609)">City rates and local special-district rates come on top. Jacksonville's consolidated rate doesn't</text>
+   <text style="font-size: 9.5px; font-family: 'Inter', sans-serif; fill: #8796a8" transform="translate(20.736 896.679238)">apply countywide in Duval, so it isn't included.</text>
+   <text style="font-size: 9.5px; font-family: 'Inter', sans-serif; fill: #8796a8" transform="translate(20.736 908.173867)">Source: Florida Department of Revenue Data Book,</text>
+   <text style="font-size: 9.5px; font-family: 'Inter', sans-serif; fill: #8796a8" transform="translate(20.736 919.668496)">https://floridarevenue.com/property/Documents/millage_taxes_levied.xlsx</text>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p2d501af111">
+   <rect x="103.68" y="82.8" width="352.512" height="747.72"/>
+  </clipPath>
+ </defs>
+</svg>

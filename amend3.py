@@ -7,6 +7,7 @@ import csv, datetime, html, json, os, re, sys
 from zoneinfo import ZoneInfo
 import sources
 import site_chrome as sc
+import redo
 from analytics import GOATCOUNTER_TAG
 
 CFG = json.load(open(os.environ.get("AMEND3_CONFIG", "amend3_config.json")))
@@ -91,6 +92,13 @@ FOOT = footnotes(CFG["footnotes_md"])
 
 def link(u, text="source"): return f"<a href='{E(u)}'>{E(text)}</a>"
 
+def who_sets_what():
+    """Lindsay's intro verbatim; the county names it mentions link to their canonical county pages (that link is the source for the counts)."""
+    t = redo.md(redo.INTRO["Who sets what"])
+    for c in ("DeSoto", "Orange"):
+        t = re.sub(r"\b" + c + r" \(", f"<a href='{redo.SITE}/fl/2025/{c.lower()}-county/'>{c}</a> (", t, count=1)
+    return f"<p>{t}</p>"
+
 def render_amend3(rows, districts, ballot, counties, sd_counties=None):
     if sd_counties is None: sd_counties = sources.coverage(sources.load_rows())["counties_with_rows"]
     names = [c for c, _ in counties]
@@ -134,7 +142,10 @@ def render_amend3(rows, districts, ballot, counties, sd_counties=None):
       f"<p>Florida Division of Elections, official ballot title and summary ({link(ballot['source_url'])}):</p>"
       f"<blockquote class=official><p>&ldquo;{E(ballot['title'])}&rdquo;</p><p>&ldquo;{E(ballot['ballot_summary'])}&rdquo;</p><p>{link(ballot['source_url'])}</p></blockquote>"
       f"<p>Election date: {ed.strftime('%B')} {ed.day}, {ed.year} ({link(CFG['election_date_source'])}).</p>"
-      f"<h2>Adopted millage by county</h2>"
+      + redo.chart("county-dots", "Dot plot: 2025 county and school board countywide rates for each Florida county")
+      + "<h2 id=before-you-vote>Before you vote</h2>" + redo.intro("Before you vote (ballot measure numbered 3 page)").replace("the 2025 adopted rates", f"the {link(srcs[0][1], '2025 adopted rates')}", 1)
+      + redo.stack("Example county: Alachua, 2025", title_html=f"Example county: Alachua, {link(srcs[0][1], '2025')}", layers=[(sc.display_name(r["taxing_body"]), f"{sc.label(r['body_type'])} · {sc.label(r['levy_component']).lower()}, {sc.label(r['levy_scope'])}", f"{float(r['rate']):.4f}", r["source_url"]) for r in group("Alachua")[:3]])
+      + f"<h2>Adopted millage by county</h2>"
       f"<p>These are 2025 adopted rates. As of {asof_et.strftime('%B')} {asof_et.day}, {asof_et.year}, {asof_et.strftime('%H:%M')} ET (latest retrieval of a source file used on this page; the footer's site data date covers every page, {link(asof_src)}).</p>"
       f"<p>Coverage: {len(covered)} of {len(names)} counties ({link(county_src['url'], 'county list: ' + county_src['agency'])}; rates: {link(srcs[0][1], 'Florida Department of Revenue')}).</p>"
       + (f"<p>Not yet collected: {', '.join(E(c) for c in missing)}.</p>" if missing else "")
@@ -143,9 +154,11 @@ def render_amend3(rows, districts, ballot, counties, sd_counties=None):
       + (f"; not yet collected for: {', '.join(E(c) for c in sd_missing)}" if sd_missing else "") + "."
       + (f" {E(sources.alt_sentence(others))}" if others else "") + "</p>"
       + f"<p>Rows shown: {nt['county']} county, {nt['school_district']} school district, {nt['municipality']} municipal and {len(districts)} special-district rates ({link(srcs[0][1], 'Florida Department of Revenue')}).</p>"
+      + "<h2 id=who-sets-what>Who sets what</h2>" + who_sets_what()
       + jump + "".join(sections)
       + f"<p>Rows shown on this page: <a href='{PATH}/{api}.csv'>CSV</a> · <a href='{PATH}/{api}.json'>JSON</a>.</p>"
-      f"<h2>Questions</h2><dl><dt>What is millage?</dt><dd>{E(md['agency'])}: <q>{E(md['text'])}</q> {link(md['url'])}</dd>"
+      + redo.getdata(f"<a href='{PATH}/{api}.csv'>CSV</a> · <a href='{PATH}/{api}.json'>JSON</a>")
+      + f"<h2>Questions</h2><dl><dt>What is millage?</dt><dd>{E(md['agency'])}: <q>{E(md['text'])}</q> {link(md['url'])}</dd>"
       f"<dt>Where do these rates come from?</dt><dd>Each value on this page links to the official document it was read from.</dd></dl>")
     title = ballot["title"]
     page = (f"<!doctype html><html lang=en><head><meta charset=utf-8><title>{E(title)}: Florida 2025 adopted millage baseline</title>"

@@ -36,7 +36,7 @@ def check_page(p):
     if re.search(r"<th(?![^>]*scope=col)[ >]", h): errs.append("th without scope=col")
     for raw in RAW:
         if raw in h: errs.append(f"raw enum {raw}")
-    if re.search(r">https?://", h) and "/fl/" in p and "amendment" not in p: errs.append("raw URL as link text")
+    if re.search(r">https?://", re.sub(r"<svg\b.*?</svg>", "", h, flags=re.S)) and "/fl/" in p and "amendment" not in p: errs.append("raw URL as link text")  # inline chart text (Her?'s SVG source notes) is not link text
     return errs
 bad = {p: e for p in pages if (e := check_page(p))}
 ok(not bad, f"all {len(pages)} pages pass the shared checks; failing: {dict(list(bad.items())[:3])}")

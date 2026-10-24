@@ -54,7 +54,8 @@ def tree(d):
             for p, _, fs in os.walk(d) for f in fs}
 def planted(path, old, new):
     tmp = tempfile.mkdtemp()
-    for n in ("build.py", "sources.py", "amend3.py", "analytics.py", "site_chrome.py", "amend3_config.json"): shutil.copy(n, tmp)
+    for n in ("build.py", "sources.py", "amend3.py", "analytics.py", "site_chrome.py", "redo.py", "amend3_config.json"): shutil.copy(n, tmp)
+    for n in ("assets", "content"): shutil.copytree(n, os.path.join(tmp, n))
     shutil.copytree("data", os.path.join(tmp, "data")); shutil.copytree("docs", os.path.join(tmp, "docs"))
     p = os.path.join(tmp, path); s = open(p, encoding="utf-8").read(); assert old in s, old
     open(p, "w", encoding="utf-8").write(s.replace(old, new, 1))

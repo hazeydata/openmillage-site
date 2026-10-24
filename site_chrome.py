@@ -1,5 +1,6 @@
 """Shared page chrome for build.py and amend3.py: stylesheet, head tags, header, footer, readable labels, display names."""
 import html, re
+import redo
 
 CSS = """:root{--fg:#1a1a1a;--bg:#fff;--muted:#595959;--link:#0b57d0;--accent:#0b57d0;--border:#c8c8c8;--badge-fg:#6b4500;--badge-bg:#fff4d6;--row-agg:#fff8e6}
 @media (prefers-color-scheme:dark){:root{--fg:#e8e8e8;--bg:#121212;--muted:#b3b3b3;--link:#8ab4f8;--accent:#8ab4f8;--border:#3d3d3d;--badge-fg:#ffd98a;--badge-bg:#3d2e00;--row-agg:#2a2410}}
@@ -71,7 +72,7 @@ def api_page(slug): return f"api/v1/fl/2025/{slug.split('/')[-1]}-baseline.json"
 METHOD_PAGE = "llms.txt"  # no method page exists: llms.txt carries the fields, rate kinds and rules
 
 SKIP = "<a class=skip href='#main'>Skip to content</a>"
-def head_extra(PATH): return f"<meta name=viewport content='width=device-width, initial-scale=1'><link rel=stylesheet href='{PATH}/style.css'>"
+def head_extra(PATH): return f"<meta name=viewport content='width=device-width, initial-scale=1'><link rel=stylesheet href='{PATH}/style.css'><link rel=stylesheet href='{PATH}/redo.css'>"
 def header(PATH, current=None, slug="fl/amendment-3"):
     cur = lambda k: " aria-current=page" if current == k else ""
     return (f"<header><a class=brand href='{PATH}/'>OpenMillage</a><nav aria-label=Site><a href='{PATH}/#counties'{cur('counties')}>Counties</a> "
@@ -84,7 +85,7 @@ def footer(PATH, lead="", updated=None):
     d, u = updated
     up = f"<p>Site data updated <time datetime={d.isoformat()}>{d.strftime('%B')} {d.day}, {d.year}</time> (latest source retrieval across all pages, <a href='{html.escape(u)}'>source</a>).</p>"
     return (f"<footer>{up}<p>{lead}<a href='{PATH}/llms.txt'>llms.txt</a> · <a href='{PATH}/'>All counties</a></p>"
-            "<p>Data: CC BY 4.0 (<a href='https://creativecommons.org/licenses/by/4.0/'>licence</a>). Published by Hazey Data.</p></footer>")
+            "<p>Data: CC BY 4.0 (<a href='https://creativecommons.org/licenses/by/4.0/'>licence</a>). Published by Hazey Data.</p>" + redo.credit() + "</footer>")
 def tablewrap(aria, table): return f"<div class=tablewrap tabindex=0 role=region aria-label=\"{html.escape(aria)}\">{table}</div>"
 def body(PATH, title_html, inner, current=None, slug="fl/amendment-3", lead="", updated=None, trail=None):
     bc = crumbs(PATH, trail) if trail else ""
