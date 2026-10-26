@@ -78,6 +78,8 @@ def chart(name, label, attrs="", caption=""):
             + (f"<figcaption class=muted>{caption}</figcaption>" if caption else "") + "</figure>")
 
 SOURCE_LINK = "<a href='https://floridarevenue.com/property/Documents/millage_taxes_levied.xlsx'>Source: Florida Department of Revenue, millage data</a>"
+HISTORY_CAPTION = ("Alachua 2002 school: operating 6.646 mills, as published. County series may understate by up to ~0.1 mill where small debt or district levies weren't captured. "
+                   + SOURCE_LINK + "; <a href='https://edr.state.fl.us/Content/local-government/data/data-a-to-z/advaltxco.xlsx'>Florida Office of Economic &amp; Demographic Research</a>. ")
 DOTS_CAPTION = ("Duval shows the school board rate only: Jacksonville and Duval are consolidated, so the city-county rate isn't countywide and is left out. "
                 "City and special-district rates are not included. "
                 + SOURCE_LINK)
