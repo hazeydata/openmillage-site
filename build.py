@@ -155,7 +155,7 @@ for (co, lv), hrs in sorted(HIST.items()):
         w = csv.DictWriter(f, fieldnames=HIST_FIELDS, lineterminator="\n"); w.writeheader(); w.writerows(hrs)
     json.dump({"source": {"repo": "hazeydata/openmillage", "commit": HIST_PIN, "path": "data/fl_millage_history.csv"}, "county": co, "level": lv, "rows": hrs}, open(f"{d}/index.json", "w"), indent=1)
     yrs = sorted({r["year"] for r in hrs}); line = redo.HISTORY_LINE.get(co); ch = redo.HISTORY_CHART.get(co)
-    chart_html = (redo.chart(ch[0], ch[1], f" id=history-chart data-slot=history-chart data-src='{PATH}/{hp[:-10]}index.json'", f"Re-cut on openmillage@{HIST_PIN[:7]} &middot; ") if ch
+    chart_html = (redo.chart(ch[0], ch[1], f" id=history-chart data-slot=history-chart data-src='{PATH}/{hp[:-10]}index.json'", f"Re-cut on openmillage@{HIST_PIN[:7]}") if ch
                   else f"<figure class=hero id=history-chart data-slot=history-chart data-src='{PATH}/{hp[:-10]}index.json'></figure>")
     other = [(l, f"{PATH}/{hist_path(co, l)[:-10]}") for l in HIST_LEVELS if l != lv and (co, l) in HIST]
     page(hp, f"{co} County, FL {HIST_LEVELS[lv].lower()} millage history, {yrs[0]}–{yrs[-1]}",
@@ -168,7 +168,7 @@ for (co, lv), hrs in sorted(HIST.items()):
          lead=HEAD_LEAD, trail=[("Counties", f"{PATH}/#counties"), (f"{co} County, FL", f"{PATH}/fl/2025/{slug(co)}-county/"), (f"History: {HIST_LEVELS[lv]}", None)])
 AL = sorted([r for r in rows if r["county"] == "Alachua" and r["levy_scope"] == "countywide" and r["rate_kind"] == "adopted" and r["body_type"] in ("county", "school_district")], key=lambda r: r["body_type"])
 HOME_STACK = redo.stack("Example: Alachua County, 2025 adopted rates", [(sc.display_name(r["taxing_body"]), f"{sc.label(r['body_type'])} · {sc.label(r['levy_component']).lower()}, countywide", f"{float(r['rate']):.4f}", r["source_url"]) for r in AL])
-HOME_HERO = redo.chart("county-dots", "Dot plot: 2025 county and school board countywide rates for each Florida county") + redo.lede()
+HOME_HERO = redo.chart("county-dots", "Dot plot: 2025 county and school board countywide rates for each Florida county", caption=redo.DOTS_CAPTION) + redo.lede()
 HOME_REDO = (redo.intro("The stack (home page)") + HOME_STACK + "<p class=muted>One layer per taxing authority. Not a total: add only the layers that apply to your parcel.</p>" + redo.howto())
 page("index.html", "Florida property tax millage rates 2025, each linked to its official source", HOME_HERO + f"<p class=sources>{len(rows)} official rates {html.escape(LEAD_SRC)}, retrieved {max(r['retrieved_at'] for r in rows)[:10]} (UTC). {sum(r['rate_kind']=='aggregate_effective' for r in rows)} rows are Florida DOR totals for districts smaller than a county, not any one body's adopted rate. {cov['sd_rows_in_csv']} baseline rows are independent special districts. {sum(r['body_type']=='special_district' for r in rows) - cov['sd_rows_in_csv']} more, from county property appraisers, appear only on county pages.</p>"
      f"<p class=callout>Voting on Amendment 3 on {ELECTION}? <a href='{PATH}/{AMEND}/'>See the 2025 adopted millage baseline by county</a>.</p>"

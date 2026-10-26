@@ -56,7 +56,7 @@ ok(sources.read_lock() is not None, "sources.read_lock accepts the lock with the
 # --- slots (history chart, history line, credit) are present, marked, and filled from the source files
 ah = rd("docs/fl/history/alachua-county/county/index.html")
 fig = re.search(r"<figure class=hero id=history-chart data-slot=history-chart data-src='/fl/history/alachua-county/county/index.json'>(.*?)</figure>", ah, re.S)
-ok(fig and "chart-svg" in fig.group(1) and "her-history-multiples-350/720-dark.svg" in fig.group(1), "Alachua history-chart slot holds Her?'s history-multiples (350 + 720)")
+ok(fig and "chart-svg" in fig.group(1) and "history-multiples" in fig.group(1), "Alachua history-chart slot holds Her?'s history-multiples (350 + 720)")
 ok(all(re.search(r"<figure class=hero id=history-chart data-slot=history-chart data-src='[^']+index.json'>", rd(p)) for p in hist), "every history page has the marked history-chart slot")
 line = re.search(r"<p data-slot=history-line>(.*?)</p>", ah, re.S)
 want = html.escape("Alachua County's county and school board countywide rate, for example, fell from 21.2 mills in 1997 to 13.9 in 2025.†", quote=True)

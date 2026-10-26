@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="518.4pt" height="927.72pt" viewBox="0 0 518.4 927.72" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="518.4pt" height="872pt" viewBox="0 0 518.4 872" xmlns="http://www.w3.org/2000/svg" version="1.1">
  <metadata>
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
@@ -760,12 +760,6 @@ z
   <g id="text_81">
    <text style="font-size: 9.5px; font-family: 'Inter', sans-serif; fill: #8796a8" transform="translate(20.736 39.443125)">2025 adopted rates, county and school board levies that apply countywide. Unincorporated homestead</text>
    <text style="font-size: 9.5px; font-family: 'Inter', sans-serif; fill: #8796a8" transform="translate(20.736 50.937754)">parcel; city rates not included.</text>
-  </g>
-  <g id="text_82">
-   <text style="font-size: 9.5px; font-family: 'Inter', sans-serif; fill: #8796a8" transform="translate(20.736 885.184609)">City rates and local special-district rates come on top. Jacksonville's consolidated rate doesn't</text>
-   <text style="font-size: 9.5px; font-family: 'Inter', sans-serif; fill: #8796a8" transform="translate(20.736 896.679238)">apply countywide in Duval, so it isn't included.</text>
-   <text style="font-size: 9.5px; font-family: 'Inter', sans-serif; fill: #8796a8" transform="translate(20.736 908.173867)">Source: Florida Department of Revenue Data Book,</text>
-   <text style="font-size: 9.5px; font-family: 'Inter', sans-serif; fill: #8796a8" transform="translate(20.736 919.668496)">https://floridarevenue.com/property/Documents/millage_taxes_levied.xlsx</text>
   </g>
  </g>
  <defs>
