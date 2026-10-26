@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="518.4pt" height="208.8pt" viewBox="0 0 518.4 208.8" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="518.4pt" height="162pt" viewBox="0 0 518.4 162" xmlns="http://www.w3.org/2000/svg" version="1.1">
  <metadata>
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
@@ -67,10 +67,6 @@ z
   <g id="text_5">
    <text style="font-size: 9.5px; font-family: 'Inter', sans-serif; fill: #8796a8" transform="translate(20.736 46.787125)">Unincorporated homestead parcel: county and school board levies that apply countywide; city</text>
    <text style="font-size: 9.5px; font-family: 'Inter', sans-serif; fill: #8796a8" transform="translate(20.736 58.281754)">rates not included.</text>
-  </g>
-  <g id="text_6">
-   <text style="font-size: 9px; font-family: 'Inter', sans-serif; fill: #8796a8" transform="translate(20.736 189.475453)">Source: Florida Department of Revenue Data Book,</text>
-   <text style="font-size: 9px; font-family: 'Inter', sans-serif; fill: #8796a8" transform="translate(20.736 200.365102)">https://floridarevenue.com/property/Documents/millage_taxes_levied.xlsx</text>
   </g>
  </g>
  <defs>

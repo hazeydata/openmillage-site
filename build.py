@@ -125,7 +125,7 @@ for (st, yr, co), rs in sorted(by.items()):
         layers.append((f"{who} ({n})" if bt == 'municipality' else f"Special district levies ({len(lr)})", sub, f"{float(lr[0]['rate']):.4f}–{float(lr[-1]['rate']):.4f}" if len(lr) > 1 else f"{float(lr[0]['rate']):.4f}", lr[0]['source_url'])
                       if lr else (who, sub, "— no value in data", None))
     hist = [(lv, f"{PATH}/{hist_path(co, lv)[:-10]}") for lv in HIST_LEVELS if (co, lv) in HIST]
-    top = ((redo.chart("alachua-bar", "Bar chart: Alachua County 2025 county and school board operating rates, side by side") if co == "Alachua" else "")
+    top = ((redo.chart("alachua-bar", "Bar chart: Alachua County 2025 county and school board operating rates, side by side", caption=redo.SOURCE_LINK) if co == "Alachua" else "")
            + redo.intro("The stack (county pages)") + (redo.stack(f"{co} County, {yr} adopted rates", layers) if layers else "")
            + "<p class=muted>One layer per taxing authority. Not a total: add only the layers that apply to your parcel.</p>"
            + (("<p>History since 1996: " + " · ".join(f"<a href='{h}'>{HIST_LEVELS[lv]}</a>" for lv, h in hist) + "</p>") if hist else "")

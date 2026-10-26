@@ -77,9 +77,10 @@ def chart(name, label, attrs="", caption=""):
             f"<div class=chart-m role=img aria-label='{E(label)}'>{_svg(name, 350, name + '-m-')}</div><div class=chart-d role=img aria-label='{E(label)}'>{_svg(name, 720, name + '-d-')}</div></div>"
             + (f"<figcaption class=muted>{caption}</figcaption>" if caption else "") + "</figure>")
 
+SOURCE_LINK = "<a href='https://floridarevenue.com/property/Documents/millage_taxes_levied.xlsx'>Source: Florida Department of Revenue, millage data</a>"
 DOTS_CAPTION = ("Duval shows the school board rate only: Jacksonville and Duval are consolidated, so the city-county rate isn't countywide and is left out. "
                 "City and special-district rates are not included. "
-                "<a href='https://floridarevenue.com/property/Documents/millage_taxes_levied.xlsx'>Source: Florida Department of Revenue, millage data</a>")
+                + SOURCE_LINK)
 
 def stack(title, layers, title_html=None):
     """B 'Rate stack': one layer per taxing authority, no total (a total depends on the parcel)."""

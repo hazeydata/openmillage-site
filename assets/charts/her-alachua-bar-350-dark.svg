@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="252pt" height="280.8pt" viewBox="0 0 252 280.8" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="252pt" height="232pt" viewBox="0 0 252 232" xmlns="http://www.w3.org/2000/svg" version="1.1">
  <metadata>
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
@@ -71,11 +71,6 @@ z
   <g id="text_6">
    <text style="font-size: 8.5px; font-family: 'Inter', sans-serif; fill: #8796a8" transform="translate(10.08 210.410375)">County set by the County Commission;</text>
    <text style="font-size: 8.5px; font-family: 'Inter', sans-serif; fill: #8796a8" transform="translate(10.08 220.695043)">school board by the School Board.</text>
-  </g>
-  <g id="text_7">
-   <text style="font-size: 8.5px; font-family: 'Inter', sans-serif; fill: #8796a8" transform="translate(10.08 249.756371)">Source: Florida Department of Revenue Data Book,</text>
-   <text style="font-size: 8.5px; font-family: 'Inter', sans-serif; fill: #8796a8" transform="translate(10.08 260.041039)">https://floridarevenue.com/property/</text>
-   <text style="font-size: 8.5px; font-family: 'Inter', sans-serif; fill: #8796a8" transform="translate(10.08 270.325707)">Documents/millage_taxes_levied.xlsx</text>
   </g>
  </g>
  <defs>
