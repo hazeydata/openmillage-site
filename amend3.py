@@ -140,7 +140,7 @@ def render_amend3(rows, districts, ballot, counties, sd_counties=None):
     kicker = f"<p class=kicker>Ballot measure numbered {ballot['ballot_number']} · {link(CFG['election_date_source'], edtxt)}</p>"
     body = (
       f"<p>Election date: {ed.strftime('%B')} {ed.day}, {ed.year} ({link(CFG['election_date_source'])}).</p>"
-      + redo.chart("county-dots", "Dot plot: 2025 county and school board countywide rates for each Florida county")
+      + redo.chart("county-dots", "Dot plot: 2025 county and school board countywide rates for each Florida county", caption=redo.DOTS_CAPTION)
       + "<h2 id=before-you-vote>Before you vote</h2>" + redo.intro("Before you vote (ballot measure numbered 3 page)").replace("the 2025 adopted rates", f"the {link(srcs[0][1], '2025 adopted rates')}", 1)
       + (
       f"<p class=label>{link(ballot['source_url'], 'Ballot Number ' + str(ballot['ballot_number']))}</p>"

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="518.4pt" height="345.6pt" viewBox="0 0 518.4 345.6" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="518.4pt" height="285pt" viewBox="0 0 518.4 285" xmlns="http://www.w3.org/2000/svg" version="1.1">
  <metadata>
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
@@ -17283,12 +17283,6 @@ L 464.715 252.288
   <g id="text_25">
    <text style="font-size: 9.5px; font-family: 'Inter', sans-serif; fill: #8796a8" transform="translate(20.736 58.278325)">Adopted millage, 1996–2025; every Florida county or city as a thin grey line, shared scale. Gaps are</text>
    <text style="font-size: 9.5px; font-family: 'Inter', sans-serif; fill: #8796a8" transform="translate(20.736 69.772954)">left blank, never interpolated; no values are held over.</text>
-  </g>
-  <g id="text_26">
-   <text style="font-size: 9.5px; font-family: 'Inter', sans-serif; fill: #8796a8" transform="translate(20.736 304.677409)">Source: Florida Office of Economic &amp; Demographic Research and Florida Department of Revenue, via the</text>
-   <text style="font-size: 9.5px; font-family: 'Inter', sans-serif; fill: #8796a8" transform="translate(20.736 316.172038)">openmillage Florida millage history dataset (commit 7c1a525). Alachua 2002 school: operating 6.646</text>
-   <text style="font-size: 9.5px; font-family: 'Inter', sans-serif; fill: #8796a8" transform="translate(20.736 327.666667)">mills, as published. County series may understate by up to ~0.1 mill where small debt or district levies</text>
-   <text style="font-size: 9.5px; font-family: 'Inter', sans-serif; fill: #8796a8" transform="translate(20.736 339.161296)">weren't captured.</text>
   </g>
  </g>
  <defs>
