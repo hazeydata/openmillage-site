@@ -2,7 +2,7 @@
 Layout: openmillage-meta 9911d28 (Variation B "Rate stack" on A's tokens). Copy: content/copy.md (Lindsay afab3f2, verbatim).
 Charts: assets/charts/ (Her?), inlined so their text uses the self-hosted fonts in assets/fonts/.
 Slots: HISTORY_LINE and HISTORY_CHART below are the two history slots; edit them (or copy.md) and rebuild."""
-import html, os, re, shutil
+import collections, html, os, re, shutil
 E = lambda s: html.escape(str(s), quote=True)
 COPY_FILE = "content/copy.md"
 CHART_DIR = "assets/charts"
@@ -78,8 +78,15 @@ def chart(name, label, attrs="", caption=""):
             + (f"<figcaption class=muted>{caption}</figcaption>" if caption else "") + "</figure>")
 
 SOURCE_LINK = "<a href='https://floridarevenue.com/property/Documents/millage_taxes_levied.xlsx'>Source: Florida Department of Revenue, millage data</a>"
-HISTORY_CAPTION = ("Alachua 2002 school: operating 6.646 mills, as published. County series may understate by up to ~0.1 mill where small debt or district levies weren't captured. "
-                   + SOURCE_LINK + "; <a href='https://edr.state.fl.us/Content/local-government/data/data-a-to-z/advaltxco.xlsx'>Florida Office of Economic &amp; Demographic Research</a>. ")
+def page_edr_url(rows):
+    """The EDR workbook a history page's own rows cite most often, or None if no row cites EDR."""
+    c = collections.Counter(r["source_url"] for r in rows if "edr.state.fl.us" in (r.get("source_url") or ""))
+    return c.most_common(1)[0][0] if c else None
+def history_caption(edr_url):
+    """History chart caption; edr_url is the EDR workbook the page's own rows cite (county or school).
+    With no EDR rows (edr_url None) the caption carries no EDR link."""
+    return ("Alachua 2002 school: operating 6.646 mills, as published. County series may understate by up to ~0.1 mill where small debt or district levies weren't captured. "
+                   + SOURCE_LINK + (f"; <a href='{E(edr_url)}'>Florida Office of Economic &amp; Demographic Research</a>. " if edr_url else ". "))
 DOTS_CAPTION = ("Duval shows the school board rate only: Jacksonville and Duval are consolidated, so the city-county rate isn't countywide and is left out. "
                 "City and special-district rates are not included. "
                 + SOURCE_LINK)

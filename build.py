@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Static build: data/ (pinned by data/SOURCES.lock) -> docs/ (GitHub Pages). Per-county pages, JSON API, sitemap, llms.txt."""
-import csv, json, os, re, html, datetime
+import collections, csv, json, os, re, html, datetime
 import sources
 from analytics import GOATCOUNTER_TAG
 import site_chrome as sc
@@ -155,7 +155,7 @@ for (co, lv), hrs in sorted(HIST.items()):
         w = csv.DictWriter(f, fieldnames=HIST_FIELDS, lineterminator="\n"); w.writeheader(); w.writerows(hrs)
     json.dump({"source": {"repo": "hazeydata/openmillage", "commit": HIST_PIN, "path": "data/fl_millage_history.csv"}, "county": co, "level": lv, "rows": hrs}, open(f"{d}/index.json", "w"), indent=1)
     yrs = sorted({r["year"] for r in hrs}); line = redo.HISTORY_LINE.get(co); ch = redo.HISTORY_CHART.get(co)
-    chart_html = (redo.chart(ch[0], ch[1], f" id=history-chart data-slot=history-chart data-src='{PATH}/{hp[:-10]}index.json'", redo.HISTORY_CAPTION + f"Re-cut on openmillage@{HIST_PIN[:7]}") if ch
+    chart_html = (redo.chart(ch[0], ch[1], f" id=history-chart data-slot=history-chart data-src='{PATH}/{hp[:-10]}index.json'", redo.history_caption(redo.page_edr_url(hrs)) + f"Re-cut on openmillage@{HIST_PIN[:7]}") if ch
                   else f"<figure class=hero id=history-chart data-slot=history-chart data-src='{PATH}/{hp[:-10]}index.json'></figure>")
     other = [(l, f"{PATH}/{hist_path(co, l)[:-10]}") for l in HIST_LEVELS if l != lv and (co, l) in HIST]
     page(hp, f"{co} County, FL {HIST_LEVELS[lv].lower()} millage history, {yrs[0]}–{yrs[-1]}",
