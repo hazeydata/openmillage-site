@@ -43,6 +43,11 @@ blockquote.official{margin:1rem 0;padding:.25rem 1rem;border-left:4px solid var(
 .filter label{font-weight:600;margin-right:.5rem}
 .filter input{font:inherit;padding:.5rem;min-height:44px;max-width:100%;box-sizing:border-box;border:1px solid var(--muted);border-radius:.25rem;background:var(--bg);color:var(--fg)}
 [hidden]{display:none!important}
+.keynums{font-size:1rem}
+details.cgroup{border-bottom:1px solid var(--border);padding:.25rem 0}
+details.cgroup summary{cursor:pointer;padding:.6rem 0;min-height:44px}
+.chart img{width:100%;height:auto}
+.sortbtn{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
 .callout{border:1px solid var(--accent);border-left-width:6px;border-radius:.25rem;padding:.75rem 1rem}
 """
 
@@ -95,8 +100,8 @@ def crumbs(PATH, trail):
     parts = [f"<a href='{PATH}/'>OpenMillage</a>"] + [(f"<a href='{h}'>{html.escape(t)}</a>" if h else f"<span aria-current=page>{html.escape(t)}</span>") for t, h in trail]
     return "<nav aria-label=Breadcrumb class=crumbs>" + " &rsaquo; ".join(parts) + "</nav>"
 def footer(PATH, lead="", updated=None):
-    d, u = updated
-    up = f"<p>Site data updated <time datetime={d.isoformat()}>{d.strftime('%B')} {d.day}, {d.year}</time> (latest source retrieval across all pages, <a href='{html.escape(u)}'>source</a>).</p>"
+    d, u, *lab = updated
+    up = f"<p>Site data updated <time datetime={d.isoformat()}>{d.strftime('%B')} {d.day}, {d.year}</time> ({lab[0] if lab else 'latest source retrieval across all pages'}, <a href='{html.escape(u)}'>source</a>).</p>"
     return (f"<footer>{up}<p>{lead}<a href='{PATH}/llms.txt'>llms.txt</a> · <a href='{PATH}/'>All counties</a> · {redo.contact()}</p>"
             "<p>Data: CC BY 4.0 (<a href='https://creativecommons.org/licenses/by/4.0/'>licence</a>). Published by Hazey Data.</p>" + redo.credit() + "</footer>")
 def tablewrap(aria, table): return f"<div class=tablewrap tabindex=0 role=region aria-label=\"{html.escape(aria)}\">{table}</div>"

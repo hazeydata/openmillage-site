@@ -1,0 +1,7 @@
+scope,body_type,reason_code,reason_text,source_row_ref
+FL 2025 school districts,school_district,school_district_no_statewide_rbr_source,No statewide official per-district 2025 school rolled-back-rate file was found; only per-district DR-420S filings exist.,82
+FL 2025 independent special districts levying less than 5 years not printed in MillCapComp25,special_district,isd_lt_5_years_not_published,MillCapComp25 excludes independent special districts levying less than 5 years except rows it prints with *; no statewide rolled-back file covers the rest.,84
+FL 2025 independent special districts not subject to maximum millage,special_district,isd_not_subject_to_max_millage_not_published,Districts outside the maximum-millage reports have no statewide rolled-back file.,84
+FL 2025 dependent districts and MSTUs of independent special districts,dependent_district,isd_dependent_districts_not_published,No statewide rolled-back file itemizes dependent districts of independent special districts.,84
+"FL 2025 all taxing authorities, per-authority DR-420 filings",all,dr420_bulk_login_gated,"DOR publishes no bulk DR-420 dataset; filings sit behind the eTRIM/OASYS login, which was not accessed.",83
+FL 2025 Broward Table 1 row 'Sunrise Key' (CITY OF FORT LAUDERDALE),dependent_district,duplicate_row_in_source,duplicate row in source: Broward_Table_1.pdf p1 repeats every value of the 'City of Sunrise' row (p2); its real levy is not printed in any source. Fact check: evidence/om-rollback/fact/verdicts.md,11

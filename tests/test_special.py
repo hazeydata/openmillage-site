@@ -34,7 +34,7 @@ def append(path, line):
 lock = sources.read_lock()
 rows = sources.load_rows(lock)
 paths = {f["path"]: f for f in lock["files"]}
-ok(set(paths) == {sources.BASE_FILE, sources.SD_FILE, sources.ALT_FILE, sources.STATUS_FILE, "data/history/fl_millage_history.csv"}, "AC1 lock lists the four openmillage copies plus the pinned history CSV")
+ok(set(paths) == {sources.BASE_FILE, sources.SD_FILE, sources.ALT_FILE, sources.STATUS_FILE, "data/history/fl_millage_history.csv"} | {p for p in paths if p.startswith(("data/nc/", "data/rollback/"))}, "AC1 lock lists the four openmillage copies plus the pinned history CSV")
 ok(all(f["repo"] == "hazeydata/openmillage" and re.fullmatch(r"[0-9a-f]{40}", f["commit"]) and re.fullmatch(r"[0-9a-f]{64}", f["sha256"]) for f in lock["files"]),
    "AC1 each lock entry has repo, 40-hex commit and 64-hex sha256")
 tmp, r = build_copy(lambda t: open(os.path.join(t, sources.SD_FILE), "a").write("\n"))
