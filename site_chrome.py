@@ -43,6 +43,9 @@ blockquote.official{margin:1rem 0;padding:.25rem 1rem;border-left:4px solid var(
 .filter label{font-weight:600;margin-right:.5rem}
 .filter input{font:inherit;padding:.5rem;min-height:44px;max-width:100%;box-sizing:border-box;border:1px solid var(--muted);border-radius:.25rem;background:var(--bg);color:var(--fg)}
 [hidden]{display:none!important}
+.chart img{width:100%;height:auto}
+.chart-tall{max-height:80vh;overflow-y:auto}
+.sortbtn{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
 .callout{border:1px solid var(--accent);border-left-width:6px;border-radius:.25rem;padding:.75rem 1rem}
 """
 

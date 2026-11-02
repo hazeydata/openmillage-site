@@ -34,6 +34,111 @@
    "commit": "7c1a5259eb42384e64b957a6f809cb520f568ef8",
    "source_path": "data/fl_millage_history.csv",
    "sha256": "0d74a1f09ccc579bfe459ce0d309fc8c94139998d7775106a425e4f213041869"
+  },
+  {
+   "path": "data/nc/nc-2021.csv",
+   "repo": "hazeydata/openmillage",
+   "commit": "9578336ec76597bb3e98542e809b987442d80b63",
+   "source_path": "data/nc-2021.csv",
+   "sha256": "ce0f7f973f36ae32a20bf1eedd48f41c03739344dcc43079fb237d3cf7929292"
+  },
+  {
+   "path": "data/nc/nc-2021.provenance.csv",
+   "repo": "hazeydata/openmillage",
+   "commit": "9578336ec76597bb3e98542e809b987442d80b63",
+   "source_path": "data/nc-2021.provenance.csv",
+   "sha256": "5a317bc5f9daa5f370fba10c343ed1c06217ef92a7aed1ea29fc6214c924ecde"
+  },
+  {
+   "path": "data/nc/nc-2022.csv",
+   "repo": "hazeydata/openmillage",
+   "commit": "9578336ec76597bb3e98542e809b987442d80b63",
+   "source_path": "data/nc-2022.csv",
+   "sha256": "b2c21e7ba798cc4dc21093067787795bdcdfcbe7c48a06bd733ec90a88641499"
+  },
+  {
+   "path": "data/nc/nc-2022.provenance.csv",
+   "repo": "hazeydata/openmillage",
+   "commit": "9578336ec76597bb3e98542e809b987442d80b63",
+   "source_path": "data/nc-2022.provenance.csv",
+   "sha256": "269c19c851842b8f9f1ba4b89cfd0ad1ba7b8294838c542a75324071888c612e"
+  },
+  {
+   "path": "data/nc/nc-2023.csv",
+   "repo": "hazeydata/openmillage",
+   "commit": "9578336ec76597bb3e98542e809b987442d80b63",
+   "source_path": "data/nc-2023.csv",
+   "sha256": "5891f4c20e4215a2e29c1b6ed580c5c1ed0f66a0c0d757e725e6f528e4b559c2"
+  },
+  {
+   "path": "data/nc/nc-2023.provenance.csv",
+   "repo": "hazeydata/openmillage",
+   "commit": "9578336ec76597bb3e98542e809b987442d80b63",
+   "source_path": "data/nc-2023.provenance.csv",
+   "sha256": "a58d0982a1ea967a643733b1cda8da6a1d8330a511a417afad5bc1e6156f1ec7"
+  },
+  {
+   "path": "data/nc/nc-2024.csv",
+   "repo": "hazeydata/openmillage",
+   "commit": "9578336ec76597bb3e98542e809b987442d80b63",
+   "source_path": "data/nc-2024.csv",
+   "sha256": "a4215afadeb86bd9bafd6f960b209bbcf351d655e2146d85c12d5638b7148598"
+  },
+  {
+   "path": "data/nc/nc-2024.provenance.csv",
+   "repo": "hazeydata/openmillage",
+   "commit": "9578336ec76597bb3e98542e809b987442d80b63",
+   "source_path": "data/nc-2024.provenance.csv",
+   "sha256": "98b22faff2efa2b79258f6fafab242576558958fc83035e0f5f06c96e061603d"
+  },
+  {
+   "path": "data/nc/nc-2025.csv",
+   "repo": "hazeydata/openmillage",
+   "commit": "9578336ec76597bb3e98542e809b987442d80b63",
+   "source_path": "data/nc-2025.csv",
+   "sha256": "3230f0d5a84159a5df39f98a94aeed6596b5aecd61630dd2e55a32c993cb678b"
+  },
+  {
+   "path": "data/nc/nc-2025.provenance.csv",
+   "repo": "hazeydata/openmillage",
+   "commit": "9578336ec76597bb3e98542e809b987442d80b63",
+   "source_path": "data/nc-2025.provenance.csv",
+   "sha256": "d05b955c69d5fb13c5ec211590ad2f2018bd3710b6e6d6e9b8ed6d5a1acbbf41"
+  },
+  {
+   "path": "data/nc/nc-history.report.md",
+   "repo": "hazeydata/openmillage",
+   "commit": "9578336ec76597bb3e98542e809b987442d80b63",
+   "source_path": "data/nc-history.report.md",
+   "sha256": "8e5cf297760e1b6a801a4198cfb0ecdd0bcb9606f4d9b2e314824d63341b03f9"
+  },
+  {
+   "path": "data/nc/nc_unit_basis.csv",
+   "repo": "hazeydata/openmillage",
+   "commit": "9578336ec76597bb3e98542e809b987442d80b63",
+   "source_path": "reference/nc_unit_basis.csv",
+   "sha256": "c0e437e6a0b44a005d98c7a49e8cebe69b1b98034202ecd065abce24aad23544"
+  },
+  {
+   "path": "data/rollback/fl-2025-rollback-exclusions.csv",
+   "repo": "hazeydata/openmillage",
+   "commit": "9578336ec76597bb3e98542e809b987442d80b63",
+   "source_path": "data/fl-2025-rollback-exclusions.csv",
+   "sha256": "e542eeac14b99f9d0ee298043af4dbd16d5f667280b83bd6c498c28f2a7e8c96"
+  },
+  {
+   "path": "data/rollback/fl-2025-rollback.csv",
+   "repo": "hazeydata/openmillage",
+   "commit": "9578336ec76597bb3e98542e809b987442d80b63",
+   "source_path": "data/fl-2025-rollback.csv",
+   "sha256": "f55ba067476ccd1b2f3559fcea5ad873fac1c8322ce9ad672f8030c6673f7f49"
+  },
+  {
+   "path": "data/rollback/fl_rollback_sources_notes.md",
+   "repo": "hazeydata/openmillage",
+   "commit": "9578336ec76597bb3e98542e809b987442d80b63",
+   "source_path": "reference/fl_rollback_sources_notes.md",
+   "sha256": "4494f91c905adfffa77f6088a525d7d962a12ad655ae30cb5d742fcf7ae8af53"
   }
  ]
 }
