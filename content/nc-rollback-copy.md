@@ -11,7 +11,7 @@ Counties whose general rate rose or held, FY2021-22 vs FY2025-26, per $100 of va
 In numbers: 9 counties raised their rate and 10 kept it the same. Biggest rises per $100: Currituck (+16.0 cents), Hyde (+12.5 cents) and Cherokee (+11.0 cents).
 Counties whose general rate fell, FY2021-22 vs FY2025-26, per $100 of value. Source: NC DOR, via the table below. SVG.
 Source: hazeydata/openmillage-site data/nc/nc-2021.csv and data/nc/nc-2025.csv (body_type = county, one row per county; North Carolina Department of Revenue).
-Unit basis: per $100 is stated by the source for FY2025-26 only; for FY2021-22 it is inferred (reference/nc_unit_basis.csv).
+Unit basis: per $100 is stated by the source for FY2025-26 only; for FY2021-22 it is inferred (see page note).
 All 100 counties present in both years; none missing. 81 fell, 9 rose, 10 unchanged.
 Rate drops often follow a county revaluation (rates fall when values are reassessed); revaluation years are not recorded in these files, so they are not marked.
 In numbers: 81 counties lowered their rate. Biggest drops per $100: Cumberland (−30.0 cents), Franklin (−29.0 cents) and Wilkes (−24.0 cents).

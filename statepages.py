@@ -86,7 +86,7 @@ FIRE_P = "<p><strong>Rural fire districts: not collected yet.</strong> This page
 # From the footnote of dataviz nc-rates-fell.py / .svg (mathtext escapes removed); source line repointed to the public
 # openmillage-site copy (the image still names the private repo until dataviz re-renders)
 FELL_NOTE = ("Source: hazeydata/openmillage-site data/nc/nc-2021.csv and data/nc/nc-2025.csv (body_type = county, one row per county; North Carolina Department of Revenue).\n"
- "Unit basis: per $100 is stated by the source for FY2025-26 only; for FY2021-22 it is inferred (reference/nc_unit_basis.csv).\n"
+ "Unit basis: per $100 is stated by the source for FY2025-26 only; for FY2021-22 it is inferred (see page note).\n"
  "All 100 counties present in both years; none missing. 81 fell, 9 rose, 10 unchanged.\n"
  "Rate drops often follow a county revaluation (rates fall when values are reassessed); revaluation years are not recorded in these files, so they are not marked.")
 
@@ -214,7 +214,7 @@ def fl_page(alts):
              f"(<a href='{F200}'>F.S. 200.065(1)</a>). "
              "Every taxing authority computes it each summer during TRIM (Truth in Millage). Florida DOR publishes each authority's rolled-back and adopted rates after the fact "
              "(<a href='https://floridarevenue.com/property/Documents/method.pdf'>DOR method</a>). One mill is $1 per $1,000 of taxable value.</p>"
-             + figure("fl-rollback", alts["fl-rollback"], f"Adopted minus rolled-back millage, {len(ok)} Florida 2025 levies. Source: Florida DOR, via the table below.", 1600, 900) + keys
+             + figure("fl-rollback", alts["fl-rollback"], f"Adopted minus rolled-back millage, {len(ok)} Florida 2025 levies. Source: Florida DOR, via the table below.", 1600, 840) + keys
              + "<h2>Every levy, by county</h2><p>Open a county to see its levies. Difference is adopted minus rolled-back, in mills.</p><div class=filter><label for=f-fl>Find a county or body</label><input id=f-fl data-g=fl-groups></div>" + tbl
              + "<p class=muted>Adopted minus rolled-back is computed from the two DOR figures in the same row. Click a column heading to sort. Data file: "
                f"<a href='{SITE_DATA.format('blob', 'rollback/fl-2025-rollback.csv')}'>fl-2025-rollback.csv</a>.</p>"
