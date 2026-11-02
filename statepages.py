@@ -37,11 +37,11 @@ def doc(path, title, desc, inner, trail, updated):
 def updated_of(rs):
     return sources.data_updated(sources.load_rows())  # site-wide footer date, same as every other page
 
-def figure(name, alt, cap, w, h, tall=False):
-    box = " class=chart-tall" if tall else ""
-    return (f"<figure class=chart data-chart='{name}'><div{box} tabindex=0 role=region aria-label='{E(name)} chart'>"
+def figure(name, alt, cap, w, h, note=""):
+    note = "".join(f"<p class=footnote>{E(l)}</p>" for l in note.split("\n") if l) if note else ""
+    return (f"<figure class=chart data-chart='{name}'><div>"
             f"<img src='{PATH}/charts/{name}.png' width={w} height={h} alt='{E(alt)}'></div>"
-            f"<figcaption class=muted>{cap} <a href='{PATH}/charts/{name}.svg'>SVG</a>.</figcaption></figure>")
+            f"<figcaption class=muted>{cap} <a href='{PATH}/charts/{name}.svg'>SVG</a>.</figcaption>{note}</figure>")
 
 # ---------- North Carolina ----------
 def nc_load():
@@ -80,6 +80,12 @@ UNIT_P = ("<p class=callout><strong>About the unit.</strong> Every rate here is 
           "<p class=footnote id=fn-unit>1. North Carolina law caps these rates per $100 of value, so per $100 is also inferred from statute: city rates under <a href='https://www.ncleg.gov/EnactedLegislation/Statutes/HTML/BySection/Chapter_160A/GS_160A-209.html'>G.S. 160A-209(d)</a>, city service districts under <a href='https://www.ncleg.gov/EnactedLegislation/Statutes/HTML/BySection/Chapter_160A/GS_160A-542.html'>G.S. 160A-542(c)</a> and county service districts under <a href='https://www.ncleg.gov/EnactedLegislation/Statutes/HTML/BySection/Chapter_153A/GS_153A-307.html'>G.S. 153A-307</a>. <a href='#fnref-unit'>Back</a></p>")
 FIRE_P = "<p><strong>Rural fire districts: not collected yet.</strong> This page shows county and city rates only. Fire, rescue and other special-district rates aren't on it.</p>"
 
+# Verbatim from the footnote of dataviz nc-rates-fell.py / .svg (mathtext escapes removed)
+FELL_NOTE = ("Source: hazeydata/openmillage data/nc-2021.csv and data/nc-2025.csv (body_type = county, one row per county; North Carolina Department of Revenue).\n"
+ "Unit basis: per $100 is stated by the source for FY2025-26 only; for FY2021-22 it is inferred (reference/nc_unit_basis.csv).\n"
+ "All 100 counties present in both years; none missing. 81 fell, 9 rose, 10 unchanged.\n"
+ "Rate drops often follow a county revaluation (rates fall when values are reassessed); revaluation years are not recorded in these files, so they are not marked.")
+
 def nc_pages(alts):
     data = nc_load()
     by = {y: {r["body_id"]: r for r in data[y]} for y in YEARS}
@@ -117,7 +123,8 @@ def nc_pages(alts):
     inner = (f"<p class=lead>Between FY2021-22 and FY2025-26, {dn} of North Carolina's 100 counties lowered their general property tax rate, {up} raised it and {same} kept it the same. "
              "Rates below are per $100 of assessed value, straight from NC Department of Revenue spreadsheets.</p>"
              + UNIT_P + FIRE_P
-             + figure("nc-rates", alts["nc-rates"], "County general rate, FY2021-22 vs FY2025-26, per $100 of value. Source: NC DOR, via the table below.", 1600, 3800, tall=True)
+             + figure("nc-rates-rose-flat", alts["nc-rates-rose-flat"], "Counties whose general rate rose or held, FY2021-22 vs FY2025-26, per $100 of value. Source: NC DOR, via the table below.", 1600, 1216)
+             + figure("nc-rates-fell", alts["nc-rates-fell"], "Counties whose general rate fell, FY2021-22 vs FY2025-26, per $100 of value. Source: NC DOR, via the table below.", 1600, 3448, note=FELL_NOTE)
              + "<h2>Every county, five years</h2><div class=filter><label for=f-nc>Find a county</label><input id=f-nc data-t=t-nc></div>" + hub_tbl
              + f"<p class=muted>Change is the FY2025-26 rate minus the FY2021-22 rate, both from DOR. Click a column heading to sort. Each county page also lists its cities and towns. Data file: "
                f"<a href='https://github.com/hazeydata/openmillage/tree/9578336ec76597bb3e98542e809b987442d80b63/data'>hazeydata/openmillage data/nc-2021..2025.csv</a>.</p>")
@@ -166,7 +173,7 @@ def main():
     if miss: print(f"statepages: BUILD FAILED, missing {miss}", file=sys.stderr); return 1
     alts = alt_text()
     os.makedirs(f"{OUT}/charts", exist_ok=True)
-    for n in ("nc-rates", "fl-rollback"):
+    for n in ("nc-rates-rose-flat", "nc-rates-fell", "fl-rollback"):
         for ext in ("png", "svg"): shutil.copyfile(f"{CHARTS}/{n}.{ext}", f"{OUT}/charts/{n}.{ext}")
     urls = nc_pages(alts); fl, stats = fl_page(alts); urls += fl
     sm = f"{OUT}/sitemap.xml"; s = open(sm).read()

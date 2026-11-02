@@ -10,7 +10,12 @@ Between FY2021-22 and FY2025-26, 81 of North Carolina's 100 counties lowered the
 About the unit. Every rate here is dollars per $100 of assessed value, so 0.5000 means 50 cents per $100. Only North Carolina DOR's FY2025-26 county rate PDF states that unit (“(All rates per $100 valuation*)”, source). The DOR spreadsheets the other rates come from carry no unit label, so for those rates the unit is inferred, not stated. In DOR's words from our data notes: “NC DOR doesn't state a unit for this rate; we read it as per $100 based on older DOR tables” (Table 67). Rates marked i use the inferred unit.1
 1. North Carolina law caps these rates per $100 of value, so per $100 is also inferred from statute: city rates under G.S. 160A-209(d), city service districts under G.S. 160A-542(c) and county service districts under G.S. 153A-307. Back
 Rural fire districts: not collected yet. This page shows county and city rates only. Fire, rescue and other special-district rates aren't on it.
-County general rate, FY2021-22 vs FY2025-26, per $100 of value. Source: NC DOR, via the table below. SVG.
+Counties whose general rate rose or held, FY2021-22 vs FY2025-26, per $100 of value. Source: NC DOR, via the table below. SVG.
+Counties whose general rate fell, FY2021-22 vs FY2025-26, per $100 of value. Source: NC DOR, via the table below. SVG.
+Source: hazeydata/openmillage data/nc-2021.csv and data/nc-2025.csv (body_type = county, one row per county; North Carolina Department of Revenue).
+Unit basis: per $100 is stated by the source for FY2025-26 only; for FY2021-22 it is inferred (reference/nc_unit_basis.csv).
+All 100 counties present in both years; none missing. 81 fell, 9 rose, 10 unchanged.
+Rate drops often follow a county revaluation (rates fall when values are reassessed); revaluation years are not recorded in these files, so they are not marked.
 
 ### Every county, five yearsFind a county
 Change is the FY2025-26 rate minus the FY2021-22 rate, both from DOR. Click a column heading to sort. Each county page also lists its cities and towns. Data file: hazeydata/openmillage data/nc-2021..2025.csv.
@@ -62,9 +67,11 @@ King's Crest (Osceola): rolled-back not printed, adopted not printed (source, ro
 Law Enforcement (Santa Rosa): rolled-back 0.0000, adopted 2.0700 (source, row 879)
 
 ## Chart alt text (dataviz, verbatim)
-
-#### nc-rates.png
-Dot plot of all 100 North Carolina counties, one row each, showing the county general property tax rate in dollars per $100 of valuation for FY2021-22 (open dot) and FY2025-26 (blue dot), sorted by change. 81 counties fell, 9 rose and 10 were unchanged. The largest increase was Currituck (+16.0 cents per $100) and the largest decreases were Cumberland (−30.0 cents) and Franklin (−29.0 cents). Rates range from $0.225 to $1.00. The unit basis is stated in the source for FY2025-26 and inferred for FY2021-22.
-
 #### fl-rollback.png
 Strip plot of 927 Florida 2025 operating levies, showing adopted millage minus rolled-back millage in three rows: above (733 levies, blue), equal (69, grey) and below (125, orange). The median difference is +0.08 mills. Most above-rate levies sit within 0 to +0.5 mills, and the highest is Bunnell (Flagler) at +2.23 mills. The lowest is Waterway Shores Light (Lee) at −5.59 mills. Four source rows are not plotted because they have no usable rolled-back or adopted rate, and school districts and some special districts are out of scope.
+
+#### nc-rates-rose-flat.png
+Dot plot of the 19 North Carolina counties whose general property tax rate rose or held between FY2021-22 (open dot) and FY2025-26 (blue dot), in dollars per $100 of valuation, with the largest rise at the top. Nine counties rose: Currituck +16.0 cents per $100 (largest), Hyde +12.5, Cherokee +11.0, Pender +9.3, Bertie +6.5, Buncombe +5.9, Swain +5.0, Pamlico +2.0 and Haywood +1.5. Ten were unchanged: Washington, Hertford, Columbus, Greene, Anson, Guilford, Montgomery, Alleghany, Davidson and Clay. The x-axis uses the same rate scale as the companion chart of counties that fell ($0.225 to $1.00 per $100). The unit basis is stated in the source for FY2025-26 and inferred for FY2021-22.
+
+#### nc-rates-fell.png
+Dot plot of the 81 North Carolina counties whose general property tax rate fell between FY2021-22 (open dot) and FY2025-26 (blue dot), in dollars per $100 of valuation, sorted by size of drop with the largest at the top. The largest drops were Cumberland (−30.0 cents per $100), Franklin (−29.0) and Wilkes (−24.0). The smallest were 1.0 cent, in Scotland, Jones, Yadkin and Mcdowell. The x-axis uses the same rate scale as the companion chart of counties that rose or were unchanged ($0.225 to $1.00 per $100). The unit basis is stated in the source for FY2025-26 and inferred for FY2021-22.
