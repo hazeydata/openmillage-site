@@ -83,8 +83,9 @@ UNIT_P = ("<p class=callout><strong>About the unit.</strong> Every rate here is 
           "<p class=footnote id=fn-unit>1. North Carolina law caps these rates per $100 of value, so per $100 is also inferred from statute: county general rates under <a href='https://www.ncleg.gov/EnactedLegislation/Statutes/HTML/BySection/Chapter_153A/GS_153A-149.html'>G.S. 153A-149(c)</a>, city rates under <a href='https://www.ncleg.gov/EnactedLegislation/Statutes/HTML/BySection/Chapter_160A/GS_160A-209.html'>G.S. 160A-209(d)</a>, city service districts under <a href='https://www.ncleg.gov/EnactedLegislation/Statutes/HTML/BySection/Chapter_160A/GS_160A-542.html'>G.S. 160A-542(c)</a> and county service districts under <a href='https://www.ncleg.gov/EnactedLegislation/Statutes/HTML/BySection/Chapter_153A/GS_153A-307.html'>G.S. 153A-307</a>. <a href='#fnref-unit'>Back</a></p>")
 FIRE_P = "<p><strong>Rural fire districts: not collected yet.</strong> This page shows county and city rates only. Fire, rescue and other special-district rates aren't on it.</p>"
 
-# Verbatim from the footnote of dataviz nc-rates-fell.py / .svg (mathtext escapes removed)
-FELL_NOTE = ("Source: hazeydata/openmillage data/nc-2021.csv and data/nc-2025.csv (body_type = county, one row per county; North Carolina Department of Revenue).\n"
+# From the footnote of dataviz nc-rates-fell.py / .svg (mathtext escapes removed); source line repointed to the public
+# openmillage-site copy (the image still names the private repo until dataviz re-renders)
+FELL_NOTE = ("Source: hazeydata/openmillage-site data/nc/nc-2021.csv and data/nc/nc-2025.csv (body_type = county, one row per county; North Carolina Department of Revenue).\n"
  "Unit basis: per $100 is stated by the source for FY2025-26 only; for FY2021-22 it is inferred (reference/nc_unit_basis.csv).\n"
  "All 100 counties present in both years; none missing. 81 fell, 9 rose, 10 unchanged.\n"
  "Rate drops often follow a county revaluation (rates fall when values are reassessed); revaluation years are not recorded in these files, so they are not marked.")
@@ -111,7 +112,8 @@ def nc_updated(data):
     from zoneinfo import ZoneInfo
     allr = [r for y in YEARS for r in data[y]]
     lat = max(r["retrieved_at"] for r in allr)
-    url = min(r["source_url"] for r in allr if r["retrieved_at"] == lat)
+    # Ties on the latest retrieval: link the newest fiscal year (FY2025-26), then the smallest URL, for a stable choice.
+    url = min((-y, r["source_url"]) for y in YEARS for r in data[y] if r["retrieved_at"] == lat)[1]
     d = datetime.datetime.fromisoformat(lat.replace("Z", "+00:00")).astimezone(ZoneInfo("America/New_York")).date()
     return d, url, "latest NC DOR retrieval for these pages"
 

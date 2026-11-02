@@ -10,7 +10,7 @@ Rural fire districts: not collected yet. This page shows county and city rates o
 Counties whose general rate rose or held, FY2021-22 vs FY2025-26, per $100 of value. Source: NC DOR, via the table below. SVG.
 In numbers: 9 counties raised their rate and 10 kept it the same. Biggest rises per $100: Currituck (+16.0 cents), Hyde (+12.5 cents) and Cherokee (+11.0 cents).
 Counties whose general rate fell, FY2021-22 vs FY2025-26, per $100 of value. Source: NC DOR, via the table below. SVG.
-Source: hazeydata/openmillage data/nc-2021.csv and data/nc-2025.csv (body_type = county, one row per county; North Carolina Department of Revenue).
+Source: hazeydata/openmillage-site data/nc/nc-2021.csv and data/nc/nc-2025.csv (body_type = county, one row per county; North Carolina Department of Revenue).
 Unit basis: per $100 is stated by the source for FY2025-26 only; for FY2021-22 it is inferred (reference/nc_unit_basis.csv).
 All 100 counties present in both years; none missing. 81 fell, 9 rose, 10 unchanged.
 Rate drops often follow a county revaluation (rates fall when values are reassessed); revaluation years are not recorded in these files, so they are not marked.
