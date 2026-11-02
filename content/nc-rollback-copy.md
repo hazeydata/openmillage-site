@@ -8,7 +8,7 @@ Skip to contentOpenMillage › North Carolina
 ### North Carolina property tax rates by county, FY2021-22 to FY2025-26
 Between FY2021-22 and FY2025-26, 81 of North Carolina's 100 counties lowered their general property tax rate, 9 raised it and 10 kept it the same. Rates below are per $100 of assessed value, straight from NC Department of Revenue spreadsheets.
 About the unit. Every rate here is dollars per $100 of assessed value, so 0.5000 means 50 cents per $100. Only North Carolina DOR's FY2025-26 county rate PDF states that unit (“(All rates per $100 valuation*)”, source). The DOR spreadsheets the other rates come from carry no unit label, so for those rates the unit is inferred, not stated. In DOR's words from our data notes: “NC DOR doesn't state a unit for this rate; we read it as per $100 based on older DOR tables” (Table 67). Rates marked i use the inferred unit.1
-1. North Carolina law caps these rates per $100 of value, so per $100 is also inferred from statute: city rates under G.S. 160A-209(d), city service districts under G.S. 160A-542(c) and county service districts under G.S. 153A-307. Back
+1. North Carolina law caps these rates per $100 of value, so per $100 is also inferred from statute: county general rates under G.S. 153A-149(c), city rates under G.S. 160A-209(d), city service districts under G.S. 160A-542(c) and county service districts under G.S. 153A-307. Back
 Rural fire districts: not collected yet. This page shows county and city rates only. Fire, rescue and other special-district rates aren't on it.
 Counties whose general rate rose or held, FY2021-22 vs FY2025-26, per $100 of value. Source: NC DOR, via the table below. SVG.
 Counties whose general rate fell, FY2021-22 vs FY2025-26, per $100 of value. Source: NC DOR, via the table below. SVG.
@@ -28,7 +28,7 @@ Skip to contentOpenMillage › North Carolina › Wake County
 ### Wake County NC property tax rate, FY2021-22 to FY2025-26
 Wake County's general property tax rate is 0.5171 per $100 of assessed value in FY2025-26, down from 0.6000 in FY2021-22 (-0.0829). Cities and towns add their own rate on top for property inside their limits.
 About the unit. Every rate here is dollars per $100 of assessed value, so 0.5000 means 50 cents per $100. Only North Carolina DOR's FY2025-26 county rate PDF states that unit (“(All rates per $100 valuation*)”, source). The DOR spreadsheets the other rates come from carry no unit label, so for those rates the unit is inferred, not stated. In DOR's words from our data notes: “NC DOR doesn't state a unit for this rate; we read it as per $100 based on older DOR tables” (Table 67). Rates marked i use the inferred unit.1
-1. North Carolina law caps these rates per $100 of value, so per $100 is also inferred from statute: city rates under G.S. 160A-209(d), city service districts under G.S. 160A-542(c) and county service districts under G.S. 153A-307. Back
+1. North Carolina law caps these rates per $100 of value, so per $100 is also inferred from statute: county general rates under G.S. 153A-149(c), city rates under G.S. 160A-209(d), city service districts under G.S. 160A-542(c) and county service districts under G.S. 153A-307. Back
 
 ### County rate
 
