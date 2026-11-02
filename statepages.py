@@ -15,8 +15,8 @@ E = lambda s: html.escape(str(s), quote=True)
 YEARS = [2021, 2022, 2023, 2024, 2025]
 FY = {y: f"FY{y}-{str(y+1)[2:]}" for y in YEARS}
 CHARTS = "assets/charts/om-2026-11-02"
-# Public copy of the pinned data: this (public) repo at a fixed commit. Checked 200 logged out on 2026-11-02.
-SITE_DATA = "https://github.com/hazeydata/openmillage-site/{}/fcc8acfe7f6d8eef542588b1e66a4e23ab0d9036/data/{}"
+# Public copy of the pinned data: this (public) repo at a fixed commit (the #18 squash-merge commit on main). Checked 200 logged out on 2026-11-02.
+SITE_DATA = "https://github.com/hazeydata/openmillage-site/{}/1f1d9a3b8dea39062f91d96c0e06183202e6a805/data/{}"
 F200 = "https://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0200-0299/0200/Sections/0200.065.html"
 NC_SLUG, FL_SLUG = "nc/property-tax-rates", "fl/rolled-back-rate"
 def slug(s): return re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")
