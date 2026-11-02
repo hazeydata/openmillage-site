@@ -86,6 +86,23 @@ FELL_NOTE = ("Source: hazeydata/openmillage data/nc-2021.csv and data/nc-2025.cs
  "All 100 counties present in both years; none missing. 81 fell, 9 rose, 10 unchanged.\n"
  "Rate drops often follow a county revaluation (rates fall when values are reassessed); revaluation years are not recorded in these files, so they are not marked.")
 
+RATIO = re.compile(r"ratio/appraisal county ([A-Za-z .'-]+?)\s*$")
+def muni_list(data, c):
+    """(body_id, display name) for one county's towns, sorted by name then body_id (stable across builds).
+    A name shared by more than one row gets '(in <county>)' only when the DOR row's own label names its
+    ratio/appraisal county (provenance source_label, latest year that has it); otherwise no label."""
+    name, where = {}, {}
+    for y in YEARS:  # later years overwrite, so the latest name/label wins
+        for r in data[y]:
+            if r["body_type"] == "municipal" and r["county"] == c:
+                name[r["body_id"]] = r["taxing_body"]
+                m = RATIO.search(r["_prov"].get("source_label", ""))
+                if m: where[r["body_id"]] = m[1]
+    count = {}
+    for n in name.values(): count[n] = count.get(n, 0) + 1
+    out = [(b, f"{n} (in {where[b]})" if count[n] > 1 and b in where else n) for b, n in name.items()]
+    return sorted(out, key=lambda x: (name[x[0]], x[0]))
+
 def nc_pages(alts):
     data = nc_load()
     by = {y: {r["body_id"]: r for r in data[y]} for y in YEARS}
@@ -98,7 +115,7 @@ def nc_pages(alts):
         a, b = by[2021].get(cid), by[2025].get(cid)
         if a and b:
             d = Decimal(b["rate"]) - Decimal(a["rate"]); up += d > 0; dn += d < 0; same += d == 0
-        munis = sorted({(r["body_id"], r["taxing_body"]) for y in YEARS for r in data[y] if r["body_type"] == "municipal" and r["county"] == c}, key=lambda x: x[1])
+        munis = muni_list(data, c)
         cur = b or a
         lead = (f"<p class=lead>{E(c)} County's general property tax rate is <strong>{E(b['rate'])} per $100</strong> of assessed value in FY2025-26, "
                 f"{'up' if d > 0 else 'down' if d < 0 else 'unchanged'} from {E(a['rate'])} in FY2021-22"
