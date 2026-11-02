@@ -15,6 +15,9 @@ E = lambda s: html.escape(str(s), quote=True)
 YEARS = [2021, 2022, 2023, 2024, 2025]
 FY = {y: f"FY{y}-{str(y+1)[2:]}" for y in YEARS}
 CHARTS = "assets/charts/om-2026-11-02"
+# Public copy of the pinned data: this (public) repo at a fixed commit. Checked 200 logged out on 2026-11-02.
+SITE_DATA = "https://github.com/hazeydata/openmillage-site/{}/fcc8acfe7f6d8eef542588b1e66a4e23ab0d9036/data/{}"
+F200 = "https://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0200-0299/0200/Sections/0200.065.html"
 NC_SLUG, FL_SLUG = "nc/property-tax-rates", "fl/rolled-back-rate"
 def slug(s): return re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")
 def rows(p): return list(csv.DictReader(open(p, encoding="utf-8")))
@@ -24,7 +27,7 @@ def alt_text():
     return {m[0]: m[1].strip() for m in re.findall(r"^## (\S+)\.png\n(.+?)(?=\n## |\Z)", t, flags=re.S | re.M)}
 
 SORT_JS = """<script>document.querySelectorAll('table.sortable').forEach(function(t){t.querySelectorAll('th').forEach(function(h,i){var b=document.createElement('button');b.type='button';b.textContent=h.textContent;b.className='sortbtn';h.textContent='';h.appendChild(b);b.onclick=function(){var tb=t.tBodies[0],r=[].slice.call(tb.rows),d=h.getAttribute('aria-sort')==='ascending'?-1:1;r.sort(function(x,y){var a=x.cells[i].dataset.v||x.cells[i].textContent.trim(),c=y.cells[i].dataset.v||y.cells[i].textContent.trim(),na=parseFloat(a),nc=parseFloat(c);return (isNaN(na)||isNaN(nc)?a.localeCompare(c):na-nc)*d});t.querySelectorAll('th').forEach(function(o){o.removeAttribute('aria-sort')});h.setAttribute('aria-sort',d>0?'ascending':'descending');r.forEach(function(x){tb.appendChild(x)})}})})</script>"""
-FILTER_JS = """<script>document.querySelectorAll('.filter input').forEach(function(i){var t=document.getElementById(i.dataset.t);i.oninput=function(){var q=i.value.toLowerCase();[].forEach.call(t.tBodies[0].rows,function(r){r.hidden=q&&r.textContent.toLowerCase().indexOf(q)<0})}})</script>"""
+FILTER_JS = """<script>document.querySelectorAll('.filter input[data-g]').forEach(function(i){var g=document.getElementById(i.dataset.g);i.oninput=function(){var q=i.value.toLowerCase();[].forEach.call(g.children,function(d){var m=!q||d.dataset.q.indexOf(q)>=0;d.hidden=!m;d.open=!!q&&m})}});document.querySelectorAll('.filter input[data-t]').forEach(function(i){var t=document.getElementById(i.dataset.t);i.oninput=function(){var q=i.value.toLowerCase();[].forEach.call(t.tBodies[0].rows,function(r){r.hidden=q&&r.textContent.toLowerCase().indexOf(q)<0})}})</script>"""
 
 def doc(path, title, desc, inner, trail, updated):
     url = f"{BASE}/{path[:-10]}"
@@ -103,10 +106,21 @@ def muni_list(data, c):
     out = [(b, f"{n} (in {where[b]})" if count[n] > 1 and b in where else n) for b, n in name.items()]
     return sorted(out, key=lambda x: (name[x[0]], x[0]))
 
+def nc_updated(data):
+    """Footer for NC pages: latest NC DOR retrieval (not the site-wide Florida one), as an America/New_York date."""
+    from zoneinfo import ZoneInfo
+    allr = [r for y in YEARS for r in data[y]]
+    lat = max(r["retrieved_at"] for r in allr)
+    url = min(r["source_url"] for r in allr if r["retrieved_at"] == lat)
+    d = datetime.datetime.fromisoformat(lat.replace("Z", "+00:00")).astimezone(ZoneInfo("America/New_York")).date()
+    return d, url, "latest NC DOR retrieval for these pages"
+
+def cents(d): return f"{'+' if d > 0 else '−' if d < 0 else ''}{abs(d) * 100:.1f}"
+
 def nc_pages(alts):
     data = nc_load()
     by = {y: {r["body_id"]: r for r in data[y]} for y in YEARS}
-    upd = updated_of(data[2025])
+    upd = nc_updated(data)
     counties = sorted({r["county"] for r in data[2025] if r["body_type"] == "county" and r["county"]})
     urls, cty_trs = [], []
     up = dn = same = 0
@@ -133,6 +147,16 @@ def nc_pages(alts):
                         f"{c} County, North Carolina property tax rates per $100 of value for the county and its cities, FY2021-22 to FY2025-26, each linked to NC DOR.",
                         inner, [("North Carolina", f"{PATH}/{NC_SLUG}/"), (f"{c} County", None)], upd))
         cty_trs.append((c, cid))
+    moves = []
+    for c, cid in cty_trs:
+        a, b = by[2021].get(cid), by[2025].get(cid)
+        if a and b: moves.append((Decimal(b["rate"]) - Decimal(a["rate"]), c))
+    rise = sorted([m for m in moves if m[0] > 0], key=lambda m: (-m[0], m[1]))[:3]
+    fall = sorted([m for m in moves if m[0] < 0], key=lambda m: (m[0], m[1]))[:3]
+    lst = lambda ms: sc.name_list([f"{c} ({cents(d)} cents)" for d, c in ms])
+    keys_rose = (f"<p class=keynums><strong>In numbers:</strong> {up} counties raised their rate and {same} kept it the same. "
+                 f"Biggest rises per $100: {lst(rise)}.</p>")
+    keys_fell = (f"<p class=keynums><strong>In numbers:</strong> {dn} counties lowered their rate. Biggest drops per $100: {lst(fall)}.</p>")
     hub_tbl = nc_table("County general rates, per $100 of value", "t-nc", [(cid, f"{c} County") for c, cid in cty_trs], by)
     hub_tbl = hub_tbl.replace("<td>", "<td>", 1)
     for c, cid in cty_trs:
@@ -140,11 +164,11 @@ def nc_pages(alts):
     inner = (f"<p class=lead>Between FY2021-22 and FY2025-26, {dn} of North Carolina's 100 counties lowered their general property tax rate, {up} raised it and {same} kept it the same. "
              "Rates below are per $100 of assessed value, straight from NC Department of Revenue spreadsheets.</p>"
              + UNIT_P + FIRE_P
-             + figure("nc-rates-rose-flat", alts["nc-rates-rose-flat"], "Counties whose general rate rose or held, FY2021-22 vs FY2025-26, per $100 of value. Source: NC DOR, via the table below.", 1600, 1216)
-             + figure("nc-rates-fell", alts["nc-rates-fell"], "Counties whose general rate fell, FY2021-22 vs FY2025-26, per $100 of value. Source: NC DOR, via the table below.", 1600, 3448, note=FELL_NOTE)
+             + figure("nc-rates-rose-flat", alts["nc-rates-rose-flat"], "Counties whose general rate rose or held, FY2021-22 vs FY2025-26, per $100 of value. Source: NC DOR, via the table below.", 1600, 1216) + keys_rose
+             + figure("nc-rates-fell", alts["nc-rates-fell"], "Counties whose general rate fell, FY2021-22 vs FY2025-26, per $100 of value. Source: NC DOR, via the table below.", 1600, 3448, note=FELL_NOTE) + keys_fell
              + "<h2>Every county, five years</h2><div class=filter><label for=f-nc>Find a county</label><input id=f-nc data-t=t-nc></div>" + hub_tbl
-             + f"<p class=muted>Change is the FY2025-26 rate minus the FY2021-22 rate, both from DOR. Click a column heading to sort. Each county page also lists its cities and towns. Data file: "
-               f"<a href='https://github.com/hazeydata/openmillage/tree/9578336ec76597bb3e98542e809b987442d80b63/data'>hazeydata/openmillage data/nc-2021..2025.csv</a>.</p>")
+             + f"<p class=muted>Change is the FY2025-26 rate minus the FY2021-22 rate, both from DOR. Click a column heading to sort. Each county page also lists its cities and towns. Data files: "
+               f"<a href='{SITE_DATA.format('tree', 'nc')}'>nc-2021.csv to nc-2025.csv</a>.</p>")
     urls.insert(0, doc(f"{NC_SLUG}/index.html", "North Carolina property tax rates by county, FY2021-22 to FY2025-26",
                        "What every North Carolina county charges per $100 of value and how it moved over five years, each rate linked to NC DOR.",
                        inner, [("North Carolina", None)], upd))
@@ -160,24 +184,38 @@ def fl_page(alts):
     up = sum(r["_d"] > 0 for r in ok); dn = sum(r["_d"] < 0 for r in ok); eq = sum(r["_d"] == 0 for r in ok)
     exc = rows("data/rollback/fl-2025-rollback-exclusions.csv")
     def tr(r):
-        src = f"<a href='{E(r['source_url'])}' title='fl-2025-rollback.csv row {r['_row']}'>{E(r['source_table'] or 'DOR')}, p. {E(r['source_page'])}</a>"
-        pos = "above" if r["_d"] > 0 else "below" if r["_d"] < 0 else "equal"
-        return (f"<tr><td>{E(r['county'])}</td><td>{E(r['taxing_body'])}</td><td>{E(sc.label(r['body_subtype']))}</td><td>{E(sc.label(r['levy_component']))}</td>"
+        src = f"<a href='{E(r['source_url'])}' title='{E(r['source_table'] or 'DOR')}; fl-2025-rollback.csv row {r['_row']}'>PDF p.{E(r['source_page'])}</a>"
+        lv = "" if r["levy_component"] == "operating" else f" ({E(sc.label(r['levy_component']))})"
+        return (f"<tr><td>{E(r['taxing_body'])}{lv}<br><span class=muted>{E(sc.label(r['body_subtype']))}</span></td>"
                 f"<td class=num data-v='{r['rolled_back_mills']}'>{E(r['rolled_back_mills'])}</td><td class=num data-v='{r['adopted_mills']}'>{E(r['adopted_mills'])}</td>"
-                f"<td class=num data-v='{r['_d']}'>{'+' if r['_d']>0 else ''}{r['_d']}</td><td>{pos}</td><td>{src}</td></tr>")
-    head = "".join(f"<th scope=col{' class=num' if n else ''}>{h}</th>" for h, n in [("County",0),("Taxing body",0),("Type",0),("Levy",0),("Rolled-back (mills)",1),("Adopted (mills)",1),("Adopted minus rolled-back",1),("Position",0),("Source",0)])
-    tbl = sc.tablewrap("Florida 2025 rolled-back vs adopted", f"<table class=sortable id=t-fl><caption>Florida 2025 operating levies: rolled-back vs adopted millage</caption><thead><tr>{head}</tr></thead><tbody>{''.join(tr(r) for r in sorted(ok, key=lambda r:(r['county'], r['taxing_body'])))}</tbody></table>")
-    exl = "".join(f"<li>{E(e['scope'])}: {E(e['reason_text'])}</li>" for e in exc)
+                f"<td class=num data-v='{r['_d']}'>{'+' if r['_d']>0 else ''}{r['_d']}</td><td>{src}</td></tr>")
+    head = "".join(f"<th scope=col{' class=num' if n else ''}>{h}</th>" for h, n in [("Taxing body",0),("Rolled-back",1),("Adopted",1),("Difference",1),("Source",0)])
+    groups = []
+    for cty in sorted({r["county"] for r in ok}):
+        g = sorted([r for r in ok if r["county"] == cty], key=lambda r: (r["taxing_body"], r["body_id"], r["levy_component"]))
+        u = sum(r["_d"] > 0 for r in g); q = sum(r["_d"] == 0 for r in g); w = sum(r["_d"] < 0 for r in g)
+        tid = "t-fl-" + slug(cty)
+        groups.append(f"<details class=cgroup data-q='{E(cty.lower())} {E(' '.join(r['taxing_body'].lower() for r in g))}'><summary>{E(cty)}: {len(g)} levies, {u} above, {q} equal, {w} below</summary>"
+                      + sc.tablewrap(f"Levies, {cty}", f"<table class=sortable id={tid}><caption>{E(cty)}: rolled-back vs adopted, mills</caption><thead><tr>{head}</tr></thead><tbody>{''.join(tr(r) for r in g)}</tbody></table>")
+                      + "</details>")
+    tbl = "<div id=fl-groups>" + "".join(groups) + "</div>"
+    top = max(ok, key=lambda r: (r["_d"], r["body_id"])); low = min(ok, key=lambda r: (r["_d"], r["body_id"]))
+    ds = sorted(r["_d"] for r in ok); n = len(ds); med = ds[n // 2] if n % 2 else (ds[n // 2 - 1] + ds[n // 2]) / 2
+    keys = (f"<p class=keynums><strong>In numbers:</strong> {up} levies above the rolled-back rate, {eq} equal and {dn} below. "
+            f"Median difference: {'+' if med > 0 else ''}{med.quantize(Decimal('0.01'))} mills. Highest: {E(top['taxing_body'])} ({E(top['county'])}), +{top['_d']} mills. "
+            f"Lowest: {E(low['taxing_body'])} ({E(low['county'])}), {low['_d']} mills.</p>")
+    exl = "".join(f"<li>{E(e['scope'])}: {E(re.sub(r'\s*Fact check: \S+$', '', e['reason_text']))}</li>" for e in exc)
     skl = "".join(f"<li>{E(r['taxing_body'])} ({E(r['county'])}): rolled-back {E(r['rolled_back_mills'] or 'not printed')}, adopted {E(r['adopted_mills'] or 'not printed')} (<a href='{E(r['source_url'])}'>source</a>, row {r['_row']})</li>" for r in skipped)
     inner = (f"<p class=lead>In 2025, {up} of the {len(ok)} Florida levies we could compare were adopted above their rolled-back rate, {eq} matched it and {dn} came in below it. "
-             "Under Florida's TRIM law, adopting a rate above the rolled-back rate counts as a tax increase.</p>"
-             "<h2>What the rolled-back rate is</h2><p>The rolled-back rate is the millage that would raise the same property tax revenue as last year, leaving out new construction. "
+             f"Under Florida law, the percent by which an adopted rate exceeds the rolled-back rate is called \u201cthe percentage increase in property taxes\u201d (<a href='{F200}'>F.S. 200.065(2)(d)</a>).</p>"
+             "<h2>What the rolled-back rate is</h2><p>The rolled-back rate is the millage that would raise the same property tax revenue as last year, leaving out new construction "
+             f"(<a href='{F200}'>F.S. 200.065(1)</a>). "
              "Every taxing authority computes it each summer during TRIM (Truth in Millage). Florida DOR publishes each authority's rolled-back and adopted rates after the fact "
              "(<a href='https://floridarevenue.com/property/Documents/method.pdf'>DOR method</a>). One mill is $1 per $1,000 of taxable value.</p>"
-             + figure("fl-rollback", alts["fl-rollback"], f"Adopted minus rolled-back millage, {len(ok)} Florida 2025 levies. Source: Florida DOR, via the table below.", 1600, 900)
-             + "<h2>Every levy</h2><div class=filter><label for=f-fl>Find a county or body</label><input id=f-fl data-t=t-fl></div>" + tbl
+             + figure("fl-rollback", alts["fl-rollback"], f"Adopted minus rolled-back millage, {len(ok)} Florida 2025 levies. Source: Florida DOR, via the table below.", 1600, 900) + keys
+             + "<h2>Every levy, by county</h2><p>Open a county to see its levies. Difference is adopted minus rolled-back, in mills.</p><div class=filter><label for=f-fl>Find a county or body</label><input id=f-fl data-g=fl-groups></div>" + tbl
              + "<p class=muted>Adopted minus rolled-back is computed from the two DOR figures in the same row. Click a column heading to sort. Data file: "
-               "<a href='https://github.com/hazeydata/openmillage/blob/9578336ec76597bb3e98542e809b987442d80b63/data/fl-2025-rollback.csv'>fl-2025-rollback.csv</a>.</p>"
+               f"<a href='{SITE_DATA.format('blob', 'rollback/fl-2025-rollback.csv')}'>fl-2025-rollback.csv</a>.</p>"
              + f"<h2>What isn't here</h2><p>These aren't in DOR's statewide rolled-back reports, so they aren't on this page:</p><ul>{exl}</ul>"
              + (f"<p>{len(skipped)} rows are in our file but can't be compared because a rate is missing or the rolled-back rate is zero:</p><ul>{skl}</ul>" if skipped else ""))
     return [doc(f"{FL_SLUG}/index.html", "Florida rolled-back rate vs adopted millage, 2025",
