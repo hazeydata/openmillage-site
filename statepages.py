@@ -76,7 +76,8 @@ UNIT_P = ("<p class=callout><strong>About the unit.</strong> Every rate here is 
           "Only North Carolina DOR's FY2025-26 county rate PDF states that unit (\u201c(All rates per $100 valuation*)\u201d, "
           "<a href='https://www.ncdor.gov/2025-2026-county-tax-rates-finalpdf/open'>source</a>). The DOR spreadsheets the other rates come from carry no unit label, "
           "so for those rates the unit is inferred, not stated. In DOR's words from our data notes: \u201cNC DOR doesn't state a unit for this rate; we read it as per $100 based on older DOR tables\u201d "
-          "(<a href='https://www.ncdor.gov/documents/reports/table67-1/open'>Table 67</a>). Rates marked <sup>i</sup> use the inferred unit.</p>")
+          "(<a href='https://www.ncdor.gov/documents/reports/table67-1/open'>Table 67</a>). Rates marked <sup>i</sup> use the inferred unit.<sup><a href='#fn-unit' id=fnref-unit>1</a></sup></p>"
+          "<p class=footnote id=fn-unit>1. North Carolina law caps these rates per $100 of value, so per $100 is also inferred from statute: city rates under <a href='https://www.ncleg.gov/EnactedLegislation/Statutes/HTML/BySection/Chapter_160A/GS_160A-209.html'>G.S. 160A-209(d)</a>, city service districts under <a href='https://www.ncleg.gov/EnactedLegislation/Statutes/HTML/BySection/Chapter_160A/GS_160A-542.html'>G.S. 160A-542(c)</a> and county service districts under <a href='https://www.ncleg.gov/EnactedLegislation/Statutes/HTML/BySection/Chapter_153A/GS_153A-307.html'>G.S. 153A-307</a>. <a href='#fnref-unit'>Back</a></p>")
 FIRE_P = "<p><strong>Rural fire districts: not collected yet.</strong> This page shows county and city rates only. Fire, rescue and other special-district rates aren't on it.</p>"
 
 def nc_pages(alts):
