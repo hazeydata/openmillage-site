@@ -6,13 +6,13 @@ No mismatch vs VOICE-DRAFT keynums (Jeff Davis +58.7, Willacy +56.3, Baylor +38.
 
 ## Rose / held panel
 
-- **Files:** `tx-yoy-rose-held.png`, `tx-yoy-rose-held.svg` (script `tx-yoy-rose-held.py`)
+- **Files:** `tx-rates-rose-held.png`, `tx-rates-rose-held.svg` (script `tx-yoy-rose-held.py`, renamed from tx-yoy-* to tx-rates-* output)
 - **Caption (VOICE-DRAFT):** Counties whose county total rate rose or held, 2021 vs 2025, per $100 of value. Source: Texas Comptroller, via the table below.
 - **Alt text:** Dumbbell chart of 59 Texas counties whose county total property tax rate rose or stayed the same from 2021 to 2025. Open dots are 2021 rates and blue dots are 2025 rates, in dollars per $100 of taxable value; labels show the change in cents per $100. Title: 48 of 254 Texas counties raised their total rate and 11 held it; the largest rise was Jeff Davis, +58.7 cents per $100. Culberson County is excluded because its 2025 total is not reported.
 
 ## Fell panel
 
-- **Files:** `tx-yoy-fell.png`, `tx-yoy-fell.svg` (script `tx-yoy-fell.py`)
+- **Files:** `tx-rates-fell.png`, `tx-rates-fell.svg` (script `tx-yoy-fell.py`)
 - **Caption (VOICE-DRAFT):** Counties whose county total rate fell, 2021 vs 2025, per $100 of value. Source: Texas Comptroller, via the table below.
 - **Alt text:** Dumbbell chart of 194 Texas counties whose county total property tax rate fell from 2021 to 2025. Open dots are 2021 rates and blue dots are 2025 rates, in dollars per $100 of taxable value; labels show the change in cents per $100. Title: 194 of 254 Texas counties had a lower total rate in 2025 than in 2021; the largest drop was Cochran, −26.1 cents per $100. Culberson County is excluded because its 2025 total is not reported.
 

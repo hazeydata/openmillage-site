@@ -47,6 +47,8 @@ blockquote.official{margin:1rem 0;padding:.25rem 1rem;border-left:4px solid var(
 details.cgroup{border-bottom:1px solid var(--border);padding:.25rem 0}
 details.cgroup summary{cursor:pointer;padding:.6rem 0;min-height:44px}
 .chart img{width:100%;height:auto}
+.chart>div{overflow-x:auto}
+@media (max-width:40rem){.chart img{width:auto;max-width:none;min-width:60rem;height:auto}}
 .sortbtn{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
 .callout{border:1px solid var(--accent);border-left-width:6px;border-radius:.25rem;padding:.75rem 1rem}
 .banner{border:1px solid var(--border);border-left:6px solid var(--muted);border-radius:.25rem;padding:.75rem 1rem}
