@@ -38,7 +38,8 @@ walked = sorted(os.path.relpath(os.path.join(d, n), "docs") for d, _, fs in os.w
 pages = sorted(os.path.relpath(p, "docs") for p in glob.glob("docs/**/*.html", recursive=True))
 ok(pages == walked and walked, f"glob finds every .html page a recursive walk finds ({len(walked)})")
 locs = re.findall(r"<loc>([^<]+)</loc>", open("docs/sitemap.xml", encoding="utf-8").read())
-ok(len(locs) > 0 and len(walked) == len(locs), f"page count {len(walked)} equals sitemap URL count {len(locs)}")
+ALIASES = {"tx/index.html"}  # same-content aliases whose <link rel=canonical> is another (sitemapped) URL: OM-SITE-TX-001 OQ-5
+ok(len(locs) > 0 and len(walked) - len(ALIASES & set(walked)) == len(locs), f"page count {len(walked)} equals sitemap URL count {len(locs)} plus {len(ALIASES & set(walked))} canonical alias page(s)")
 # docs/ page set equals a fresh build.py + amend3.py run in a temp dir
 tmp = tempfile.mkdtemp()
 for n in ("build.py", "sources.py", "amend3.py", "statepages.py", "analytics.py", "site_chrome.py", "redo.py", "amend3_config.json"): shutil.copy(n, tmp)

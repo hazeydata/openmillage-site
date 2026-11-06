@@ -34,7 +34,7 @@ def append(path, line):
 lock = sources.read_lock()
 rows = sources.load_rows(lock)
 paths = {f["path"]: f for f in lock["files"]}
-ok(set(paths) == {sources.BASE_FILE, sources.SD_FILE, sources.ALT_FILE, sources.STATUS_FILE, "data/history/fl_millage_history.csv"} | {p for p in paths if p.startswith(("data/nc/", "data/rollback/"))}, "AC1 lock lists the four openmillage copies plus the pinned history CSV")
+ok(set(paths) == {sources.BASE_FILE, sources.SD_FILE, sources.ALT_FILE, sources.STATUS_FILE, "data/history/fl_millage_history.csv"} | {p for p in paths if p.startswith(("data/nc/", "data/rollback/", "data/tx/"))}, "AC1 lock lists the four openmillage copies plus the pinned history CSV")
 ok(all(f["repo"] == "hazeydata/openmillage" and re.fullmatch(r"[0-9a-f]{40}", f["commit"]) and re.fullmatch(r"[0-9a-f]{64}", f["sha256"]) for f in lock["files"]),
    "AC1 each lock entry has repo, 40-hex commit and 64-hex sha256")
 tmp, r = build_copy(lambda t: open(os.path.join(t, sources.SD_FILE), "a").write("\n"))
@@ -165,11 +165,13 @@ BANNED = re.compile(r"\b(CEO|rulings?|R6)\b", re.I)
 hits = ["CEO ruling 2026-10-20", "CEO rulings", "Fred ruling", "(ruling 5)", "ceo", "Ruling", "rulings", "r6", "per R6."]
 misses = ["Osceola", "OSCEOLA County", "overruling", "AR6X", "R60", "ceos", "rulingx"]
 ok(all(BANNED.search(s) for s in hits) and not any(BANNED.search(s) for s in misses), "banned-word regex fixture: catches CEO/ruling/R6 in any case, not Osceola, overruling, AR6X or R60")
+BANNED_TXPROV = re.compile(r"\b(CEO|rulings?)\b", re.I)
 SCANNED = (".html", ".json", ".txt", ".csv", ".xml", ".md", ".js", ".lock")
 SCAN_ROOTS = ("docs", "data")
 def scan(root):
     files = [p for p in glob.glob(os.path.join(root, "**/*"), recursive=True) if os.path.isfile(p) and p.endswith(SCANNED)]
-    return files, [p for p in files if BANNED.search(open(p, encoding="utf-8").read())]
+    # TX provenance CSVs hold Excel cell references in source_cell (e.g. "R6" = row 6, column R): not internal wording, so only CEO/ruling apply there
+    return files, [p for p in files if (BANNED_TXPROV if p.endswith(".provenance.csv") and os.sep + "tx" + os.sep in p else BANNED).search(open(p, encoding="utf-8").read())]
 fx = tempfile.mkdtemp()
 for n, body in (("notes.md", "Per the CEO ruling."), ("app.js", "var n = 'ruling 5';"), ("osceola.md", "Osceola County"), ("ok.js", "var c = 'Osceola';")):
     open(os.path.join(fx, n), "w").write(body)

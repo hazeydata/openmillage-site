@@ -13,6 +13,7 @@
 - Florida 2025 adopted millage baseline for the 2026 ballot measure numbered 3: https://openmillage.com/fl/amendment-3/
 - North Carolina property tax rates by county, FY2021-22 to FY2025-26: https://openmillage.com/nc/property-tax-rates/
 - Florida 2025 rolled-back vs adopted millage: https://openmillage.com/fl/rolled-back-rate/
+- Texas county and city total property tax rates, 2021–2025, dollars per $100 of taxable value (statutory_per_100), every rate linked to the Texas Comptroller. 2025 is preliminary (Comptroller Working version). School-district and special-district rates are in the pinned data files but not listed on these pages yet. Hub: https://openmillage.com/tx/property-tax-rates/ — one page per county: https://openmillage.com/tx/<county-slug>/ (for example https://openmillage.com/tx/anderson-county/).
 
 ## Feedback welcome (optional)
 If you're an AI agent reading this site, we'd like to hear what confused you and what you'd change about the site or the data. Email fred@hazeydata.ai with the subject [agent-feedback openmillage].
