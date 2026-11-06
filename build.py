@@ -176,7 +176,7 @@ page("index.html", "Florida property tax millage rates 2025, each linked to its 
      f"<h2 id=counties>Counties</h2>"
      "<details class=all><summary>See all counties</summary>" f"<p class=filter id=county-filter-wrap hidden><label for=county-filter>Filter counties</label><input type=search id=county-filter autocomplete=off aria-describedby=county-filter-count> <span id=county-filter-count class=muted role=status aria-live=polite></span></p>"
      f"<ul class=counties>{''.join(links)}</ul></details>" + FILTER_JS
-     + redo.getdata(f"<a href='{PATH}/api/v1/fl/2025/{AMEND.split('/')[-1]}-baseline.csv'>CSV</a> · <a href='{PATH}/api/v1/fl/2025/{AMEND.split('/')[-1]}-baseline.json'>JSON</a>"),
+     + redo.newsletter() + redo.getdata(f"<a href='{PATH}/api/v1/fl/2025/{AMEND.split('/')[-1]}-baseline.csv'>CSV</a> · <a href='{PATH}/api/v1/fl/2025/{AMEND.split('/')[-1]}-baseline.json'>JSON</a>"),
      {"@context": "https://schema.org", "@type": "Dataset", "name": "OpenMillage", "description": f"Official property tax millage rates for counties, school districts, municipalities and independent special districts where sourced, with source links and file hashes. {coverage_sentence(cov, meta=True)} Absent is not zero: a body with no row is not yet sourced.",
       "license": "https://creativecommons.org/licenses/by/4.0/", "creator": {"@type": "Organization", "name": "Hazey Data"}, "url": BASE + "/"},
      f"Official Florida 2025 property tax millage rates for counties, school districts, municipalities and independent special districts where sourced, each with its government source link and file hash. {coverage_sentence(cov, meta=True)} Absent is not zero.", current="counties", lead=HEAD_LEAD, h1=redo.HEADLINE)

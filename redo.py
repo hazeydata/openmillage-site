@@ -42,6 +42,38 @@ def who_lead():
 def getdata(links, k="Get the data (home, county and ballot measure pages)"):
     return f"<h2 id=get-the-data>Get the data</h2>{intro(k)}<p class=muted>{links}</p>"
 
+# --- newsletter signup (BEEHIIV-104 Phase 4). FINAL copy from Lindsay; do not paraphrase. Behaviour lives in assets/newsletter.js.
+NEWSLETTER_ENDPOINT = "https://hazeydata.ai/api/subscribe"
+NEWSLETTER_SUPPORT = "fred@hazeydata.ai"
+NEWSLETTER_COPY = {
+    "heading": "OpenMillage updates from HazeyData",
+    "description": "Join the HazeyData newsletter. We tag you for OpenMillage. Same list covers our other public-data products.",
+    "label": "Email",
+    "button": "Get updates",
+    "success": "You're on the list.",
+    "already": "You're already on the list.",
+    "pending": "Your subscription is pending confirmation.",
+    "sending": "Sending\u2026",
+    "invalid": "That email doesn't look right. Try again.",
+    "error": "Something broke on our end. Try again in a minute, or email",   # + support mailto link
+}
+def newsletter():
+    c, a = NEWSLETTER_COPY, lambda k: html.escape(NEWSLETTER_COPY[k], quote=True)
+    mail = f"<a href='mailto:{NEWSLETTER_SUPPORT}'>{NEWSLETTER_SUPPORT}</a>"
+    return (f"<section class='callout stack newsletter' id=newsletter aria-labelledby=newsletter-h><h2 id=newsletter-h>{html.escape(c['heading'])}</h2>"
+        f"<p id=newsletter-desc>{html.escape(c['description'])}</p>"
+        f"<form id=newsletter-form method=post action='{NEWSLETTER_ENDPOINT}' novalidate aria-describedby=newsletter-desc "
+        + "".join(f"data-msg-{k}='{a(k)}' " for k in ("success", "already", "pending", "sending", "invalid"))
+        + f"data-endpoint='{NEWSLETTER_ENDPOINT}'>"
+        "<input type=hidden name=source value=openmillage>"
+        "<p class=hp aria-hidden=true hidden><label>Leave this field empty <input type=text name=website tabindex=-1 autocomplete=off></label></p>"
+        f"<label for=newsletter-email>{html.escape(c['label'])}</label>"
+        "<div class=nl-row><input type=email id=newsletter-email name=email autocomplete=email inputmode=email required aria-describedby=newsletter-status>"
+        f"<button type=submit>{html.escape(c['button'])}</button></div>"
+        f"<p id=newsletter-status class=nl-status role=status aria-live=polite aria-atomic=true></p>"
+        f"<template id=newsletter-error-tpl>{html.escape(c['error'])} {mail}</template>"
+        "</form><script src='/newsletter.js' defer></script></section>")
+
 # --- history slots (filled 2026-10-23 from copy afab3f2 and Her?'s 7c1a525 re-cut). Key: county name.
 def _over_time():
     body, foot = INTRO["Over time (history pages)"].split("\n\n")
@@ -101,6 +133,7 @@ def copy_assets(out):
     os.makedirs(f"{out}/fonts", exist_ok=True)
     for f in sorted(os.listdir(FONT_DIR)): shutil.copyfile(os.path.join(FONT_DIR, f), f"{out}/fonts/{f}")
     open(f"{out}/redo.css", "w").write(CSS)
+    shutil.copyfile("assets/newsletter.js", f"{out}/newsletter.js")
 
 FONTS = [("Inter", 400, "Inter-400.ttf"), ("Inter", 600, "Inter-600.ttf"), ("Inter", 700, "Inter-700.ttf"), ("Space Grotesk", 600, "SpaceGrotesk-600.ttf")]
 def _ff(PATH=""): return "".join(f"@font-face{{font-family:'{f}';font-weight:{w};font-style:normal;font-display:swap;src:url(fonts/{n}) format('truetype')}}\n" for f, w, n in FONTS)
@@ -137,4 +170,8 @@ table{font-size:var(--fs--1)}
 .callout{background:var(--surface);border-color:var(--line);border-left-color:var(--cyan);border-radius:var(--radius)}
 footer{margin-top:var(--s6);font-size:var(--fs--1)}
 .credit{color:var(--text)}
+.newsletter label{display:block;margin-bottom:var(--s0);font-weight:600}.nl-row{display:flex;flex-wrap:wrap;gap:var(--s0)}
+.newsletter input[type=email]{flex:1 1 16rem;font:inherit;padding:.5rem;min-height:44px;box-sizing:border-box;border:1px solid var(--muted);border-radius:.25rem;background:var(--bg);color:var(--fg)}
+.newsletter button{font:600 var(--fs0) var(--font-body);min-height:44px;padding:.5rem var(--s2);border:1px solid var(--cyan);border-radius:.25rem;background:var(--raised);color:var(--text);cursor:pointer}
+.newsletter button:disabled,.newsletter input:disabled{opacity:.6;cursor:not-allowed}.nl-status{min-height:1.6em;margin:var(--s0) 0 0}
 """
