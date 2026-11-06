@@ -205,7 +205,7 @@ from zoneinfo import ZoneInfo
 _lat = max(r["retrieved_at"] for r in rows); _d = datetime.datetime.fromisoformat(_lat).astimezone(ZoneInfo("America/New_York")).date()
 _u = min(r["source_url"] for r in rows if r["retrieved_at"] == _lat)
 upd = f"<footer><p>Site data updated <time datetime={_d.isoformat()}>{_d.strftime('%B')} {_d.day}, {_d.year}</time> (latest source retrieval across all pages, <a href='{html.escape(_u)}'>source</a>).</p>"
-ftbad = [p for p in pages if upd not in rd(p) and not p.startswith("docs/nc/")]  # NC pages carry their own NC DOR retrieval date (statepages.nc_updated)
+ftbad = [p for p in pages if upd not in rd(p) and not p.startswith(("docs/nc/", "docs/tx/"))]  # NC/TX pages carry their own state retrieval date (statepages.nc_updated / tx_updated)
 ok(not ftbad, f"every page footer says 'Site data updated {_d}' from the latest retrieved_at in data/, linked to that source; failing {ftbad[:3]}")
 ok("date.today" not in rd("site_chrome.py") and "data_updated(rows)" in rd("build.py"), "footer date is not the build clock")
 
@@ -258,4 +258,6 @@ ok(all(re.findall(r"<h2(?: id=[^ >]+)?>(County|School|Municipalities|Special dis
 # --- NC pages: footer cites NC's own latest DOR retrieval (QG round 1 item 5), never the Florida source
 _nc = sorted(glob.glob("docs/nc/**/*.html", recursive=True))
 ok(_nc and all("latest NC DOR retrieval for these pages, <a href='https://www.ncdor.gov/" in rd(p) for p in _nc), f"all {len(_nc)} NC pages: footer links the latest NC DOR retrieval")
+_tx = sorted(glob.glob("docs/tx/**/*.html", recursive=True))
+ok(_tx and all("latest Texas Comptroller retrieval for these pages, <a href='https://comptroller.texas.gov/" in rd(p) for p in _tx), f"all {len(_tx)} TX pages: footer links the latest Texas Comptroller retrieval")
 print("FAILURES", len(FAIL)); sys.exit(1 if FAIL else 0)

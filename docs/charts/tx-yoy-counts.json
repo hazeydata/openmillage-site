@@ -1,0 +1,59 @@
+{
+  "pin_repo": "hazeydata/openmillage",
+  "pin_commit": "2166c8454efef496886291b675b6f9ac5dc5382a",
+  "filter": {
+    "body_type": "county",
+    "levy_component": "total",
+    "years": [
+      2021,
+      2025
+    ],
+    "require_nonempty_both_endpoints": true
+  },
+  "source_files": {
+    "tx-2021.csv": {
+      "path": "data/tx-2021.csv",
+      "sha256": "fb201ce781b9208d00e4b9e7550e193121ef017653c74cfefc5cd7293cc44d09"
+    },
+    "tx-2025.csv": {
+      "path": "data/tx-2025.csv",
+      "sha256": "5c92207a0f8e00abdecf6e5b508e85f6923668903eb49663f42a501010b3c41d"
+    }
+  },
+  "unit": "per_100_valuation",
+  "unit_basis": "statutory_per_100",
+  "preliminary_2025": true,
+  "counties_total": 254,
+  "compared": 253,
+  "rose": 48,
+  "fell": 194,
+  "unchanged": 11,
+  "excluded_null_pairs": 1,
+  "null_pairs": [
+    {
+      "body_id": "tx-055-000-00",
+      "county": "Culberson County",
+      "rate_2021": "0.162707",
+      "rate_2025": "",
+      "change": null,
+      "move": "excluded_null_pair",
+      "note": "empty rate in at least one endpoint year; excluded from YoY compared set"
+    }
+  ],
+  "biggest_rise": {
+    "county": "Jeff Davis County",
+    "body_id": "tx-122-000-00",
+    "change": "0.58737",
+    "change_cents_per_100": 58.737,
+    "rate_2021": "0.78613",
+    "rate_2025": "1.3735"
+  },
+  "biggest_fall": {
+    "county": "Cochran County",
+    "body_id": "tx-040-000-00",
+    "change": "-0.2607",
+    "change_cents_per_100": -26.07,
+    "rate_2021": "1.0607",
+    "rate_2025": "0.8"
+  }
+}

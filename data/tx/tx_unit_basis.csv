@@ -1,0 +1,12 @@
+basis,years_covered,body_type,levy_component,url,sha256,locator,quote
+statutory_per_100,2021-2025,county,,https://statutes.capitol.texas.gov/Docs/TX/htm/TX.26.htm,4c788d6c26e86f9a62e44acebea9e3d396b432c5a9efd8619d92088ef540d058,Tex. Tax Code §26.04(c)(1)-(2),dollars per $100 of taxable value
+statutory_per_100,2021-2025,municipal,,https://statutes.capitol.texas.gov/Docs/TX/htm/TX.26.htm,4c788d6c26e86f9a62e44acebea9e3d396b432c5a9efd8619d92088ef540d058,Tex. Tax Code §26.04(c)(1)-(2),dollars per $100 of taxable value
+statutory_per_100,2021-2025,school_district,,https://statutes.capitol.texas.gov/Docs/TX/htm/TX.26.htm,4c788d6c26e86f9a62e44acebea9e3d396b432c5a9efd8619d92088ef540d058,Tex. Tax Code §26.04(c)(1)-(2),dollars per $100 of taxable value
+statutory_per_100,2021-2025,special_district,,https://statutes.capitol.texas.gov/Docs/TX/htm/TX.26.htm,4c788d6c26e86f9a62e44acebea9e3d396b432c5a9efd8619d92088ef540d058,Tex. Tax Code §26.04(c)(1)-(2),dollars per $100 of taxable value
+statutory_per_100,2021-2025,county,,https://statutes.capitol.texas.gov/Docs/TX/htm/TX.26.htm,4c788d6c26e86f9a62e44acebea9e3d396b432c5a9efd8619d92088ef540d058,Tex. Tax Code §26.062(d)(1),Total tax rate (per $100 of value)
+statutory_per_100,2021-2025,municipal,,https://statutes.capitol.texas.gov/Docs/TX/htm/TX.26.htm,4c788d6c26e86f9a62e44acebea9e3d396b432c5a9efd8619d92088ef540d058,Tex. Tax Code §26.062(d)(1),Total tax rate (per $100 of value)
+statutory_per_100,2021-2025,school_district,,https://statutes.capitol.texas.gov/Docs/TX/htm/TX.26.htm,4c788d6c26e86f9a62e44acebea9e3d396b432c5a9efd8619d92088ef540d058,Tex. Tax Code §26.062(d)(1),Total tax rate (per $100 of value)
+statutory_per_100,2021-2025,special_district,,https://statutes.capitol.texas.gov/Docs/TX/htm/TX.26.htm,4c788d6c26e86f9a62e44acebea9e3d396b432c5a9efd8619d92088ef540d058,Tex. Tax Code §26.062(d)(1),Total tax rate (per $100 of value)
+statutory_per_100,2021-2025,county,,https://statutes.capitol.texas.gov/Docs/TX/htm/TX.26.htm,4c788d6c26e86f9a62e44acebea9e3d396b432c5a9efd8619d92088ef540d058,Tex. Tax Code §26.07,per $100 valuation
+statutory_per_100,2021-2025,municipal,,https://statutes.capitol.texas.gov/Docs/TX/htm/TX.26.htm,4c788d6c26e86f9a62e44acebea9e3d396b432c5a9efd8619d92088ef540d058,Tex. Tax Code §26.07,per $100 valuation
+statutory_per_100,2021-2025,special_district,,https://statutes.capitol.texas.gov/Docs/TX/htm/TX.26.htm,4c788d6c26e86f9a62e44acebea9e3d396b432c5a9efd8619d92088ef540d058,Tex. Tax Code §26.07,per $100 valuation

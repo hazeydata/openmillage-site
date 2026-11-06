@@ -1,0 +1,4085 @@
+{
+  "pin_commit": "2166c8454efef496886291b675b6f9ac5dc5382a",
+  "filter": {
+    "body_type": "county",
+    "levy_component": "total",
+    "years": [
+      2021,
+      2025
+    ],
+    "require_nonempty_both_endpoints": true
+  },
+  "unit": "per_100_valuation",
+  "counts": {
+    "rose": 48,
+    "fell": 194,
+    "unchanged": 11,
+    "excluded_null_pairs": 1,
+    "compared": 253
+  },
+  "null_pairs": [
+    {
+      "body_id": "tx-055-000-00",
+      "county": "Culberson County",
+      "rate_2021": "0.162707",
+      "rate_2025": "",
+      "change": null,
+      "move": "excluded_null_pair",
+      "note": "empty rate in at least one endpoint year; excluded from YoY compared set"
+    }
+  ],
+  "rose_or_held": [
+    {
+      "body_id": "tx-122-000-00",
+      "county": "Jeff Davis County",
+      "rate_2021": "0.78613",
+      "rate_2025": "1.3735",
+      "change": "0.58737",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-245-000-00",
+      "county": "Willacy County",
+      "rate_2021": "0.69165",
+      "rate_2025": "1.2551",
+      "change": "0.56345",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-012-000-00",
+      "county": "Baylor County",
+      "rate_2021": "0.56667",
+      "rate_2025": "0.9471",
+      "change": "0.38043",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-079-000-00",
+      "county": "Fort Bend County",
+      "rate_2021": "0.4568",
+      "rate_2025": "0.824",
+      "change": "0.3672",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-149-000-00",
+      "county": "Live Oak County",
+      "rate_2021": "0.30163",
+      "rate_2025": "0.61474",
+      "change": "0.31311",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-030-000-00",
+      "county": "Callahan County",
+      "rate_2021": "0.567539",
+      "rate_2025": "0.84405",
+      "change": "0.276511",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-200-000-00",
+      "county": "Runnels County",
+      "rate_2021": "0.633144",
+      "rate_2025": "0.820718",
+      "change": "0.187574",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-053-000-00",
+      "county": "Crockett County",
+      "rate_2021": "0.717492",
+      "rate_2025": "0.880003",
+      "change": "0.162511",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-198-000-00",
+      "county": "Robertson County",
+      "rate_2021": "0.53",
+      "rate_2025": "0.66505",
+      "change": "0.13505",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-148-000-00",
+      "county": "Lipscomb County",
+      "rate_2021": "0.877615",
+      "rate_2025": "1.01248",
+      "change": "0.134865",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-131-000-00",
+      "county": "Kenedy County",
+      "rate_2021": "0.67",
+      "rate_2025": "0.8",
+      "change": "0.13",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-216-000-00",
+      "county": "Sterling County",
+      "rate_2021": "0.612636",
+      "rate_2025": "0.735693",
+      "change": "0.123057",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-208-000-00",
+      "county": "Scurry County",
+      "rate_2021": "0.5361",
+      "rate_2025": "0.6268",
+      "change": "0.0907",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-096-000-00",
+      "county": "Hall County",
+      "rate_2021": "0.7106",
+      "rate_2025": "0.799991",
+      "change": "0.089391",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-197-000-00",
+      "county": "Roberts County",
+      "rate_2021": "0.73",
+      "rate_2025": "0.814746",
+      "change": "0.084746",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-050-000-00",
+      "county": "Coryell County",
+      "rate_2021": "0.4831",
+      "rate_2025": "0.56579",
+      "change": "0.08269",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-234-000-00",
+      "county": "Van Zandt County",
+      "rate_2021": "0.623471",
+      "rate_2025": "0.6992",
+      "change": "0.075729",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-068-000-00",
+      "county": "Ector County",
+      "rate_2021": "0.365",
+      "rate_2025": "0.43895",
+      "change": "0.07395",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-023-000-00",
+      "county": "Briscoe County",
+      "rate_2021": "0.5588",
+      "rate_2025": "0.63",
+      "change": "0.0712",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-099-000-00",
+      "county": "Hardeman County",
+      "rate_2021": "0.6181",
+      "rate_2025": "0.6888",
+      "change": "0.0707",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-104-000-00",
+      "county": "Haskell County",
+      "rate_2021": "0.494898",
+      "rate_2025": "0.561675",
+      "change": "0.066777",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-095-000-00",
+      "county": "Hale County",
+      "rate_2021": "0.643",
+      "rate_2025": "0.699779",
+      "change": "0.056779",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-097-000-00",
+      "county": "Hamilton County",
+      "rate_2021": "0.4554",
+      "rate_2025": "0.508652",
+      "change": "0.053252",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-235-000-00",
+      "county": "Victoria County",
+      "rate_2021": "0.3329",
+      "rate_2025": "0.3853",
+      "change": "0.0524",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-051-000-00",
+      "county": "Cottle County",
+      "rate_2021": "0.813",
+      "rate_2025": "0.8636",
+      "change": "0.0506",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-209-000-00",
+      "county": "Shackelford County",
+      "rate_2021": "0.6506",
+      "rate_2025": "0.6963",
+      "change": "0.0457",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-176-000-00",
+      "county": "Newton County",
+      "rate_2021": "0.653539",
+      "rate_2025": "0.696645",
+      "change": "0.043106",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-069-000-00",
+      "county": "Edwards County",
+      "rate_2021": "0.6522",
+      "rate_2025": "0.691431",
+      "change": "0.039231",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-031-000-00",
+      "county": "Cameron County",
+      "rate_2021": "0.436893",
+      "rate_2025": "0.474158",
+      "change": "0.037265",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-157-000-00",
+      "county": "Mason County",
+      "rate_2021": "0.610189",
+      "rate_2025": "0.6427",
+      "change": "0.032511",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-167-000-00",
+      "county": "Mills County",
+      "rate_2021": "0.575029",
+      "rate_2025": "0.6061",
+      "change": "0.031071",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-212-000-00",
+      "county": "Smith County",
+      "rate_2021": "0.335",
+      "rate_2025": "0.364231",
+      "change": "0.029231",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-058-000-00",
+      "county": "Dawson County",
+      "rate_2021": "0.97092",
+      "rate_2025": "0.99381",
+      "change": "0.02289",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-085-000-00",
+      "county": "Garza County",
+      "rate_2021": "0.7727",
+      "rate_2025": "0.7941",
+      "change": "0.0214",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-193-000-00",
+      "county": "Real County",
+      "rate_2021": "0.510125",
+      "rate_2025": "0.53",
+      "change": "0.019875",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-227-000-00",
+      "county": "Travis County",
+      "rate_2021": "0.357365",
+      "rate_2025": "0.375845",
+      "change": "0.018480",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-151-000-00",
+      "county": "Loving County",
+      "rate_2021": "0.4582",
+      "rate_2025": "0.47486",
+      "change": "0.01666",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-054-000-00",
+      "county": "Crosby County",
+      "rate_2021": "0.67",
+      "rate_2025": "0.686035",
+      "change": "0.016035",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-105-000-00",
+      "county": "Hays County",
+      "rate_2021": "0.3867",
+      "rate_2025": "0.3999",
+      "change": "0.0132",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-029-000-00",
+      "county": "Calhoun County",
+      "rate_2021": "0.6101",
+      "rate_2025": "0.6222",
+      "change": "0.0121",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-048-000-00",
+      "county": "Concho County",
+      "rate_2021": "0.54082",
+      "rate_2025": "0.552565",
+      "change": "0.011745",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-120-000-00",
+      "county": "Jackson County",
+      "rate_2021": "0.4269",
+      "rate_2025": "0.4345",
+      "change": "0.0076",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-103-000-00",
+      "county": "Hartley County",
+      "rate_2021": "0.3981",
+      "rate_2025": "0.405342",
+      "change": "0.007242",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-092-000-00",
+      "county": "Gregg County",
+      "rate_2021": "0.2975",
+      "rate_2025": "0.304331",
+      "change": "0.006831",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-248-000-00",
+      "county": "Winkler County",
+      "rate_2021": "0.4515",
+      "rate_2025": "0.4581",
+      "change": "0.0066",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-101-000-00",
+      "county": "Harris County",
+      "rate_2021": "0.37693",
+      "rate_2025": "0.38096",
+      "change": "0.00403",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-253-000-00",
+      "county": "Zapata County",
+      "rate_2021": "0.924026",
+      "rate_2025": "0.926561",
+      "change": "0.002535",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-224-000-00",
+      "county": "Throckmorton County",
+      "rate_2021": "0.996574",
+      "rate_2025": "0.9991",
+      "change": "0.002526",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-135-000-00",
+      "county": "King County",
+      "rate_2021": "0.9347",
+      "rate_2025": "0.9347",
+      "change": "0.0000",
+      "move": "unchanged"
+    },
+    {
+      "body_id": "tx-229-000-00",
+      "county": "Tyler County",
+      "rate_2021": "0.8629",
+      "rate_2025": "0.8629",
+      "change": "0.0000",
+      "move": "unchanged"
+    },
+    {
+      "body_id": "tx-063-000-00",
+      "county": "Dickens County",
+      "rate_2021": "0.85",
+      "rate_2025": "0.85",
+      "change": "0.00",
+      "move": "unchanged"
+    },
+    {
+      "body_id": "tx-196-000-00",
+      "county": "Refugio County",
+      "rate_2021": "0.8",
+      "rate_2025": "0.8",
+      "change": "0.0",
+      "move": "unchanged"
+    },
+    {
+      "body_id": "tx-222-000-00",
+      "county": "Terrell County",
+      "rate_2021": "0.8",
+      "rate_2025": "0.8",
+      "change": "0.0",
+      "move": "unchanged"
+    },
+    {
+      "body_id": "tx-137-000-00",
+      "county": "Kleberg County",
+      "rate_2021": "0.77187",
+      "rate_2025": "0.77187",
+      "change": "0.00000",
+      "move": "unchanged"
+    },
+    {
+      "body_id": "tx-207-000-00",
+      "county": "Schleicher County",
+      "rate_2021": "0.6959",
+      "rate_2025": "0.6959",
+      "change": "0.0000",
+      "move": "unchanged"
+    },
+    {
+      "body_id": "tx-238-000-00",
+      "county": "Ward County",
+      "rate_2021": "0.69",
+      "rate_2025": "0.69",
+      "change": "0.00",
+      "move": "unchanged"
+    },
+    {
+      "body_id": "tx-108-000-00",
+      "county": "Hidalgo County",
+      "rate_2021": "0.575",
+      "rate_2025": "0.575",
+      "change": "0.000",
+      "move": "unchanged"
+    },
+    {
+      "body_id": "tx-106-000-00",
+      "county": "Hemphill County",
+      "rate_2021": "0.53",
+      "rate_2025": "0.53",
+      "change": "0.00",
+      "move": "unchanged"
+    },
+    {
+      "body_id": "tx-015-000-00",
+      "county": "Bexar County",
+      "rate_2021": "0.299999",
+      "rate_2025": "0.299999",
+      "change": "0.000000",
+      "move": "unchanged"
+    }
+  ],
+  "fell": [
+    {
+      "body_id": "tx-040-000-00",
+      "county": "Cochran County",
+      "rate_2021": "1.0607",
+      "rate_2025": "0.8",
+      "change": "-0.2607",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-013-000-00",
+      "county": "Bee County",
+      "rate_2021": "0.72903",
+      "rate_2025": "0.47673",
+      "change": "-0.25230",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-112-000-00",
+      "county": "Hopkins County",
+      "rate_2021": "0.584035",
+      "rate_2025": "0.335617",
+      "change": "-0.248418",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-017-000-00",
+      "county": "Borden County",
+      "rate_2021": "0.7425",
+      "rate_2025": "0.504",
+      "change": "-0.2385",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-028-000-00",
+      "county": "Caldwell County",
+      "rate_2021": "0.6719",
+      "rate_2025": "0.4391",
+      "change": "-0.2328",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-166-000-00",
+      "county": "Milam County",
+      "rate_2021": "0.73",
+      "rate_2025": "0.511187",
+      "change": "-0.218813",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-242-000-00",
+      "county": "Wheeler County",
+      "rate_2021": "0.72928",
+      "rate_2025": "0.51724",
+      "change": "-0.21204",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-192-000-00",
+      "county": "Reagan County",
+      "rate_2021": "0.209146",
+      "rate_2025": "0.0152",
+      "change": "-0.193946",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-169-000-00",
+      "county": "Montague County",
+      "rate_2021": "0.684",
+      "rate_2025": "0.4961",
+      "change": "-0.1879",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-147-000-00",
+      "county": "Limestone County",
+      "rate_2021": "0.7478",
+      "rate_2025": "0.56",
+      "change": "-0.1878",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-175-000-00",
+      "county": "Navarro County",
+      "rate_2021": "0.6045",
+      "rate_2025": "0.4197",
+      "change": "-0.1848",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-144-000-00",
+      "county": "Lee County",
+      "rate_2021": "0.685",
+      "rate_2025": "0.5006",
+      "change": "-0.1844",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-074-000-00",
+      "county": "Fannin County",
+      "rate_2021": "0.5341",
+      "rate_2025": "0.350311",
+      "change": "-0.183789",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-205-000-00",
+      "county": "San Patricio County",
+      "rate_2021": "0.591338",
+      "rate_2025": "0.409761",
+      "change": "-0.181577",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-211-000-00",
+      "county": "Sherman County",
+      "rate_2021": "0.68609",
+      "rate_2025": "0.5053",
+      "change": "-0.18079",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-076-000-00",
+      "county": "Fisher County",
+      "rate_2021": "0.731907",
+      "rate_2025": "0.554359",
+      "change": "-0.177548",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-142-000-00",
+      "county": "La Salle County",
+      "rate_2021": "0.625",
+      "rate_2025": "0.449762",
+      "change": "-0.175238",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-213-000-00",
+      "county": "Somervell County",
+      "rate_2021": "0.498",
+      "rate_2025": "0.3246",
+      "change": "-0.1734",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-156-000-00",
+      "county": "Martin County",
+      "rate_2021": "0.3703",
+      "rate_2025": "0.1977",
+      "change": "-0.1726",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-089-000-00",
+      "county": "Gonzales County",
+      "rate_2021": "0.4391",
+      "rate_2025": "0.2689",
+      "change": "-0.1702",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-073-000-00",
+      "county": "Falls County",
+      "rate_2021": "0.93061",
+      "rate_2025": "0.76465",
+      "change": "-0.16596",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-100-000-00",
+      "county": "Hardin County",
+      "rate_2021": "0.640601",
+      "rate_2025": "0.480106",
+      "change": "-0.160495",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-159-000-00",
+      "county": "Maverick County",
+      "rate_2021": "0.538571",
+      "rate_2025": "0.378313",
+      "change": "-0.160258",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-185-000-00",
+      "county": "Parmer County",
+      "rate_2021": "0.5334",
+      "rate_2025": "0.377399",
+      "change": "-0.156001",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-002-000-00",
+      "county": "Andrews County",
+      "rate_2021": "0.515",
+      "rate_2025": "0.3598",
+      "change": "-0.1552",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-249-000-00",
+      "county": "Wise County",
+      "rate_2021": "0.370125",
+      "rate_2025": "0.2175",
+      "change": "-0.152625",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-215-000-00",
+      "county": "Stephens County",
+      "rate_2021": "0.8",
+      "rate_2025": "0.647945",
+      "change": "-0.152055",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-210-000-00",
+      "county": "Shelby County",
+      "rate_2021": "0.8022",
+      "rate_2025": "0.6513",
+      "change": "-0.1509",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-141-000-00",
+      "county": "Lampasas County",
+      "rate_2021": "0.685",
+      "rate_2025": "0.54",
+      "change": "-0.145",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-118-000-00",
+      "county": "Irion County",
+      "rate_2021": "0.714466",
+      "rate_2025": "0.569723",
+      "change": "-0.144743",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-172-000-00",
+      "county": "Morris County",
+      "rate_2021": "0.551057",
+      "rate_2025": "0.41",
+      "change": "-0.141057",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-111-000-00",
+      "county": "Hood County",
+      "rate_2021": "0.420345",
+      "rate_2025": "0.2797",
+      "change": "-0.140645",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-143-000-00",
+      "county": "Lavaca County",
+      "rate_2021": "0.689",
+      "rate_2025": "0.5497",
+      "change": "-0.1393",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-177-000-00",
+      "county": "Nolan County",
+      "rate_2021": "0.537637",
+      "rate_2025": "0.400041",
+      "change": "-0.137596",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-128-000-00",
+      "county": "Karnes County",
+      "rate_2021": "0.376243",
+      "rate_2025": "0.241058",
+      "change": "-0.135185",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-174-000-00",
+      "county": "Nacogdoches County",
+      "rate_2021": "0.5642",
+      "rate_2025": "0.43",
+      "change": "-0.1342",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-165-000-00",
+      "county": "Midland County",
+      "rate_2021": "0.251635",
+      "rate_2025": "0.121374",
+      "change": "-0.130261",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-160-000-00",
+      "county": "McCulloch County",
+      "rate_2021": "0.74",
+      "rate_2025": "0.61019",
+      "change": "-0.12981",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-232-000-00",
+      "county": "Uvalde County",
+      "rate_2021": "0.74",
+      "rate_2025": "0.613907",
+      "change": "-0.126093",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-018-000-00",
+      "county": "Bosque County",
+      "rate_2021": "0.4628",
+      "rate_2025": "0.341",
+      "change": "-0.1218",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-006-000-00",
+      "county": "Armstrong County",
+      "rate_2021": "0.587059",
+      "rate_2025": "0.466181",
+      "change": "-0.120878",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-067-000-00",
+      "county": "Eastland County",
+      "rate_2021": "0.459",
+      "rate_2025": "0.34",
+      "change": "-0.119",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-080-000-00",
+      "county": "Franklin County",
+      "rate_2021": "0.48168",
+      "rate_2025": "0.36386",
+      "change": "-0.11782",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-001-000-00",
+      "county": "Anderson County",
+      "rate_2021": "0.610535",
+      "rate_2025": "0.493907",
+      "change": "-0.116628",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-188-000-00",
+      "county": "Potter County",
+      "rate_2021": "0.70595",
+      "rate_2025": "0.59024",
+      "change": "-0.11571",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-107-000-00",
+      "county": "Henderson County",
+      "rate_2021": "0.446487",
+      "rate_2025": "0.331493",
+      "change": "-0.114994",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-047-000-00",
+      "county": "Comanche County",
+      "rate_2021": "0.625729",
+      "rate_2025": "0.51109",
+      "change": "-0.114639",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-039-000-00",
+      "county": "Clay County",
+      "rate_2021": "0.69",
+      "rate_2025": "0.5773",
+      "change": "-0.1127",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-026-000-00",
+      "county": "Burleson County",
+      "rate_2021": "0.56",
+      "rate_2025": "0.44785",
+      "change": "-0.11215",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-082-000-00",
+      "county": "Frio County",
+      "rate_2021": "0.5535",
+      "rate_2025": "0.443",
+      "change": "-0.1105",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-182-000-00",
+      "county": "Palo Pinto County",
+      "rate_2021": "0.392145",
+      "rate_2025": "0.282158",
+      "change": "-0.109987",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-042-000-00",
+      "county": "Coleman County",
+      "rate_2021": "0.9034",
+      "rate_2025": "0.7954",
+      "change": "-0.1080",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-252-000-00",
+      "county": "Young County",
+      "rate_2021": "0.693585",
+      "rate_2025": "0.58635",
+      "change": "-0.107235",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-113-000-00",
+      "county": "Houston County",
+      "rate_2021": "0.53",
+      "rate_2025": "0.423",
+      "change": "-0.107",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-119-000-00",
+      "county": "Jack County",
+      "rate_2021": "0.54378",
+      "rate_2025": "0.439206",
+      "change": "-0.104574",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-093-000-00",
+      "county": "Grimes County",
+      "rate_2021": "0.526933",
+      "rate_2025": "0.423077",
+      "change": "-0.103856",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-230-000-00",
+      "county": "Upshur County",
+      "rate_2021": "0.615",
+      "rate_2025": "0.514",
+      "change": "-0.101",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-044-000-00",
+      "county": "Collingsworth County",
+      "rate_2021": "0.916129",
+      "rate_2025": "0.817475",
+      "change": "-0.098654",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-110-000-00",
+      "county": "Hockley County",
+      "rate_2021": "0.59688",
+      "rate_2025": "0.499918",
+      "change": "-0.096962",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-005-000-00",
+      "county": "Archer County",
+      "rate_2021": "0.62783",
+      "rate_2025": "0.53152",
+      "change": "-0.09631",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-010-000-00",
+      "county": "Bandera County",
+      "rate_2021": "0.6262",
+      "rate_2025": "0.5304",
+      "change": "-0.0958",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-116-000-00",
+      "county": "Hunt County",
+      "rate_2021": "0.428379",
+      "rate_2025": "0.333241",
+      "change": "-0.095138",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-117-000-00",
+      "county": "Hutchinson County",
+      "rate_2021": "0.595",
+      "rate_2025": "0.5",
+      "change": "-0.095",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-206-000-00",
+      "county": "San Saba County",
+      "rate_2021": "0.595",
+      "rate_2025": "0.5",
+      "change": "-0.095",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-204-000-00",
+      "county": "San Jacinto County",
+      "rate_2021": "0.5779",
+      "rate_2025": "0.48291",
+      "change": "-0.09499",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-007-000-00",
+      "county": "Atascosa County",
+      "rate_2021": "0.577073",
+      "rate_2025": "0.482888",
+      "change": "-0.094185",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-115-000-00",
+      "county": "Hudspeth County",
+      "rate_2021": "0.656074",
+      "rate_2025": "0.562371",
+      "change": "-0.093703",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-011-000-00",
+      "county": "Bastrop County",
+      "rate_2021": "0.522",
+      "rate_2025": "0.4287",
+      "change": "-0.0933",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-219-000-00",
+      "county": "Swisher County",
+      "rate_2021": "0.715",
+      "rate_2025": "0.622",
+      "change": "-0.093",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-243-000-00",
+      "county": "Wichita County",
+      "rate_2021": "0.613841",
+      "rate_2025": "0.521303",
+      "change": "-0.092538",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-102-000-00",
+      "county": "Harrison County",
+      "rate_2021": "0.43526",
+      "rate_2025": "0.3428",
+      "change": "-0.09246",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-084-000-00",
+      "county": "Galveston County",
+      "rate_2021": "0.41494",
+      "rate_2025": "0.32266",
+      "change": "-0.09228",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-136-000-00",
+      "county": "Kinney County",
+      "rate_2021": "0.559",
+      "rate_2025": "0.4672",
+      "change": "-0.0918",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-179-000-00",
+      "county": "Ochiltree County",
+      "rate_2021": "0.757732",
+      "rate_2025": "0.666938",
+      "change": "-0.090794",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-161-000-00",
+      "county": "McLennan County",
+      "rate_2021": "0.425",
+      "rate_2025": "0.334805",
+      "change": "-0.090195",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-066-000-00",
+      "county": "Duval County",
+      "rate_2021": "0.951899",
+      "rate_2025": "0.861839",
+      "change": "-0.090060",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-037-000-00",
+      "county": "Cherokee County",
+      "rate_2021": "0.58",
+      "rate_2025": "0.49",
+      "change": "-0.09",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-086-000-00",
+      "county": "Gillespie County",
+      "rate_2021": "0.3577",
+      "rate_2025": "0.2685",
+      "change": "-0.0892",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-194-000-00",
+      "county": "Red River County",
+      "rate_2021": "0.78034",
+      "rate_2025": "0.69158",
+      "change": "-0.08876",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-201-000-00",
+      "county": "Rusk County",
+      "rate_2021": "0.631876",
+      "rate_2025": "0.544476",
+      "change": "-0.087400",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-098-000-00",
+      "county": "Hansford County",
+      "rate_2021": "0.539128",
+      "rate_2025": "0.454422",
+      "change": "-0.084706",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-062-000-00",
+      "county": "DeWitt County",
+      "rate_2021": "0.46937",
+      "rate_2025": "0.38576",
+      "change": "-0.08361",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-127-000-00",
+      "county": "Jones County",
+      "rate_2021": "0.618948",
+      "rate_2025": "0.536293",
+      "change": "-0.082655",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-083-000-00",
+      "county": "Gaines County",
+      "rate_2021": "0.605924",
+      "rate_2025": "0.523555",
+      "change": "-0.082369",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-020-000-00",
+      "county": "Brazoria County",
+      "rate_2021": "0.38653",
+      "rate_2025": "0.304758",
+      "change": "-0.081772",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-225-000-00",
+      "county": "Titus County",
+      "rate_2021": "0.4669",
+      "rate_2025": "0.3861",
+      "change": "-0.0808",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-121-000-00",
+      "county": "Jasper County",
+      "rate_2021": "0.6519",
+      "rate_2025": "0.5711",
+      "change": "-0.0808",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-004-000-00",
+      "county": "Aransas County",
+      "rate_2021": "0.458936",
+      "rate_2025": "0.3785",
+      "change": "-0.080436",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-241-000-00",
+      "county": "Wharton County",
+      "rate_2021": "0.42479",
+      "rate_2025": "0.34517",
+      "change": "-0.07962",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-163-000-00",
+      "county": "Medina County",
+      "rate_2021": "0.5223",
+      "rate_2025": "0.4434",
+      "change": "-0.0789",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-226-000-00",
+      "county": "Tom Green County",
+      "rate_2021": "0.5488",
+      "rate_2025": "0.47075",
+      "change": "-0.07805",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-049-000-00",
+      "county": "Cooke County",
+      "rate_2021": "0.413",
+      "rate_2025": "0.3355",
+      "change": "-0.0775",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-146-000-00",
+      "county": "Liberty County",
+      "rate_2021": "0.5543",
+      "rate_2025": "0.48",
+      "change": "-0.0743",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-254-000-00",
+      "county": "Zavala County",
+      "rate_2021": "0.72",
+      "rate_2025": "0.6471",
+      "change": "-0.0729",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-035-000-00",
+      "county": "Castro County",
+      "rate_2021": "0.595",
+      "rate_2025": "0.5239",
+      "change": "-0.0711",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-155-000-00",
+      "county": "Marion County",
+      "rate_2021": "0.606929",
+      "rate_2025": "0.535878",
+      "change": "-0.071051",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-021-000-00",
+      "county": "Brazos County",
+      "rate_2021": "0.4935",
+      "rate_2025": "0.423059",
+      "change": "-0.070441",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-250-000-00",
+      "county": "Wood County",
+      "rate_2021": "0.5325",
+      "rate_2025": "0.4625",
+      "change": "-0.0700",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-090-000-00",
+      "county": "Gray County",
+      "rate_2021": "0.65056",
+      "rate_2025": "0.58103",
+      "change": "-0.06953",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-195-000-00",
+      "county": "Reeves County",
+      "rate_2021": "0.47562",
+      "rate_2025": "0.407473",
+      "change": "-0.068147",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-027-000-00",
+      "county": "Burnet County",
+      "rate_2021": "0.3997",
+      "rate_2025": "0.3323",
+      "change": "-0.0674",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-171-000-00",
+      "county": "Moore County",
+      "rate_2021": "0.550001",
+      "rate_2025": "0.483735",
+      "change": "-0.066266",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-070-000-00",
+      "county": "Ellis County",
+      "rate_2021": "0.339338",
+      "rate_2025": "0.273992",
+      "change": "-0.065346",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-190-000-00",
+      "county": "Rains County",
+      "rate_2021": "0.5894",
+      "rate_2025": "0.524316",
+      "change": "-0.065084",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-008-000-00",
+      "county": "Austin County",
+      "rate_2021": "0.56743",
+      "rate_2025": "0.50377",
+      "change": "-0.06366",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-158-000-00",
+      "county": "Matagorda County",
+      "rate_2021": "0.39974",
+      "rate_2025": "0.33651",
+      "change": "-0.06323",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-014-000-00",
+      "county": "Bell County",
+      "rate_2021": "0.3943",
+      "rate_2025": "0.3317",
+      "change": "-0.0626",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-199-000-00",
+      "county": "Rockwall County",
+      "rate_2021": "0.3131",
+      "rate_2025": "0.251",
+      "change": "-0.0621",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-060-000-00",
+      "county": "Delta County",
+      "rate_2021": "0.655951",
+      "rate_2025": "0.594097",
+      "change": "-0.061854",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-081-000-00",
+      "county": "Freestone County",
+      "rate_2021": "0.39375",
+      "rate_2025": "0.3335",
+      "change": "-0.06025",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-087-000-00",
+      "county": "Glasscock County",
+      "rate_2021": "0.21",
+      "rate_2025": "0.15",
+      "change": "-0.06",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-162-000-00",
+      "county": "McMullen County",
+      "rate_2021": "0.52",
+      "rate_2025": "0.46",
+      "change": "-0.06",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-025-000-00",
+      "county": "Brown County",
+      "rate_2021": "0.5542",
+      "rate_2025": "0.49482",
+      "change": "-0.05938",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-173-000-00",
+      "county": "Motley County",
+      "rate_2021": "0.67462",
+      "rate_2025": "0.61561",
+      "change": "-0.05901",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-033-000-00",
+      "county": "Carson County",
+      "rate_2021": "0.578509",
+      "rate_2025": "0.519967",
+      "change": "-0.058542",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-132-000-00",
+      "county": "Kent County",
+      "rate_2021": "0.95",
+      "rate_2025": "0.8917",
+      "change": "-0.0583",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-189-000-00",
+      "county": "Presidio County",
+      "rate_2021": "0.533665",
+      "rate_2025": "0.47586",
+      "change": "-0.057805",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-041-000-00",
+      "county": "Coke County",
+      "rate_2021": "0.464776",
+      "rate_2025": "0.40715",
+      "change": "-0.057626",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-186-000-00",
+      "county": "Pecos County",
+      "rate_2021": "0.777",
+      "rate_2025": "0.7196",
+      "change": "-0.0574",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-139-000-00",
+      "county": "Lamar County",
+      "rate_2021": "0.3608",
+      "rate_2025": "0.3063",
+      "change": "-0.0545",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-072-000-00",
+      "county": "Erath County",
+      "rate_2021": "0.4355",
+      "rate_2025": "0.3811",
+      "change": "-0.0544",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-075-000-00",
+      "county": "Fayette County",
+      "rate_2021": "0.464",
+      "rate_2025": "0.40984",
+      "change": "-0.05416",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-065-000-00",
+      "county": "Donley County",
+      "rate_2021": "0.612776",
+      "rate_2025": "0.558867",
+      "change": "-0.053909",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-251-000-00",
+      "county": "Yoakum County",
+      "rate_2021": "0.745",
+      "rate_2025": "0.692864",
+      "change": "-0.052136",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-133-000-00",
+      "county": "Kerr County",
+      "rate_2021": "0.4545",
+      "rate_2025": "0.4024",
+      "change": "-0.0521",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-022-000-00",
+      "county": "Brewster County",
+      "rate_2021": "0.421531",
+      "rate_2025": "0.370007",
+      "change": "-0.051524",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-154-000-00",
+      "county": "Madison County",
+      "rate_2021": "0.55",
+      "rate_2025": "0.5",
+      "change": "-0.05",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-094-000-00",
+      "county": "Guadalupe County",
+      "rate_2021": "0.3799",
+      "rate_2025": "0.3304",
+      "change": "-0.0495",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-221-000-00",
+      "county": "Taylor County",
+      "rate_2021": "0.607",
+      "rate_2025": "0.5578",
+      "change": "-0.0492",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-181-000-00",
+      "county": "Orange County",
+      "rate_2021": "0.542",
+      "rate_2025": "0.492847",
+      "change": "-0.049153",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-046-000-00",
+      "county": "Comal County",
+      "rate_2021": "0.353515",
+      "rate_2025": "0.305015",
+      "change": "-0.048500",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-237-000-00",
+      "county": "Waller County",
+      "rate_2021": "0.604632",
+      "rate_2025": "0.556187",
+      "change": "-0.048445",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-153-000-00",
+      "county": "Lynn County",
+      "rate_2021": "0.7",
+      "rate_2025": "0.652365",
+      "change": "-0.047635",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-061-000-00",
+      "county": "Denton County",
+      "rate_2021": "0.233086",
+      "rate_2025": "0.185938",
+      "change": "-0.047148",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-202-000-00",
+      "county": "Sabine County",
+      "rate_2021": "0.388732",
+      "rate_2025": "0.341882",
+      "change": "-0.046850",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-032-000-00",
+      "county": "Camp County",
+      "rate_2021": "0.4689",
+      "rate_2025": "0.422737",
+      "change": "-0.046163",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-036-000-00",
+      "county": "Chambers County",
+      "rate_2021": "0.513196",
+      "rate_2025": "0.467092",
+      "change": "-0.046104",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-129-000-00",
+      "county": "Kaufman County",
+      "rate_2021": "0.461171",
+      "rate_2025": "0.415113",
+      "change": "-0.046058",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-228-000-00",
+      "county": "Trinity County",
+      "rate_2021": "0.5846",
+      "rate_2025": "0.539",
+      "change": "-0.0456",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-034-000-00",
+      "county": "Cass County",
+      "rate_2021": "0.506873",
+      "rate_2025": "0.462009",
+      "change": "-0.044864",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-109-000-00",
+      "county": "Hill County",
+      "rate_2021": "0.497242",
+      "rate_2025": "0.452647",
+      "change": "-0.044595",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-003-000-00",
+      "county": "Angelina County",
+      "rate_2021": "0.4936",
+      "rate_2025": "0.449041",
+      "change": "-0.044559",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-059-000-00",
+      "county": "Deaf Smith County",
+      "rate_2021": "0.600638",
+      "rate_2025": "0.55633",
+      "change": "-0.044308",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-184-000-00",
+      "county": "Parker County",
+      "rate_2021": "0.329362",
+      "rate_2025": "0.28507",
+      "change": "-0.044292",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-038-000-00",
+      "county": "Childress County",
+      "rate_2021": "0.578882",
+      "rate_2025": "0.535",
+      "change": "-0.043882",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-191-000-00",
+      "county": "Randall County",
+      "rate_2021": "0.44421",
+      "rate_2025": "0.40099",
+      "change": "-0.04322",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-220-000-00",
+      "county": "Tarrant County",
+      "rate_2021": "0.229",
+      "rate_2025": "0.1862",
+      "change": "-0.0428",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-024-000-00",
+      "county": "Brooks County",
+      "rate_2021": "0.943599",
+      "rate_2025": "0.900847",
+      "change": "-0.042752",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-244-000-00",
+      "county": "Wilbarger County",
+      "rate_2021": "0.56619",
+      "rate_2025": "0.523742",
+      "change": "-0.042448",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-214-000-00",
+      "county": "Starr County",
+      "rate_2021": "0.75",
+      "rate_2025": "0.7086",
+      "change": "-0.0414",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-187-000-00",
+      "county": "Polk County",
+      "rate_2021": "0.637906",
+      "rate_2025": "0.5986",
+      "change": "-0.039306",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-239-000-00",
+      "county": "Washington County",
+      "rate_2021": "0.5032",
+      "rate_2025": "0.464",
+      "change": "-0.0392",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-217-000-00",
+      "county": "Stonewall County",
+      "rate_2021": "0.9515",
+      "rate_2025": "0.9146",
+      "change": "-0.0369",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-134-000-00",
+      "county": "Kimble County",
+      "rate_2021": "0.4731",
+      "rate_2025": "0.436482",
+      "change": "-0.036618",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-233-000-00",
+      "county": "Val Verde County",
+      "rate_2021": "0.5342",
+      "rate_2025": "0.4977",
+      "change": "-0.0365",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-150-000-00",
+      "county": "Llano County",
+      "rate_2021": "0.29574",
+      "rate_2025": "0.25953",
+      "change": "-0.03621",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-130-000-00",
+      "county": "Kendall County",
+      "rate_2021": "0.4127",
+      "rate_2025": "0.377",
+      "change": "-0.0357",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-045-000-00",
+      "county": "Colorado County",
+      "rate_2021": "0.499599",
+      "rate_2025": "0.464918",
+      "change": "-0.034681",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-140-000-00",
+      "county": "Lamb County",
+      "rate_2021": "0.7943",
+      "rate_2025": "0.76",
+      "change": "-0.0343",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-091-000-00",
+      "county": "Grayson County",
+      "rate_2021": "0.339",
+      "rate_2025": "0.3051",
+      "change": "-0.0339",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-183-000-00",
+      "county": "Panola County",
+      "rate_2021": "0.6081",
+      "rate_2025": "0.5749",
+      "change": "-0.0332",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-152-000-00",
+      "county": "Lubbock County",
+      "rate_2021": "0.35999",
+      "rate_2025": "0.327425",
+      "change": "-0.032565",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-170-000-00",
+      "county": "Montgomery County",
+      "rate_2021": "0.4083",
+      "rate_2025": "0.377",
+      "change": "-0.0313",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-126-000-00",
+      "county": "Johnson County",
+      "rate_2021": "0.42",
+      "rate_2025": "0.389276",
+      "change": "-0.030724",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-180-000-00",
+      "county": "Oldham County",
+      "rate_2021": "0.5",
+      "rate_2025": "0.47",
+      "change": "-0.03",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-231-000-00",
+      "county": "Upton County",
+      "rate_2021": "0.259406",
+      "rate_2025": "0.230176",
+      "change": "-0.029230",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-240-000-00",
+      "county": "Webb County",
+      "rate_2021": "0.41",
+      "rate_2025": "0.3825",
+      "change": "-0.0275",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-246-000-00",
+      "county": "Williamson County",
+      "rate_2021": "0.440846",
+      "rate_2025": "0.413776",
+      "change": "-0.027070",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-114-000-00",
+      "county": "Howard County",
+      "rate_2021": "0.327545",
+      "rate_2025": "0.301711",
+      "change": "-0.025834",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-056-000-00",
+      "county": "Dallam County",
+      "rate_2021": "0.335015",
+      "rate_2025": "0.30927",
+      "change": "-0.025745",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-138-000-00",
+      "county": "Knox County",
+      "rate_2021": "0.62156",
+      "rate_2025": "0.59693",
+      "change": "-0.02463",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-145-000-00",
+      "county": "Leon County",
+      "rate_2021": "0.443095",
+      "rate_2025": "0.419296",
+      "change": "-0.023799",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-236-000-00",
+      "county": "Walker County",
+      "rate_2021": "0.4799",
+      "rate_2025": "0.4571",
+      "change": "-0.0228",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-178-000-00",
+      "county": "Nueces County",
+      "rate_2021": "0.310445",
+      "rate_2025": "0.289789",
+      "change": "-0.020656",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-125-000-00",
+      "county": "Jim Wells County",
+      "rate_2021": "0.787581",
+      "rate_2025": "0.767802",
+      "change": "-0.019779",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-043-000-00",
+      "county": "Collin County",
+      "rate_2021": "0.168087",
+      "rate_2025": "0.149343",
+      "change": "-0.018744",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-247-000-00",
+      "county": "Wilson County",
+      "rate_2021": "0.4228",
+      "rate_2025": "0.405961",
+      "change": "-0.016839",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-168-000-00",
+      "county": "Mitchell County",
+      "rate_2021": "0.471687",
+      "rate_2025": "0.456451",
+      "change": "-0.015236",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-016-000-00",
+      "county": "Blanco County",
+      "rate_2021": "0.39",
+      "rate_2025": "0.375232",
+      "change": "-0.014768",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-088-000-00",
+      "county": "Goliad County",
+      "rate_2021": "0.791813",
+      "rate_2025": "0.777943",
+      "change": "-0.013870",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-077-000-00",
+      "county": "Floyd County",
+      "rate_2021": "0.725",
+      "rate_2025": "0.7121",
+      "change": "-0.0129",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-057-000-00",
+      "county": "Dallas County",
+      "rate_2021": "0.227946",
+      "rate_2025": "0.2155",
+      "change": "-0.012446",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-071-000-00",
+      "county": "El Paso County",
+      "rate_2021": "0.470181",
+      "rate_2025": "0.458889",
+      "change": "-0.011292",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-009-000-00",
+      "county": "Bailey County",
+      "rate_2021": "0.8",
+      "rate_2025": "0.78943",
+      "change": "-0.01057",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-064-000-00",
+      "county": "Dimmit County",
+      "rate_2021": "0.29",
+      "rate_2025": "0.28",
+      "change": "-0.01",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-164-000-00",
+      "county": "Menard County",
+      "rate_2021": "0.76745",
+      "rate_2025": "0.76027",
+      "change": "-0.00718",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-123-000-00",
+      "county": "Jefferson County",
+      "rate_2021": "0.363184",
+      "rate_2025": "0.357",
+      "change": "-0.006184",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-078-000-00",
+      "county": "Foard County",
+      "rate_2021": "0.835",
+      "rate_2025": "0.83",
+      "change": "-0.005",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-203-000-00",
+      "county": "San Augustine County",
+      "rate_2021": "0.32637",
+      "rate_2025": "0.32196",
+      "change": "-0.00441",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-218-000-00",
+      "county": "Sutton County",
+      "rate_2021": "0.692861",
+      "rate_2025": "0.689112",
+      "change": "-0.003749",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-052-000-00",
+      "county": "Crane County",
+      "rate_2021": "0.8151",
+      "rate_2025": "0.812929",
+      "change": "-0.002171",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-223-000-00",
+      "county": "Terry County",
+      "rate_2021": "0.8",
+      "rate_2025": "0.798767",
+      "change": "-0.001233",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-124-000-00",
+      "county": "Jim Hogg County",
+      "rate_2021": "1.189042",
+      "rate_2025": "1.18857",
+      "change": "-0.000472",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-019-000-00",
+      "county": "Bowie County",
+      "rate_2021": "0.424322",
+      "rate_2025": "0.423947",
+      "change": "-0.000375",
+      "move": "fell"
+    }
+  ],
+  "all_compared": [
+    {
+      "body_id": "tx-001-000-00",
+      "county": "Anderson County",
+      "rate_2021": "0.610535",
+      "rate_2025": "0.493907",
+      "change": "-0.116628",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-002-000-00",
+      "county": "Andrews County",
+      "rate_2021": "0.515",
+      "rate_2025": "0.3598",
+      "change": "-0.1552",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-003-000-00",
+      "county": "Angelina County",
+      "rate_2021": "0.4936",
+      "rate_2025": "0.449041",
+      "change": "-0.044559",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-004-000-00",
+      "county": "Aransas County",
+      "rate_2021": "0.458936",
+      "rate_2025": "0.3785",
+      "change": "-0.080436",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-005-000-00",
+      "county": "Archer County",
+      "rate_2021": "0.62783",
+      "rate_2025": "0.53152",
+      "change": "-0.09631",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-006-000-00",
+      "county": "Armstrong County",
+      "rate_2021": "0.587059",
+      "rate_2025": "0.466181",
+      "change": "-0.120878",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-007-000-00",
+      "county": "Atascosa County",
+      "rate_2021": "0.577073",
+      "rate_2025": "0.482888",
+      "change": "-0.094185",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-008-000-00",
+      "county": "Austin County",
+      "rate_2021": "0.56743",
+      "rate_2025": "0.50377",
+      "change": "-0.06366",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-009-000-00",
+      "county": "Bailey County",
+      "rate_2021": "0.8",
+      "rate_2025": "0.78943",
+      "change": "-0.01057",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-010-000-00",
+      "county": "Bandera County",
+      "rate_2021": "0.6262",
+      "rate_2025": "0.5304",
+      "change": "-0.0958",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-011-000-00",
+      "county": "Bastrop County",
+      "rate_2021": "0.522",
+      "rate_2025": "0.4287",
+      "change": "-0.0933",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-012-000-00",
+      "county": "Baylor County",
+      "rate_2021": "0.56667",
+      "rate_2025": "0.9471",
+      "change": "0.38043",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-013-000-00",
+      "county": "Bee County",
+      "rate_2021": "0.72903",
+      "rate_2025": "0.47673",
+      "change": "-0.25230",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-014-000-00",
+      "county": "Bell County",
+      "rate_2021": "0.3943",
+      "rate_2025": "0.3317",
+      "change": "-0.0626",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-015-000-00",
+      "county": "Bexar County",
+      "rate_2021": "0.299999",
+      "rate_2025": "0.299999",
+      "change": "0.000000",
+      "move": "unchanged"
+    },
+    {
+      "body_id": "tx-016-000-00",
+      "county": "Blanco County",
+      "rate_2021": "0.39",
+      "rate_2025": "0.375232",
+      "change": "-0.014768",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-017-000-00",
+      "county": "Borden County",
+      "rate_2021": "0.7425",
+      "rate_2025": "0.504",
+      "change": "-0.2385",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-018-000-00",
+      "county": "Bosque County",
+      "rate_2021": "0.4628",
+      "rate_2025": "0.341",
+      "change": "-0.1218",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-019-000-00",
+      "county": "Bowie County",
+      "rate_2021": "0.424322",
+      "rate_2025": "0.423947",
+      "change": "-0.000375",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-020-000-00",
+      "county": "Brazoria County",
+      "rate_2021": "0.38653",
+      "rate_2025": "0.304758",
+      "change": "-0.081772",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-021-000-00",
+      "county": "Brazos County",
+      "rate_2021": "0.4935",
+      "rate_2025": "0.423059",
+      "change": "-0.070441",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-022-000-00",
+      "county": "Brewster County",
+      "rate_2021": "0.421531",
+      "rate_2025": "0.370007",
+      "change": "-0.051524",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-023-000-00",
+      "county": "Briscoe County",
+      "rate_2021": "0.5588",
+      "rate_2025": "0.63",
+      "change": "0.0712",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-024-000-00",
+      "county": "Brooks County",
+      "rate_2021": "0.943599",
+      "rate_2025": "0.900847",
+      "change": "-0.042752",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-025-000-00",
+      "county": "Brown County",
+      "rate_2021": "0.5542",
+      "rate_2025": "0.49482",
+      "change": "-0.05938",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-026-000-00",
+      "county": "Burleson County",
+      "rate_2021": "0.56",
+      "rate_2025": "0.44785",
+      "change": "-0.11215",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-027-000-00",
+      "county": "Burnet County",
+      "rate_2021": "0.3997",
+      "rate_2025": "0.3323",
+      "change": "-0.0674",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-028-000-00",
+      "county": "Caldwell County",
+      "rate_2021": "0.6719",
+      "rate_2025": "0.4391",
+      "change": "-0.2328",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-029-000-00",
+      "county": "Calhoun County",
+      "rate_2021": "0.6101",
+      "rate_2025": "0.6222",
+      "change": "0.0121",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-030-000-00",
+      "county": "Callahan County",
+      "rate_2021": "0.567539",
+      "rate_2025": "0.84405",
+      "change": "0.276511",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-031-000-00",
+      "county": "Cameron County",
+      "rate_2021": "0.436893",
+      "rate_2025": "0.474158",
+      "change": "0.037265",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-032-000-00",
+      "county": "Camp County",
+      "rate_2021": "0.4689",
+      "rate_2025": "0.422737",
+      "change": "-0.046163",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-033-000-00",
+      "county": "Carson County",
+      "rate_2021": "0.578509",
+      "rate_2025": "0.519967",
+      "change": "-0.058542",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-034-000-00",
+      "county": "Cass County",
+      "rate_2021": "0.506873",
+      "rate_2025": "0.462009",
+      "change": "-0.044864",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-035-000-00",
+      "county": "Castro County",
+      "rate_2021": "0.595",
+      "rate_2025": "0.5239",
+      "change": "-0.0711",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-036-000-00",
+      "county": "Chambers County",
+      "rate_2021": "0.513196",
+      "rate_2025": "0.467092",
+      "change": "-0.046104",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-037-000-00",
+      "county": "Cherokee County",
+      "rate_2021": "0.58",
+      "rate_2025": "0.49",
+      "change": "-0.09",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-038-000-00",
+      "county": "Childress County",
+      "rate_2021": "0.578882",
+      "rate_2025": "0.535",
+      "change": "-0.043882",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-039-000-00",
+      "county": "Clay County",
+      "rate_2021": "0.69",
+      "rate_2025": "0.5773",
+      "change": "-0.1127",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-040-000-00",
+      "county": "Cochran County",
+      "rate_2021": "1.0607",
+      "rate_2025": "0.8",
+      "change": "-0.2607",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-041-000-00",
+      "county": "Coke County",
+      "rate_2021": "0.464776",
+      "rate_2025": "0.40715",
+      "change": "-0.057626",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-042-000-00",
+      "county": "Coleman County",
+      "rate_2021": "0.9034",
+      "rate_2025": "0.7954",
+      "change": "-0.1080",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-043-000-00",
+      "county": "Collin County",
+      "rate_2021": "0.168087",
+      "rate_2025": "0.149343",
+      "change": "-0.018744",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-044-000-00",
+      "county": "Collingsworth County",
+      "rate_2021": "0.916129",
+      "rate_2025": "0.817475",
+      "change": "-0.098654",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-045-000-00",
+      "county": "Colorado County",
+      "rate_2021": "0.499599",
+      "rate_2025": "0.464918",
+      "change": "-0.034681",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-046-000-00",
+      "county": "Comal County",
+      "rate_2021": "0.353515",
+      "rate_2025": "0.305015",
+      "change": "-0.048500",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-047-000-00",
+      "county": "Comanche County",
+      "rate_2021": "0.625729",
+      "rate_2025": "0.51109",
+      "change": "-0.114639",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-048-000-00",
+      "county": "Concho County",
+      "rate_2021": "0.54082",
+      "rate_2025": "0.552565",
+      "change": "0.011745",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-049-000-00",
+      "county": "Cooke County",
+      "rate_2021": "0.413",
+      "rate_2025": "0.3355",
+      "change": "-0.0775",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-050-000-00",
+      "county": "Coryell County",
+      "rate_2021": "0.4831",
+      "rate_2025": "0.56579",
+      "change": "0.08269",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-051-000-00",
+      "county": "Cottle County",
+      "rate_2021": "0.813",
+      "rate_2025": "0.8636",
+      "change": "0.0506",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-052-000-00",
+      "county": "Crane County",
+      "rate_2021": "0.8151",
+      "rate_2025": "0.812929",
+      "change": "-0.002171",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-053-000-00",
+      "county": "Crockett County",
+      "rate_2021": "0.717492",
+      "rate_2025": "0.880003",
+      "change": "0.162511",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-054-000-00",
+      "county": "Crosby County",
+      "rate_2021": "0.67",
+      "rate_2025": "0.686035",
+      "change": "0.016035",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-056-000-00",
+      "county": "Dallam County",
+      "rate_2021": "0.335015",
+      "rate_2025": "0.30927",
+      "change": "-0.025745",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-057-000-00",
+      "county": "Dallas County",
+      "rate_2021": "0.227946",
+      "rate_2025": "0.2155",
+      "change": "-0.012446",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-058-000-00",
+      "county": "Dawson County",
+      "rate_2021": "0.97092",
+      "rate_2025": "0.99381",
+      "change": "0.02289",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-059-000-00",
+      "county": "Deaf Smith County",
+      "rate_2021": "0.600638",
+      "rate_2025": "0.55633",
+      "change": "-0.044308",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-060-000-00",
+      "county": "Delta County",
+      "rate_2021": "0.655951",
+      "rate_2025": "0.594097",
+      "change": "-0.061854",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-061-000-00",
+      "county": "Denton County",
+      "rate_2021": "0.233086",
+      "rate_2025": "0.185938",
+      "change": "-0.047148",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-062-000-00",
+      "county": "DeWitt County",
+      "rate_2021": "0.46937",
+      "rate_2025": "0.38576",
+      "change": "-0.08361",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-063-000-00",
+      "county": "Dickens County",
+      "rate_2021": "0.85",
+      "rate_2025": "0.85",
+      "change": "0.00",
+      "move": "unchanged"
+    },
+    {
+      "body_id": "tx-064-000-00",
+      "county": "Dimmit County",
+      "rate_2021": "0.29",
+      "rate_2025": "0.28",
+      "change": "-0.01",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-065-000-00",
+      "county": "Donley County",
+      "rate_2021": "0.612776",
+      "rate_2025": "0.558867",
+      "change": "-0.053909",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-066-000-00",
+      "county": "Duval County",
+      "rate_2021": "0.951899",
+      "rate_2025": "0.861839",
+      "change": "-0.090060",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-067-000-00",
+      "county": "Eastland County",
+      "rate_2021": "0.459",
+      "rate_2025": "0.34",
+      "change": "-0.119",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-068-000-00",
+      "county": "Ector County",
+      "rate_2021": "0.365",
+      "rate_2025": "0.43895",
+      "change": "0.07395",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-069-000-00",
+      "county": "Edwards County",
+      "rate_2021": "0.6522",
+      "rate_2025": "0.691431",
+      "change": "0.039231",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-070-000-00",
+      "county": "Ellis County",
+      "rate_2021": "0.339338",
+      "rate_2025": "0.273992",
+      "change": "-0.065346",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-071-000-00",
+      "county": "El Paso County",
+      "rate_2021": "0.470181",
+      "rate_2025": "0.458889",
+      "change": "-0.011292",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-072-000-00",
+      "county": "Erath County",
+      "rate_2021": "0.4355",
+      "rate_2025": "0.3811",
+      "change": "-0.0544",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-073-000-00",
+      "county": "Falls County",
+      "rate_2021": "0.93061",
+      "rate_2025": "0.76465",
+      "change": "-0.16596",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-074-000-00",
+      "county": "Fannin County",
+      "rate_2021": "0.5341",
+      "rate_2025": "0.350311",
+      "change": "-0.183789",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-075-000-00",
+      "county": "Fayette County",
+      "rate_2021": "0.464",
+      "rate_2025": "0.40984",
+      "change": "-0.05416",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-076-000-00",
+      "county": "Fisher County",
+      "rate_2021": "0.731907",
+      "rate_2025": "0.554359",
+      "change": "-0.177548",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-077-000-00",
+      "county": "Floyd County",
+      "rate_2021": "0.725",
+      "rate_2025": "0.7121",
+      "change": "-0.0129",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-078-000-00",
+      "county": "Foard County",
+      "rate_2021": "0.835",
+      "rate_2025": "0.83",
+      "change": "-0.005",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-079-000-00",
+      "county": "Fort Bend County",
+      "rate_2021": "0.4568",
+      "rate_2025": "0.824",
+      "change": "0.3672",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-080-000-00",
+      "county": "Franklin County",
+      "rate_2021": "0.48168",
+      "rate_2025": "0.36386",
+      "change": "-0.11782",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-081-000-00",
+      "county": "Freestone County",
+      "rate_2021": "0.39375",
+      "rate_2025": "0.3335",
+      "change": "-0.06025",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-082-000-00",
+      "county": "Frio County",
+      "rate_2021": "0.5535",
+      "rate_2025": "0.443",
+      "change": "-0.1105",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-083-000-00",
+      "county": "Gaines County",
+      "rate_2021": "0.605924",
+      "rate_2025": "0.523555",
+      "change": "-0.082369",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-084-000-00",
+      "county": "Galveston County",
+      "rate_2021": "0.41494",
+      "rate_2025": "0.32266",
+      "change": "-0.09228",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-085-000-00",
+      "county": "Garza County",
+      "rate_2021": "0.7727",
+      "rate_2025": "0.7941",
+      "change": "0.0214",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-086-000-00",
+      "county": "Gillespie County",
+      "rate_2021": "0.3577",
+      "rate_2025": "0.2685",
+      "change": "-0.0892",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-087-000-00",
+      "county": "Glasscock County",
+      "rate_2021": "0.21",
+      "rate_2025": "0.15",
+      "change": "-0.06",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-088-000-00",
+      "county": "Goliad County",
+      "rate_2021": "0.791813",
+      "rate_2025": "0.777943",
+      "change": "-0.013870",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-089-000-00",
+      "county": "Gonzales County",
+      "rate_2021": "0.4391",
+      "rate_2025": "0.2689",
+      "change": "-0.1702",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-090-000-00",
+      "county": "Gray County",
+      "rate_2021": "0.65056",
+      "rate_2025": "0.58103",
+      "change": "-0.06953",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-091-000-00",
+      "county": "Grayson County",
+      "rate_2021": "0.339",
+      "rate_2025": "0.3051",
+      "change": "-0.0339",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-092-000-00",
+      "county": "Gregg County",
+      "rate_2021": "0.2975",
+      "rate_2025": "0.304331",
+      "change": "0.006831",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-093-000-00",
+      "county": "Grimes County",
+      "rate_2021": "0.526933",
+      "rate_2025": "0.423077",
+      "change": "-0.103856",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-094-000-00",
+      "county": "Guadalupe County",
+      "rate_2021": "0.3799",
+      "rate_2025": "0.3304",
+      "change": "-0.0495",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-095-000-00",
+      "county": "Hale County",
+      "rate_2021": "0.643",
+      "rate_2025": "0.699779",
+      "change": "0.056779",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-096-000-00",
+      "county": "Hall County",
+      "rate_2021": "0.7106",
+      "rate_2025": "0.799991",
+      "change": "0.089391",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-097-000-00",
+      "county": "Hamilton County",
+      "rate_2021": "0.4554",
+      "rate_2025": "0.508652",
+      "change": "0.053252",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-098-000-00",
+      "county": "Hansford County",
+      "rate_2021": "0.539128",
+      "rate_2025": "0.454422",
+      "change": "-0.084706",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-099-000-00",
+      "county": "Hardeman County",
+      "rate_2021": "0.6181",
+      "rate_2025": "0.6888",
+      "change": "0.0707",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-100-000-00",
+      "county": "Hardin County",
+      "rate_2021": "0.640601",
+      "rate_2025": "0.480106",
+      "change": "-0.160495",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-101-000-00",
+      "county": "Harris County",
+      "rate_2021": "0.37693",
+      "rate_2025": "0.38096",
+      "change": "0.00403",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-102-000-00",
+      "county": "Harrison County",
+      "rate_2021": "0.43526",
+      "rate_2025": "0.3428",
+      "change": "-0.09246",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-103-000-00",
+      "county": "Hartley County",
+      "rate_2021": "0.3981",
+      "rate_2025": "0.405342",
+      "change": "0.007242",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-104-000-00",
+      "county": "Haskell County",
+      "rate_2021": "0.494898",
+      "rate_2025": "0.561675",
+      "change": "0.066777",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-105-000-00",
+      "county": "Hays County",
+      "rate_2021": "0.3867",
+      "rate_2025": "0.3999",
+      "change": "0.0132",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-106-000-00",
+      "county": "Hemphill County",
+      "rate_2021": "0.53",
+      "rate_2025": "0.53",
+      "change": "0.00",
+      "move": "unchanged"
+    },
+    {
+      "body_id": "tx-107-000-00",
+      "county": "Henderson County",
+      "rate_2021": "0.446487",
+      "rate_2025": "0.331493",
+      "change": "-0.114994",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-108-000-00",
+      "county": "Hidalgo County",
+      "rate_2021": "0.575",
+      "rate_2025": "0.575",
+      "change": "0.000",
+      "move": "unchanged"
+    },
+    {
+      "body_id": "tx-109-000-00",
+      "county": "Hill County",
+      "rate_2021": "0.497242",
+      "rate_2025": "0.452647",
+      "change": "-0.044595",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-110-000-00",
+      "county": "Hockley County",
+      "rate_2021": "0.59688",
+      "rate_2025": "0.499918",
+      "change": "-0.096962",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-111-000-00",
+      "county": "Hood County",
+      "rate_2021": "0.420345",
+      "rate_2025": "0.2797",
+      "change": "-0.140645",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-112-000-00",
+      "county": "Hopkins County",
+      "rate_2021": "0.584035",
+      "rate_2025": "0.335617",
+      "change": "-0.248418",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-113-000-00",
+      "county": "Houston County",
+      "rate_2021": "0.53",
+      "rate_2025": "0.423",
+      "change": "-0.107",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-114-000-00",
+      "county": "Howard County",
+      "rate_2021": "0.327545",
+      "rate_2025": "0.301711",
+      "change": "-0.025834",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-115-000-00",
+      "county": "Hudspeth County",
+      "rate_2021": "0.656074",
+      "rate_2025": "0.562371",
+      "change": "-0.093703",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-116-000-00",
+      "county": "Hunt County",
+      "rate_2021": "0.428379",
+      "rate_2025": "0.333241",
+      "change": "-0.095138",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-117-000-00",
+      "county": "Hutchinson County",
+      "rate_2021": "0.595",
+      "rate_2025": "0.5",
+      "change": "-0.095",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-118-000-00",
+      "county": "Irion County",
+      "rate_2021": "0.714466",
+      "rate_2025": "0.569723",
+      "change": "-0.144743",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-119-000-00",
+      "county": "Jack County",
+      "rate_2021": "0.54378",
+      "rate_2025": "0.439206",
+      "change": "-0.104574",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-120-000-00",
+      "county": "Jackson County",
+      "rate_2021": "0.4269",
+      "rate_2025": "0.4345",
+      "change": "0.0076",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-121-000-00",
+      "county": "Jasper County",
+      "rate_2021": "0.6519",
+      "rate_2025": "0.5711",
+      "change": "-0.0808",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-122-000-00",
+      "county": "Jeff Davis County",
+      "rate_2021": "0.78613",
+      "rate_2025": "1.3735",
+      "change": "0.58737",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-123-000-00",
+      "county": "Jefferson County",
+      "rate_2021": "0.363184",
+      "rate_2025": "0.357",
+      "change": "-0.006184",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-124-000-00",
+      "county": "Jim Hogg County",
+      "rate_2021": "1.189042",
+      "rate_2025": "1.18857",
+      "change": "-0.000472",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-125-000-00",
+      "county": "Jim Wells County",
+      "rate_2021": "0.787581",
+      "rate_2025": "0.767802",
+      "change": "-0.019779",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-126-000-00",
+      "county": "Johnson County",
+      "rate_2021": "0.42",
+      "rate_2025": "0.389276",
+      "change": "-0.030724",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-127-000-00",
+      "county": "Jones County",
+      "rate_2021": "0.618948",
+      "rate_2025": "0.536293",
+      "change": "-0.082655",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-128-000-00",
+      "county": "Karnes County",
+      "rate_2021": "0.376243",
+      "rate_2025": "0.241058",
+      "change": "-0.135185",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-129-000-00",
+      "county": "Kaufman County",
+      "rate_2021": "0.461171",
+      "rate_2025": "0.415113",
+      "change": "-0.046058",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-130-000-00",
+      "county": "Kendall County",
+      "rate_2021": "0.4127",
+      "rate_2025": "0.377",
+      "change": "-0.0357",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-131-000-00",
+      "county": "Kenedy County",
+      "rate_2021": "0.67",
+      "rate_2025": "0.8",
+      "change": "0.13",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-132-000-00",
+      "county": "Kent County",
+      "rate_2021": "0.95",
+      "rate_2025": "0.8917",
+      "change": "-0.0583",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-133-000-00",
+      "county": "Kerr County",
+      "rate_2021": "0.4545",
+      "rate_2025": "0.4024",
+      "change": "-0.0521",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-134-000-00",
+      "county": "Kimble County",
+      "rate_2021": "0.4731",
+      "rate_2025": "0.436482",
+      "change": "-0.036618",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-135-000-00",
+      "county": "King County",
+      "rate_2021": "0.9347",
+      "rate_2025": "0.9347",
+      "change": "0.0000",
+      "move": "unchanged"
+    },
+    {
+      "body_id": "tx-136-000-00",
+      "county": "Kinney County",
+      "rate_2021": "0.559",
+      "rate_2025": "0.4672",
+      "change": "-0.0918",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-137-000-00",
+      "county": "Kleberg County",
+      "rate_2021": "0.77187",
+      "rate_2025": "0.77187",
+      "change": "0.00000",
+      "move": "unchanged"
+    },
+    {
+      "body_id": "tx-138-000-00",
+      "county": "Knox County",
+      "rate_2021": "0.62156",
+      "rate_2025": "0.59693",
+      "change": "-0.02463",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-139-000-00",
+      "county": "Lamar County",
+      "rate_2021": "0.3608",
+      "rate_2025": "0.3063",
+      "change": "-0.0545",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-140-000-00",
+      "county": "Lamb County",
+      "rate_2021": "0.7943",
+      "rate_2025": "0.76",
+      "change": "-0.0343",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-141-000-00",
+      "county": "Lampasas County",
+      "rate_2021": "0.685",
+      "rate_2025": "0.54",
+      "change": "-0.145",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-142-000-00",
+      "county": "La Salle County",
+      "rate_2021": "0.625",
+      "rate_2025": "0.449762",
+      "change": "-0.175238",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-143-000-00",
+      "county": "Lavaca County",
+      "rate_2021": "0.689",
+      "rate_2025": "0.5497",
+      "change": "-0.1393",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-144-000-00",
+      "county": "Lee County",
+      "rate_2021": "0.685",
+      "rate_2025": "0.5006",
+      "change": "-0.1844",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-145-000-00",
+      "county": "Leon County",
+      "rate_2021": "0.443095",
+      "rate_2025": "0.419296",
+      "change": "-0.023799",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-146-000-00",
+      "county": "Liberty County",
+      "rate_2021": "0.5543",
+      "rate_2025": "0.48",
+      "change": "-0.0743",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-147-000-00",
+      "county": "Limestone County",
+      "rate_2021": "0.7478",
+      "rate_2025": "0.56",
+      "change": "-0.1878",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-148-000-00",
+      "county": "Lipscomb County",
+      "rate_2021": "0.877615",
+      "rate_2025": "1.01248",
+      "change": "0.134865",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-149-000-00",
+      "county": "Live Oak County",
+      "rate_2021": "0.30163",
+      "rate_2025": "0.61474",
+      "change": "0.31311",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-150-000-00",
+      "county": "Llano County",
+      "rate_2021": "0.29574",
+      "rate_2025": "0.25953",
+      "change": "-0.03621",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-151-000-00",
+      "county": "Loving County",
+      "rate_2021": "0.4582",
+      "rate_2025": "0.47486",
+      "change": "0.01666",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-152-000-00",
+      "county": "Lubbock County",
+      "rate_2021": "0.35999",
+      "rate_2025": "0.327425",
+      "change": "-0.032565",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-153-000-00",
+      "county": "Lynn County",
+      "rate_2021": "0.7",
+      "rate_2025": "0.652365",
+      "change": "-0.047635",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-154-000-00",
+      "county": "Madison County",
+      "rate_2021": "0.55",
+      "rate_2025": "0.5",
+      "change": "-0.05",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-155-000-00",
+      "county": "Marion County",
+      "rate_2021": "0.606929",
+      "rate_2025": "0.535878",
+      "change": "-0.071051",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-156-000-00",
+      "county": "Martin County",
+      "rate_2021": "0.3703",
+      "rate_2025": "0.1977",
+      "change": "-0.1726",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-157-000-00",
+      "county": "Mason County",
+      "rate_2021": "0.610189",
+      "rate_2025": "0.6427",
+      "change": "0.032511",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-158-000-00",
+      "county": "Matagorda County",
+      "rate_2021": "0.39974",
+      "rate_2025": "0.33651",
+      "change": "-0.06323",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-159-000-00",
+      "county": "Maverick County",
+      "rate_2021": "0.538571",
+      "rate_2025": "0.378313",
+      "change": "-0.160258",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-160-000-00",
+      "county": "McCulloch County",
+      "rate_2021": "0.74",
+      "rate_2025": "0.61019",
+      "change": "-0.12981",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-161-000-00",
+      "county": "McLennan County",
+      "rate_2021": "0.425",
+      "rate_2025": "0.334805",
+      "change": "-0.090195",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-162-000-00",
+      "county": "McMullen County",
+      "rate_2021": "0.52",
+      "rate_2025": "0.46",
+      "change": "-0.06",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-163-000-00",
+      "county": "Medina County",
+      "rate_2021": "0.5223",
+      "rate_2025": "0.4434",
+      "change": "-0.0789",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-164-000-00",
+      "county": "Menard County",
+      "rate_2021": "0.76745",
+      "rate_2025": "0.76027",
+      "change": "-0.00718",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-165-000-00",
+      "county": "Midland County",
+      "rate_2021": "0.251635",
+      "rate_2025": "0.121374",
+      "change": "-0.130261",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-166-000-00",
+      "county": "Milam County",
+      "rate_2021": "0.73",
+      "rate_2025": "0.511187",
+      "change": "-0.218813",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-167-000-00",
+      "county": "Mills County",
+      "rate_2021": "0.575029",
+      "rate_2025": "0.6061",
+      "change": "0.031071",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-168-000-00",
+      "county": "Mitchell County",
+      "rate_2021": "0.471687",
+      "rate_2025": "0.456451",
+      "change": "-0.015236",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-169-000-00",
+      "county": "Montague County",
+      "rate_2021": "0.684",
+      "rate_2025": "0.4961",
+      "change": "-0.1879",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-170-000-00",
+      "county": "Montgomery County",
+      "rate_2021": "0.4083",
+      "rate_2025": "0.377",
+      "change": "-0.0313",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-171-000-00",
+      "county": "Moore County",
+      "rate_2021": "0.550001",
+      "rate_2025": "0.483735",
+      "change": "-0.066266",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-172-000-00",
+      "county": "Morris County",
+      "rate_2021": "0.551057",
+      "rate_2025": "0.41",
+      "change": "-0.141057",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-173-000-00",
+      "county": "Motley County",
+      "rate_2021": "0.67462",
+      "rate_2025": "0.61561",
+      "change": "-0.05901",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-174-000-00",
+      "county": "Nacogdoches County",
+      "rate_2021": "0.5642",
+      "rate_2025": "0.43",
+      "change": "-0.1342",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-175-000-00",
+      "county": "Navarro County",
+      "rate_2021": "0.6045",
+      "rate_2025": "0.4197",
+      "change": "-0.1848",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-176-000-00",
+      "county": "Newton County",
+      "rate_2021": "0.653539",
+      "rate_2025": "0.696645",
+      "change": "0.043106",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-177-000-00",
+      "county": "Nolan County",
+      "rate_2021": "0.537637",
+      "rate_2025": "0.400041",
+      "change": "-0.137596",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-178-000-00",
+      "county": "Nueces County",
+      "rate_2021": "0.310445",
+      "rate_2025": "0.289789",
+      "change": "-0.020656",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-179-000-00",
+      "county": "Ochiltree County",
+      "rate_2021": "0.757732",
+      "rate_2025": "0.666938",
+      "change": "-0.090794",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-180-000-00",
+      "county": "Oldham County",
+      "rate_2021": "0.5",
+      "rate_2025": "0.47",
+      "change": "-0.03",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-181-000-00",
+      "county": "Orange County",
+      "rate_2021": "0.542",
+      "rate_2025": "0.492847",
+      "change": "-0.049153",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-182-000-00",
+      "county": "Palo Pinto County",
+      "rate_2021": "0.392145",
+      "rate_2025": "0.282158",
+      "change": "-0.109987",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-183-000-00",
+      "county": "Panola County",
+      "rate_2021": "0.6081",
+      "rate_2025": "0.5749",
+      "change": "-0.0332",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-184-000-00",
+      "county": "Parker County",
+      "rate_2021": "0.329362",
+      "rate_2025": "0.28507",
+      "change": "-0.044292",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-185-000-00",
+      "county": "Parmer County",
+      "rate_2021": "0.5334",
+      "rate_2025": "0.377399",
+      "change": "-0.156001",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-186-000-00",
+      "county": "Pecos County",
+      "rate_2021": "0.777",
+      "rate_2025": "0.7196",
+      "change": "-0.0574",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-187-000-00",
+      "county": "Polk County",
+      "rate_2021": "0.637906",
+      "rate_2025": "0.5986",
+      "change": "-0.039306",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-188-000-00",
+      "county": "Potter County",
+      "rate_2021": "0.70595",
+      "rate_2025": "0.59024",
+      "change": "-0.11571",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-189-000-00",
+      "county": "Presidio County",
+      "rate_2021": "0.533665",
+      "rate_2025": "0.47586",
+      "change": "-0.057805",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-190-000-00",
+      "county": "Rains County",
+      "rate_2021": "0.5894",
+      "rate_2025": "0.524316",
+      "change": "-0.065084",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-191-000-00",
+      "county": "Randall County",
+      "rate_2021": "0.44421",
+      "rate_2025": "0.40099",
+      "change": "-0.04322",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-192-000-00",
+      "county": "Reagan County",
+      "rate_2021": "0.209146",
+      "rate_2025": "0.0152",
+      "change": "-0.193946",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-193-000-00",
+      "county": "Real County",
+      "rate_2021": "0.510125",
+      "rate_2025": "0.53",
+      "change": "0.019875",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-194-000-00",
+      "county": "Red River County",
+      "rate_2021": "0.78034",
+      "rate_2025": "0.69158",
+      "change": "-0.08876",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-195-000-00",
+      "county": "Reeves County",
+      "rate_2021": "0.47562",
+      "rate_2025": "0.407473",
+      "change": "-0.068147",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-196-000-00",
+      "county": "Refugio County",
+      "rate_2021": "0.8",
+      "rate_2025": "0.8",
+      "change": "0.0",
+      "move": "unchanged"
+    },
+    {
+      "body_id": "tx-197-000-00",
+      "county": "Roberts County",
+      "rate_2021": "0.73",
+      "rate_2025": "0.814746",
+      "change": "0.084746",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-198-000-00",
+      "county": "Robertson County",
+      "rate_2021": "0.53",
+      "rate_2025": "0.66505",
+      "change": "0.13505",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-199-000-00",
+      "county": "Rockwall County",
+      "rate_2021": "0.3131",
+      "rate_2025": "0.251",
+      "change": "-0.0621",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-200-000-00",
+      "county": "Runnels County",
+      "rate_2021": "0.633144",
+      "rate_2025": "0.820718",
+      "change": "0.187574",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-201-000-00",
+      "county": "Rusk County",
+      "rate_2021": "0.631876",
+      "rate_2025": "0.544476",
+      "change": "-0.087400",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-202-000-00",
+      "county": "Sabine County",
+      "rate_2021": "0.388732",
+      "rate_2025": "0.341882",
+      "change": "-0.046850",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-203-000-00",
+      "county": "San Augustine County",
+      "rate_2021": "0.32637",
+      "rate_2025": "0.32196",
+      "change": "-0.00441",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-204-000-00",
+      "county": "San Jacinto County",
+      "rate_2021": "0.5779",
+      "rate_2025": "0.48291",
+      "change": "-0.09499",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-205-000-00",
+      "county": "San Patricio County",
+      "rate_2021": "0.591338",
+      "rate_2025": "0.409761",
+      "change": "-0.181577",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-206-000-00",
+      "county": "San Saba County",
+      "rate_2021": "0.595",
+      "rate_2025": "0.5",
+      "change": "-0.095",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-207-000-00",
+      "county": "Schleicher County",
+      "rate_2021": "0.6959",
+      "rate_2025": "0.6959",
+      "change": "0.0000",
+      "move": "unchanged"
+    },
+    {
+      "body_id": "tx-208-000-00",
+      "county": "Scurry County",
+      "rate_2021": "0.5361",
+      "rate_2025": "0.6268",
+      "change": "0.0907",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-209-000-00",
+      "county": "Shackelford County",
+      "rate_2021": "0.6506",
+      "rate_2025": "0.6963",
+      "change": "0.0457",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-210-000-00",
+      "county": "Shelby County",
+      "rate_2021": "0.8022",
+      "rate_2025": "0.6513",
+      "change": "-0.1509",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-211-000-00",
+      "county": "Sherman County",
+      "rate_2021": "0.68609",
+      "rate_2025": "0.5053",
+      "change": "-0.18079",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-212-000-00",
+      "county": "Smith County",
+      "rate_2021": "0.335",
+      "rate_2025": "0.364231",
+      "change": "0.029231",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-213-000-00",
+      "county": "Somervell County",
+      "rate_2021": "0.498",
+      "rate_2025": "0.3246",
+      "change": "-0.1734",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-214-000-00",
+      "county": "Starr County",
+      "rate_2021": "0.75",
+      "rate_2025": "0.7086",
+      "change": "-0.0414",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-215-000-00",
+      "county": "Stephens County",
+      "rate_2021": "0.8",
+      "rate_2025": "0.647945",
+      "change": "-0.152055",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-216-000-00",
+      "county": "Sterling County",
+      "rate_2021": "0.612636",
+      "rate_2025": "0.735693",
+      "change": "0.123057",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-217-000-00",
+      "county": "Stonewall County",
+      "rate_2021": "0.9515",
+      "rate_2025": "0.9146",
+      "change": "-0.0369",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-218-000-00",
+      "county": "Sutton County",
+      "rate_2021": "0.692861",
+      "rate_2025": "0.689112",
+      "change": "-0.003749",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-219-000-00",
+      "county": "Swisher County",
+      "rate_2021": "0.715",
+      "rate_2025": "0.622",
+      "change": "-0.093",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-220-000-00",
+      "county": "Tarrant County",
+      "rate_2021": "0.229",
+      "rate_2025": "0.1862",
+      "change": "-0.0428",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-221-000-00",
+      "county": "Taylor County",
+      "rate_2021": "0.607",
+      "rate_2025": "0.5578",
+      "change": "-0.0492",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-222-000-00",
+      "county": "Terrell County",
+      "rate_2021": "0.8",
+      "rate_2025": "0.8",
+      "change": "0.0",
+      "move": "unchanged"
+    },
+    {
+      "body_id": "tx-223-000-00",
+      "county": "Terry County",
+      "rate_2021": "0.8",
+      "rate_2025": "0.798767",
+      "change": "-0.001233",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-224-000-00",
+      "county": "Throckmorton County",
+      "rate_2021": "0.996574",
+      "rate_2025": "0.9991",
+      "change": "0.002526",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-225-000-00",
+      "county": "Titus County",
+      "rate_2021": "0.4669",
+      "rate_2025": "0.3861",
+      "change": "-0.0808",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-226-000-00",
+      "county": "Tom Green County",
+      "rate_2021": "0.5488",
+      "rate_2025": "0.47075",
+      "change": "-0.07805",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-227-000-00",
+      "county": "Travis County",
+      "rate_2021": "0.357365",
+      "rate_2025": "0.375845",
+      "change": "0.018480",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-228-000-00",
+      "county": "Trinity County",
+      "rate_2021": "0.5846",
+      "rate_2025": "0.539",
+      "change": "-0.0456",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-229-000-00",
+      "county": "Tyler County",
+      "rate_2021": "0.8629",
+      "rate_2025": "0.8629",
+      "change": "0.0000",
+      "move": "unchanged"
+    },
+    {
+      "body_id": "tx-230-000-00",
+      "county": "Upshur County",
+      "rate_2021": "0.615",
+      "rate_2025": "0.514",
+      "change": "-0.101",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-231-000-00",
+      "county": "Upton County",
+      "rate_2021": "0.259406",
+      "rate_2025": "0.230176",
+      "change": "-0.029230",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-232-000-00",
+      "county": "Uvalde County",
+      "rate_2021": "0.74",
+      "rate_2025": "0.613907",
+      "change": "-0.126093",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-233-000-00",
+      "county": "Val Verde County",
+      "rate_2021": "0.5342",
+      "rate_2025": "0.4977",
+      "change": "-0.0365",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-234-000-00",
+      "county": "Van Zandt County",
+      "rate_2021": "0.623471",
+      "rate_2025": "0.6992",
+      "change": "0.075729",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-235-000-00",
+      "county": "Victoria County",
+      "rate_2021": "0.3329",
+      "rate_2025": "0.3853",
+      "change": "0.0524",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-236-000-00",
+      "county": "Walker County",
+      "rate_2021": "0.4799",
+      "rate_2025": "0.4571",
+      "change": "-0.0228",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-237-000-00",
+      "county": "Waller County",
+      "rate_2021": "0.604632",
+      "rate_2025": "0.556187",
+      "change": "-0.048445",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-238-000-00",
+      "county": "Ward County",
+      "rate_2021": "0.69",
+      "rate_2025": "0.69",
+      "change": "0.00",
+      "move": "unchanged"
+    },
+    {
+      "body_id": "tx-239-000-00",
+      "county": "Washington County",
+      "rate_2021": "0.5032",
+      "rate_2025": "0.464",
+      "change": "-0.0392",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-240-000-00",
+      "county": "Webb County",
+      "rate_2021": "0.41",
+      "rate_2025": "0.3825",
+      "change": "-0.0275",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-241-000-00",
+      "county": "Wharton County",
+      "rate_2021": "0.42479",
+      "rate_2025": "0.34517",
+      "change": "-0.07962",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-242-000-00",
+      "county": "Wheeler County",
+      "rate_2021": "0.72928",
+      "rate_2025": "0.51724",
+      "change": "-0.21204",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-243-000-00",
+      "county": "Wichita County",
+      "rate_2021": "0.613841",
+      "rate_2025": "0.521303",
+      "change": "-0.092538",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-244-000-00",
+      "county": "Wilbarger County",
+      "rate_2021": "0.56619",
+      "rate_2025": "0.523742",
+      "change": "-0.042448",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-245-000-00",
+      "county": "Willacy County",
+      "rate_2021": "0.69165",
+      "rate_2025": "1.2551",
+      "change": "0.56345",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-246-000-00",
+      "county": "Williamson County",
+      "rate_2021": "0.440846",
+      "rate_2025": "0.413776",
+      "change": "-0.027070",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-247-000-00",
+      "county": "Wilson County",
+      "rate_2021": "0.4228",
+      "rate_2025": "0.405961",
+      "change": "-0.016839",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-248-000-00",
+      "county": "Winkler County",
+      "rate_2021": "0.4515",
+      "rate_2025": "0.4581",
+      "change": "0.0066",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-249-000-00",
+      "county": "Wise County",
+      "rate_2021": "0.370125",
+      "rate_2025": "0.2175",
+      "change": "-0.152625",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-250-000-00",
+      "county": "Wood County",
+      "rate_2021": "0.5325",
+      "rate_2025": "0.4625",
+      "change": "-0.0700",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-251-000-00",
+      "county": "Yoakum County",
+      "rate_2021": "0.745",
+      "rate_2025": "0.692864",
+      "change": "-0.052136",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-252-000-00",
+      "county": "Young County",
+      "rate_2021": "0.693585",
+      "rate_2025": "0.58635",
+      "change": "-0.107235",
+      "move": "fell"
+    },
+    {
+      "body_id": "tx-253-000-00",
+      "county": "Zapata County",
+      "rate_2021": "0.924026",
+      "rate_2025": "0.926561",
+      "change": "0.002535",
+      "move": "rose"
+    },
+    {
+      "body_id": "tx-254-000-00",
+      "county": "Zavala County",
+      "rate_2021": "0.72",
+      "rate_2025": "0.6471",
+      "change": "-0.0729",
+      "move": "fell"
+    }
+  ]
+}
