@@ -52,9 +52,9 @@ test('already subscribed and pending messages', async () => {
 test('service errors never show success; email retained; recovers', async () => {
   const cases = [reply(500, { status: 'subscribed' }), reply(200, { status: 'unknown' }), reply(200, null, true), async () => { throw new Error('net'); }, reply(200, { status: 'error' })];
   for (const f of cases) {
-    const r = rig(f, 'keep@me.org'); await r.c.submit();
+    const r = rig(f, 'keep@example.com'); await r.c.submit();
     assert.match(r.status.innerHTML, /^Something broke on our end\. Try again in a minute, or email <a href='mailto:fred@hazeydata\.ai'>fred@hazeydata\.ai<\/a>$/);
-    assert.equal(r.status.attrs['data-state'], 'error'); assert.equal(r.input.value, 'keep@me.org'); assert.ok(!r.input.disabled && !r.button.disabled);
+    assert.equal(r.status.attrs['data-state'], 'error'); assert.equal(r.input.value, 'keep@example.com'); assert.ok(!r.input.disabled && !r.button.disabled);
   }
 });
 test('invalid email: client and server; no fetch for client-side; email retained', async () => {
@@ -66,7 +66,7 @@ test('invalid email: client and server; no fetch for client-side; email retained
 test('success then retry clears the success message', async () => {
   let k = 0; const r = rig(async () => reply(k++ ? 500 : 200, { status: 'subscribed' })());
   await r.c.submit(); assert.equal(r.status.textContent, "You're on the list.");
-  r.input.value = 'again@x.io'; await r.c.submit();
+  r.input.value = 'again@example.com'; await r.c.submit();
   assert.doesNotMatch(r.status.innerHTML, /on the list/); assert.match(r.status.innerHTML, /Something broke/);
 });
 test('HTTP 400 invalid_email from backend shows exact invalid message, never success', async () => {
@@ -83,7 +83,7 @@ test('pending_confirmation is not success; 2xx invalid_email is a service error'
 });
 test('success and already clear the email and set data-state; pending 202 is neither success nor error', async () => {
   for (const [code, st, state, msg] of [[200, 'subscribed', 'success', "You're on the list."], [200, 'already_subscribed', 'already', "You're already on the list."], [202, 'pending_confirmation', 'pending', 'Your subscription is pending confirmation.']]) {
-    const r = rig(reply(code, { status: st }), 'ok@x.io'); await r.c.submit();
+    const r = rig(reply(code, { status: st }), 'ok@example.com'); await r.c.submit();
     assert.equal(r.status.textContent, msg); assert.equal(r.status.attrs['data-state'], state);
     assert.equal(r.input.value, ''); assert.ok(!r.input.disabled && !r.button.disabled); assert.equal(r.form.attrs['aria-busy'], undefined);
   }
@@ -91,6 +91,6 @@ test('success and already clear the email and set data-state; pending 202 is nei
 test('aria-invalid is cleared once a later submit has a valid email', async () => {
   const r = rig(reply(200, { status: 'subscribed' }), 'bad'); await r.c.submit();
   assert.equal(r.input.attrs['aria-invalid'], 'true');
-  r.input.value = 'good@x.io'; await r.c.submit();
+  r.input.value = 'good@example.com'; await r.c.submit();
   assert.equal(r.input.attrs['aria-invalid'], undefined); assert.equal(r.status.attrs['data-state'], 'success');
 });
