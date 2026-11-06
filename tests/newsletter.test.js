@@ -81,3 +81,16 @@ test('pending_confirmation is not success; 2xx invalid_email is a service error'
   r = rig(reply(200, { status: 'invalid_email' })); await r.c.submit();
   assert.equal(r.status.attrs['data-state'], 'error');
 });
+test('success and already clear the email and set data-state; pending 202 is neither success nor error', async () => {
+  for (const [code, st, state, msg] of [[200, 'subscribed', 'success', "You're on the list."], [200, 'already_subscribed', 'already', "You're already on the list."], [202, 'pending_confirmation', 'pending', 'Your subscription is pending confirmation.']]) {
+    const r = rig(reply(code, { status: st }), 'ok@x.io'); await r.c.submit();
+    assert.equal(r.status.textContent, msg); assert.equal(r.status.attrs['data-state'], state);
+    assert.equal(r.input.value, ''); assert.ok(!r.input.disabled && !r.button.disabled); assert.equal(r.form.attrs['aria-busy'], undefined);
+  }
+});
+test('aria-invalid is cleared once a later submit has a valid email', async () => {
+  const r = rig(reply(200, { status: 'subscribed' }), 'bad'); await r.c.submit();
+  assert.equal(r.input.attrs['aria-invalid'], 'true');
+  r.input.value = 'good@x.io'; await r.c.submit();
+  assert.equal(r.input.attrs['aria-invalid'], undefined); assert.equal(r.status.attrs['data-state'], 'success');
+});

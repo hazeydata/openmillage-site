@@ -32,6 +32,10 @@ class Generator(unittest.TestCase):
         self.assertEqual(by(t, "label", **{"for": "newsletter-email"}) and 1, 1)
         st = by(t, "p", id="newsletter-status")[0]; self.assertEqual((st["role"], st["aria-live"]), ("status", "polite"))
         self.assertIn("callout", by(t, "section")[0]["class"]); self.assertEqual(by(t, "section")[0]["aria-labelledby"], "newsletter-h")
+    def test_rendered_data_msgs_carry_final_copy(self):
+        c = redo.NEWSLETTER_COPY; f = by(parse(redo.newsletter()), "form")[0]
+        for k in ("success", "already", "pending", "sending", "invalid"): self.assertEqual(f["data-msg-" + k], c[k], k)
+        self.assertEqual(f["data-endpoint"], "https://hazeydata.ai/api/subscribe")
     def test_no_promises(self):
         txt = re.sub(r"<[^>]+>", " ", redo.newsletter()).lower()
         for w in ("weekly", "daily", "monthly", "confirmation email", "check your inbox", "unsubscribe", "never spam"): self.assertNotIn(w, txt)
@@ -46,6 +50,9 @@ class Built(unittest.TestCase):
         self.assertEqual(self.h.count("<script src='/newsletter.js' defer>"), 1)
         self.assertLess(self.h.index("id=newsletter-form"), self.h.index("id=get-the-data"))
         self.assertIn(redo.newsletter(), self.h)
+    def test_built_form_data_msgs_match_final_copy(self):
+        c = redo.NEWSLETTER_COPY; f = by(parse(self.h), "form", id="newsletter-form")[0]
+        for k in ("success", "already", "pending", "sending", "invalid"): self.assertEqual(f["data-msg-" + k], c[k], k)
     def test_support_address_is_in_footer(self):
         self.assertIn("<a href='mailto:fred@hazeydata.ai'>fred@hazeydata.ai</a>", self.h.split("<footer>")[1])
     def test_asset_copied_identically(self):
