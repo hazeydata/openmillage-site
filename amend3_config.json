@@ -11,7 +11,7 @@
  "election_date_source": "https://dos.fl.gov/elections/for-voters/election-dates",
  "millage_definition": {
   "text": "Millage is a tax rate defined as the dollars assessed for each $1,000 of value; one mill is one dollar per $1,000 of assessed value.",
-  "url": "https://www.floridarevenue.com/property/Documents/homeowner_guide_millage.pdf",
+  "url": "https://floridarevenue.com/property/Documents/homeowner_guide_millage.pdf",
   "agency": "Florida Department of Revenue"
  },
  "forecast_terms": [
