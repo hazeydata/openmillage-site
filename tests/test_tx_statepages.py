@@ -239,5 +239,12 @@ hits = sorted({t for p in alltx for t in terms if re.search(r"\b" + re.escape(t)
 internal = [p for p in alltx if re.search(r"\bOM-[A-Z0-9-]+|\bCEO\b|\bruling\b|Lucille|\bticket\b", TXT[p])]
 ok(not hits and not internal, f"AC25 no forecast/advocacy terms and no CEO/ruling/OM-* wording on TX pages; hits {hits[:3]} {internal[:2]}")
 ok(not re.search(r"\bFY\s?\d|fiscal year", "".join(prose(p) for p in alltx), re.I), "S2 no FY labels on TX pages (calendar years only)")
+SITE_PIN = "76bec7d974bb92cbe4e0636368f94b8ce20ca91b"
+PIN_URL = f"https://github.com/hazeydata/openmillage-site/tree/{SITE_PIN}/data/tx"
+ok(all(TXT[p].count(PIN_URL) == 1 and "openmillage-site/tree/main/data/tx" not in TXT[p] for p in ("docs/tx/index.html", "docs/tx/property-tax-rates/index.html")),
+   "TX-REPIN hub data-files link is pinned to the public site merge SHA (/tx/ and /tx/property-tax-rates/), not tree/main")
+import ast  # statepages.py builds on import, so read the constant from its AST instead
+SP_CONST = {n.targets[0].id: n.value.value for n in ast.parse(rd("statepages.py")).body if isinstance(n, ast.Assign) and isinstance(n.targets[0], ast.Name) and isinstance(n.value, ast.Constant)}
+ok(SP_CONST.get("TX_DATA_URL") == PIN_URL, "TX-REPIN statepages.TX_DATA_URL constant itself equals the full pinned URL (not tree/main), independent of committed HTML")
 for t in made: shutil.rmtree(t, ignore_errors=True)
 print("FAILURES", len(FAIL)); sys.exit(1 if FAIL else 0)
