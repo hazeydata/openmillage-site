@@ -182,7 +182,7 @@ def nc_pages(alts):
 TX_CHARTS = "assets/charts/om-2026-11-06"
 TX_SLUG = "tx/property-tax-rates"
 TX_FILES = [f"data/tx/tx-{y}{s}.csv" for y in YEARS for s in ("", ".provenance")] + ["data/tx/tx_unit_basis.csv"]
-TX_DATA_URL = "https://github.com/hazeydata/openmillage-site/tree/main/data/tx"
+TX_DATA_URL = "https://github.com/hazeydata/openmillage-site/tree/76bec7d974bb92cbe4e0636368f94b8ce20ca91b/data/tx"
 TX_CHART_FILES = [f"tx-rates-{n}.{e}" for n in ("rose-held", "fell") for e in ("png", "svg")] + ["tx-yoy-counts.json", "tx-yoy-series.json"]
 TX_SCOPE = ("county", "municipal")  # v1 pages: body_type in TX_SCOPE and levy_component == total only
 UNIT_LOCATORS = ("Tex. Tax Code \u00a726.04(c)(1)-(2)", "Tex. Tax Code \u00a726.062(d)(1)", "Tex. Tax Code \u00a726.07")
