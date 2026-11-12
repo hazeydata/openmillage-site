@@ -62,11 +62,12 @@ def cell(r):
     if r is None: return "<td class=num data-v=''>not listed</td>"
     p = r["_prov"]; basis = p.get("unit_basis", "")
     t = f"nc-{r['year']}.csv row {r['_row']}; DOR sheet '{p.get('source_sheet','')}' cell {p.get('source_cell','')}; unit {basis}"
-    return f"<td class=num data-v='{E(r['rate'])}'><a href='{E(r['source_url'])}' title='{E(t)}'>{E(r['rate'])}</a>{'' if basis=='stated' else '<sup>i</sup>'}</td>"
+    rt = sc.rate_text(r['rate'])
+    return f"<td class=num data-v='{E(rt)}'><a href='{E(r['source_url'])}' title='{E(t)}'>{E(rt)}</a>{'' if basis=='stated' else '<sup>i</sup>'}</td>"
 
 def change(a, b):
     if a is None or b is None or not a["rate"] or not b["rate"]: return "<td class=num data-v=''>n/a</td>"
-    d = Decimal(b["rate"]) - Decimal(a["rate"])
+    d = Decimal(sc.rate_text(b["rate"])) - Decimal(sc.rate_text(a["rate"]))
     return f"<td class=num data-v='{d}'>{'+' if d > 0 else ''}{d}</td>"
 
 def nc_table(cap, tid, bodies, by):
@@ -132,11 +133,11 @@ def nc_pages(alts):
         cid = next(r["body_id"] for r in data[2025] if r["body_type"] == "county" and r["county"] == c)
         a, b = by[2021].get(cid), by[2025].get(cid)
         if a and b:
-            d = Decimal(b["rate"]) - Decimal(a["rate"]); up += d > 0; dn += d < 0; same += d == 0
+            d = Decimal(sc.rate_text(b["rate"])) - Decimal(sc.rate_text(a["rate"])); up += d > 0; dn += d < 0; same += d == 0
         munis = muni_list(data, c)
         cur = b or a
-        lead = (f"<p class=lead>{E(c)} County's general property tax rate is <strong>{E(b['rate'])} per $100</strong> of assessed value in FY2025-26, "
-                f"{'up' if d > 0 else 'down' if d < 0 else 'unchanged'} from {E(a['rate'])} in FY2021-22"
+        lead = (f"<p class=lead>{E(c)} County's general property tax rate is <strong>{E(sc.rate_text(b['rate']))} per $100</strong> of assessed value in FY2025-26, "
+                f"{'up' if d > 0 else 'down' if d < 0 else 'unchanged'} from {E(sc.rate_text(a['rate']))} in FY2021-22"
                 + (f" ({'+' if d>0 else ''}{d})" if d else "") + f". Cities and towns add their own rate on top for property inside their limits.</p>") if a and b else ""
         inner = (lead + UNIT_P
                  + "<h2>County rate</h2>" + nc_table(f"{c} County rate, per $100 of value", "t-county", [(cid, f"{c} County")], by)
@@ -154,7 +155,7 @@ def nc_pages(alts):
     moves = []
     for c, cid in cty_trs:
         a, b = by[2021].get(cid), by[2025].get(cid)
-        if a and b: moves.append((Decimal(b["rate"]) - Decimal(a["rate"]), c))
+        if a and b: moves.append((Decimal(sc.rate_text(b["rate"])) - Decimal(sc.rate_text(a["rate"])), c))
     rise = sorted([m for m in moves if m[0] > 0], key=lambda m: (-m[0], m[1]))[:3]
     fall = sorted([m for m in moves if m[0] < 0], key=lambda m: (m[0], m[1]))[:3]
     lst = lambda ms: sc.name_list([f"{c} ({cents(d)} cents)" for d, c in ms])
@@ -239,7 +240,7 @@ def tx_stats(data):
     moves, excl = [], []
     for c, bid in counties:
         a, b = by[2021].get(bid), by[2025].get(bid)
-        if a and b and a["rate"] and b["rate"]: moves.append((Decimal(b["rate"]) - Decimal(a["rate"]), c, bid))
+        if a and b and a["rate"] and b["rate"]: moves.append((Decimal(sc.rate_text(b["rate"])) - Decimal(sc.rate_text(a["rate"])), c, bid))
         else: excl.append((c, bid, a, b))
     st = {"by": by, "counties": counties, "moves": moves, "excl": excl, "total": len(counties),
           "up": sum(m[0] > 0 for m in moves), "dn": sum(m[0] < 0 for m in moves), "same": sum(m[0] == 0 for m in moves)}
@@ -261,7 +262,8 @@ def tx_cell(r, y):
     p = r["_prov"]
     t = f"data/tx/tx-{y}.csv row {r['_row']}" + (f"; Comptroller sheet '{p.get('source_sheet','')}' cell {p.get('source_cell','')}" if p.get("source_cell") else "")
     if not r["rate"]: return f"<td class=num data-v='' title='{E(t)}'>not reported</td>"
-    return f"<td class=num data-v='{E(r['rate'])}'><a href='{E(r['source_url'])}' title='{E(t)}'>{E(r['rate'])}</a></td>"
+    rt = sc.rate_text(r['rate'])
+    return f"<td class=num data-v='{E(rt)}'><a href='{E(r['source_url'])}' title='{E(t)}'>{E(rt)}</a></td>"
 
 def tx_table(cap, tid, bodies, by, link=False):
     trs = []
@@ -285,7 +287,7 @@ def png_size(path):
     return struct.unpack(">II", b[16:24])
 
 def tx_lead_county(c, a, b):
-    ra, rb = a["rate"] if a else "", b["rate"] if b else ""
+    ra, rb = sc.rate_text(a["rate"]) if a else "", sc.rate_text(b["rate"]) if b else ""
     if rb and ra:
         d = Decimal(rb) - Decimal(ra)
         mv = f"up from {E(ra)} in 2021 (+{d})" if d > 0 else f"down from {E(ra)} in 2021 (\u2212{abs(d)})" if d < 0 else f"unchanged from {E(ra)} in 2021"
@@ -360,16 +362,16 @@ def tx_copy_charts():
 def fl_page(alts):
     rs = rows("data/rollback/fl-2025-rollback.csv")
     for i, r in enumerate(rs, start=2): r["_row"] = i
-    ok = [r for r in rs if r["rolled_back_mills"] and r["adopted_mills"] and Decimal(r["rolled_back_mills"]) > 0]
+    ok = [r for r in rs if r["rolled_back_mills"] and r["adopted_mills"] and Decimal(sc.rate_text(r["rolled_back_mills"])) > 0]
     skipped = [r for r in rs if r not in ok]
-    for r in ok: r["_d"] = Decimal(r["adopted_mills"]) - Decimal(r["rolled_back_mills"])
+    for r in ok: r["_d"] = Decimal(sc.rate_text(r["adopted_mills"])) - Decimal(sc.rate_text(r["rolled_back_mills"]))
     up = sum(r["_d"] > 0 for r in ok); dn = sum(r["_d"] < 0 for r in ok); eq = sum(r["_d"] == 0 for r in ok)
     exc = rows("data/rollback/fl-2025-rollback-exclusions.csv")
     def tr(r):
         src = f"<a href='{E(r['source_url'])}' title='{E(r['source_table'] or 'DOR')}; fl-2025-rollback.csv row {r['_row']}'>PDF p.{E(r['source_page'])}</a>"
         lv = "" if r["levy_component"] == "operating" else f" ({E(sc.label(r['levy_component']))})"
         return (f"<tr><td>{E(r['taxing_body'])}{lv}<br><span class=muted>{E(sc.label(r['body_subtype']))}</span></td>"
-                f"<td class=num data-v='{r['rolled_back_mills']}'>{E(r['rolled_back_mills'])}</td><td class=num data-v='{r['adopted_mills']}'>{E(r['adopted_mills'])}</td>"
+                f"<td class=num data-v='{sc.rate_text(r['rolled_back_mills'])}'>{E(sc.rate_text(r['rolled_back_mills']))}</td><td class=num data-v='{sc.rate_text(r['adopted_mills'])}'>{E(sc.rate_text(r['adopted_mills']))}</td>"
                 f"<td class=num data-v='{r['_d']}'>{'+' if r['_d']>0 else ''}{r['_d']}</td><td>{src}</td></tr>")
     head = "".join(f"<th scope=col{' class=num' if n else ''}>{h}</th>" for h, n in [("Taxing body",0),("Rolled-back",1),("Adopted",1),("Difference",1),("Source",0)])
     groups = []
@@ -387,7 +389,7 @@ def fl_page(alts):
             f"Median difference: {'+' if med > 0 else ''}{med.quantize(Decimal('0.01'))} mills. Highest: {E(top['taxing_body'])} ({E(top['county'])}), +{top['_d']} mills. "
             f"Lowest: {E(low['taxing_body'])} ({E(low['county'])}), {low['_d']} mills.</p>")
     exl = "".join(f"<li>{E(e['scope'])}: {E(re.sub(r'\s*Fact check: \S+$', '', e['reason_text']))}</li>" for e in exc)
-    skl = "".join(f"<li>{E(r['taxing_body'])} ({E(r['county'])}): rolled-back {E(r['rolled_back_mills'] or 'not printed')}, adopted {E(r['adopted_mills'] or 'not printed')} (<a href='{E(r['source_url'])}'>source</a>, row {r['_row']})</li>" for r in skipped)
+    skl = "".join(f"<li>{E(r['taxing_body'])} ({E(r['county'])}): rolled-back {E(sc.rate_text(r['rolled_back_mills']) or 'not printed')}, adopted {E(sc.rate_text(r['adopted_mills']) or 'not printed')} (<a href='{E(r['source_url'])}'>source</a>, row {r['_row']})</li>" for r in skipped)
     inner = (f"<p class=lead>In 2025, {up} of the {len(ok)} Florida levies we could compare were adopted above their rolled-back rate, {eq} matched it and {dn} came in below it. "
              f"Under Florida law, the percent by which an adopted rate exceeds the rolled-back rate is called \u201cthe percentage increase in property taxes\u201d (<a href='{F200}'>F.S. 200.065(2)(d)</a>).</p>"
              "<h2>What the rolled-back rate is</h2><p>The rolled-back rate is the millage that would raise the same property tax revenue as last year, leaving out new construction "

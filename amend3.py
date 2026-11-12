@@ -114,7 +114,7 @@ def render_amend3(rows, districts, ballot, counties, sd_counties=None):
     group = lambda c: sorted([r for r in rows if r["county"] == c], key=lambda r: ({"county": 0, "school_district": 1}.get(r["body_type"], 2), r["taxing_body"], r["levy_component"], r["levy_scope"]))
     nm = lambda r: E(sc.display_name(r['taxing_body']))
     def tr(r): return (f"<tr><td>{nm(r)}</td><td>{E(sc.label(r['body_type']))}</td><td>{E(sc.label(r['levy_component']))} ({E(sc.label(r['levy_scope']))})</td>"
-                       f"<td class='rate num' data-body-id='{E(r['body_id'])}' data-levy='{E(r['levy_component'])}|{E(r['levy_scope'])}'>{E(r['rate'])} {E(r['unit'])} "
+                       f"<td class='rate num' data-body-id='{E(r['body_id'])}' data-levy='{E(r['levy_component'])}|{E(r['levy_scope'])}'>{E(sc.rate_text(r['rate']))} {E(r['unit'])} "
                        f"<a href='{E(r['source_url'])}' aria-label='Source for {nm(r)}'>source</a></td></tr>")
     def table(cap, trs):
         return sc.tablewrap(cap, f"<table><caption>{E(cap)}</caption><thead><tr><th scope=col>Taxing body</th><th scope=col>Type</th><th scope=col>Levy</th>"

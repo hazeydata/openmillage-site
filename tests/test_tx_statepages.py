@@ -52,9 +52,13 @@ TXT = {p: rd(p) for p in alltx}
 def prose(p):
     t = re.sub(r"<script.*?</script>|<head>.*?</head>", " ", TXT[p], flags=re.S)
     return html.unescape(re.sub(r"<[^>]+>", " ", t))
+def RT(s):
+    if len(Decimal(s).as_tuple().digits) <= 15: return s
+    return format(Decimal(f"{float(s):.15g}"), "f")
+
 def expect(r):
     """What a rate cell must show and link to for CSV row r (None = body absent that year)."""
-    return ("not listed", None) if r is None else ("not reported", None) if r["rate"] == "" else (r["rate"], r["source_url"])
+    return ("not listed", None) if r is None else ("not reported", None) if r["rate"] == "" else (RT(r["rate"]), r["source_url"])
 
 # ---------------- T1 pin and fail-closed ----------------
 lock = {f["path"]: f for f in json.load(open("data/SOURCES.lock"))["files"]}
@@ -123,14 +127,14 @@ for c in COUNTIES:
         bid = next(b for y in YEARS[::-1] for b, r in MU[y].items() if r["county"] == c and r["taxing_body"] == row[0][0])
         bad += [(c, row[0][0], y) for y, cell in zip(YEARS, row[1:6]) if (cell[0], cell[1]) != expect(MU[y].get(bid))]
 ok(not bad, f"AC4/9 every municipal cell on every county page equals the CSV rate (or not reported / not listed) with its source_url link; bad {bad[:3]}")
-allowed = {r["rate"] for y in YEARS for bt in ("county", "municipal") for r in tot(y, bt) if r["rate"]}
+allowed = {RT(r["rate"]) for y in YEARS for bt in ("county", "municipal") for r in tot(y, bt) if r["rate"]}
 series = json.load(open("docs/charts/tx-yoy-series.json")); counts_j = json.load(open("docs/charts/tx-yoy-counts.json"))
 jrates = {x[k] for part in ("rose_or_held", "fell", "all_compared") for x in series[part] for k in ("rate_2021", "rate_2025")}
 ok(jrates and jrates <= allowed, f"AC6 all {len(jrates)} chart JSON rate strings are in-scope CSV rates")
 changes = {"0.5000"}  # the unit example in the callout
 for bid, b in list(CT[2025].items()) + list(MU[2025].items()):
     a = (CT if bid in CT[2025] else MU)[2021].get(bid)
-    if a and a["rate"] and b["rate"]: changes.add(str(abs(Decimal(b["rate"]) - Decimal(a["rate"]))))
+    if a and a["rate"] and b["rate"]: changes.add(str(abs(Decimal(RT(b["rate"])) - Decimal(RT(a["rate"])))))
 decs = {d for p in alltx for d in re.findall(r"(?<![\w./-])0\.\d{3,}(?![\w./-])", prose(p))}
 ok(not (decs - allowed - changes), f"AC6 every decimal in the text of all TX pages is a CSV rate, a Decimal change of two CSV rates, or the unit example; stray {sorted(decs - allowed - changes)[:5]}")
 llms, sm = rd("docs/llms.txt"), rd("docs/sitemap.xml")
@@ -146,7 +150,7 @@ new25 = sorted(set(MU[2025]) - set(MU[2021]))
 checked = 0
 for bid in new25:
     r = MU[2025][bid]; row = next(x for x in tables(f"docs/tx/{slug(r['county'])}/index.html")["t-muni"][1:] if x[0][0] == r["taxing_body"])
-    checked += row[1][0] == "not listed" and row[1][1] is None and row[6][0] == "n/a" and row[5][0] == (r["rate"] or "not reported")
+    checked += row[1][0] == "not listed" and row[1][1] is None and row[6][0] == "n/a" and row[5][0] == (RT(r["rate"]) if r["rate"] else "not reported")
 ok(new25 and checked == len(new25), f"AC8 {len(new25)} municipal bodies in 2025 but absent in 2021 show 'not listed' in 2021 and Change n/a, never a borrowed value")
 zero = [(p, c) for p in alltx for tid, rs in tables(p).items() if tid in ("t-tx", "t-county", "t-muni") for row in rs[1:] for c in row[1:6] if re.fullmatch(r"0(\.0+)?", c[0])]
 csv_zero = {r["rate"] for y in YEARS for bt in ("county", "municipal") for r in tot(y, bt)} & {"0", "0.0"}
@@ -188,7 +192,7 @@ ok(all("School districts and special districts: in the data, not on these pages 
    "AC11/S1 coverage note says 'in the data, not on these pages yet' on every page; never 'not collected'")
 
 # ---------------- T6 YoY ----------------
-moves = [(Decimal(b["rate"]) - Decimal(CT[2021][bid]["rate"]), b["county"], bid) for bid, b in CT[2025].items() if b["rate"] and CT[2021][bid]["rate"]]
+moves = [(Decimal(RT(b["rate"])) - Decimal(RT(CT[2021][bid]["rate"])), b["county"], bid) for bid, b in CT[2025].items() if b["rate"] and CT[2021][bid]["rate"]]
 up, dn, same = (sum(m[0] > 0 for m in moves), sum(m[0] < 0 for m in moves), sum(m[0] == 0 for m in moves))
 ok((up, dn, same, 254 - len(moves)) == (48, 194, 11, 1), f"AC17 recomputed from the pinned CSVs: rose/fell/unchanged/excluded = {(up, dn, same, 254 - len(moves))}, spec 48/194/11/1")
 hubh = TXT[hub_p]
@@ -206,7 +210,7 @@ ok(not any(re.search(r"fetch\(|XMLHttpRequest|tx-yoy|<script[^>]*src=[^>]*json",
 bad = []
 for row in hub[1:]:
     a, b = CT[2021][CID[row[0][0]]]["rate"], CT[2025][CID[row[0][0]]]["rate"]
-    want = "n/a" if not a or not b else ("+" if Decimal(b) > Decimal(a) else "") + str(Decimal(b) - Decimal(a))
+    want = "n/a" if not a or not b else ("+" if Decimal(RT(b)) > Decimal(RT(a)) else "") + str(Decimal(RT(b)) - Decimal(RT(a)))
     if row[6][0] != want: bad.append((row[0][0], row[6][0], want))
 ok(not bad and next(r for r in hub[1:] if r[0][0] == "Anderson County")[6][0] == "-0.116628" and "%" not in " ".join(c[0] for r in hub for c in r), f"AC19 Change = Decimal(2025) − Decimal(2021), else n/a; no percent column; bad {bad[:3]}")
 ok(all(f"data-chart='tx-rates-{k}'" in hubh and f"/charts/tx-rates-{k}.png" in hubh and os.path.exists(f"docs/charts/tx-rates-{k}.png") and os.path.exists(f"docs/charts/tx-rates-{k}.svg") for k in ("rose-held", "fell")), "AC17/S6 both chart panels are on the hub with PNG + SVG copied into docs/charts/")
