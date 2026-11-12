@@ -9,13 +9,13 @@ FAIL = []
 def ok(cond, msg): print(("PASS " if cond else "FAIL ") + msg); cond or FAIL.append(msg)
 rd = lambda p: open(p, encoding="utf-8").read()
 YEARS = [2021, 2022, 2023, 2024, 2025]
-PIN = "2166c8454efef496886291b675b6f9ac5dc5382a"
-FACTS = {  # spec Facts table: file name under data/tx/ -> sha256
-    "tx-2021.csv": "fb201ce781b9208d00e4b9e7550e193121ef017653c74cfefc5cd7293cc44d09", "tx-2021.provenance.csv": "bf28ba8b5e3c3b28740eae072c3456be71a9bcf1c01c6953d590493027e04e82",
-    "tx-2022.csv": "6d9bb606a557092fe80b1cb03a24f079deae38af138e23946f3ebe07476a4b3e", "tx-2022.provenance.csv": "feb5849bc5b7081aa18ae6e0ae3cbd1adef0861e790f648b4f4de4d1ab6637dc",
-    "tx-2023.csv": "895d7bc11b86de1aced9f1d0ae86c93ea4958c551aa3568b54cecf0aa3f70c4d", "tx-2023.provenance.csv": "a74d1c3e3426eb1b63de0cf115c3a9688e928b0a9b5364dd4621c16a799d69b7",
-    "tx-2024.csv": "add388dcbd0f00db8d680b0601eedc598d2157c9f519ed0df4470d76075d0c76", "tx-2024.provenance.csv": "4202fb8b586e1971de1be54d7faab24fae4d60e54d69bbd954bdcd246df563ab",
-    "tx-2025.csv": "5c92207a0f8e00abdecf6e5b508e85f6923668903eb49663f42a501010b3c41d", "tx-2025.provenance.csv": "356b4977d24d83cfab460128ee77836173e783fae0e08338faa3755f85648af8",
+PIN = "5ceed4f493b7b4283606da18c089f44cde2321bf"
+FACTS = {  # spec Facts table: file name under data/tx/ -> sha256 (OM-DATA-REPIN-001: 9 files re-hashed after float-noise removal)
+    "tx-2021.csv": "9c560a6b12bc52d9f1d28c69e6c31aa6d153f30358f6dac4092ebf6f8dee63ac", "tx-2021.provenance.csv": "c9f3f0593d7e7c3b0de0c707fa24850e249fc498fcb7ca494855dfd0329c4428",
+    "tx-2022.csv": "bc1d8a65cdff9b6b2f418cab9de2935042ad18e6a827a9cd843481683e1a067b", "tx-2022.provenance.csv": "1a47de8458c36957d75156ca0a2da8bf8aadde43eca276c058e2a1ff5b3423b3",
+    "tx-2023.csv": "bffd88e29a6b761335bea9dac34e18688638d9fd4fd60ba34dd88970892387f1", "tx-2023.provenance.csv": "f3fd7d40a3c35b3347bb476bb87d275e1f339f6df69ead04b2abf0c685260e64",
+    "tx-2024.csv": "add388dcbd0f00db8d680b0601eedc598d2157c9f519ed0df4470d76075d0c76", "tx-2024.provenance.csv": "a7ceca0798d182c10e664df32655adfc5d9fcf79bb134fdd0a1887cf13d86151",
+    "tx-2025.csv": "c2c2f3a75017f2ca229cb1f2827f7eb10f0a72774a1d7bcfad62e415e3ccc5eb", "tx-2025.provenance.csv": "3ebb2ae494deb03903b8de86638e19181461ef94f34f36a1390010d948a91352",
     "tx_unit_basis.csv": "29a39389919c8dd6ec348915acd39db7ab78303f9eee49c38685c72f215b8316"}
 
 class Tbl(html.parser.HTMLParser):

@@ -31,9 +31,9 @@
   {
    "path": "data/history/fl_millage_history.csv",
    "repo": "hazeydata/openmillage",
-   "commit": "7c1a5259eb42384e64b957a6f809cb520f568ef8",
+   "commit": "5ceed4f493b7b4283606da18c089f44cde2321bf",
    "source_path": "data/fl_millage_history.csv",
-   "sha256": "0d74a1f09ccc579bfe459ce0d309fc8c94139998d7775106a425e4f213041869"
+   "sha256": "ad1e00071bd55f05b861472995d9736ad271eddee240d0046f5394ac274b9cd7"
   },
   {
    "path": "data/nc/nc-2021.csv",
@@ -143,77 +143,77 @@
   {
    "path": "data/tx/tx-2021.csv",
    "repo": "hazeydata/openmillage",
-   "commit": "2166c8454efef496886291b675b6f9ac5dc5382a",
+   "commit": "5ceed4f493b7b4283606da18c089f44cde2321bf",
    "source_path": "data/tx-2021.csv",
-   "sha256": "fb201ce781b9208d00e4b9e7550e193121ef017653c74cfefc5cd7293cc44d09"
+   "sha256": "9c560a6b12bc52d9f1d28c69e6c31aa6d153f30358f6dac4092ebf6f8dee63ac"
   },
   {
    "path": "data/tx/tx-2021.provenance.csv",
    "repo": "hazeydata/openmillage",
-   "commit": "2166c8454efef496886291b675b6f9ac5dc5382a",
+   "commit": "5ceed4f493b7b4283606da18c089f44cde2321bf",
    "source_path": "data/tx-2021.provenance.csv",
-   "sha256": "bf28ba8b5e3c3b28740eae072c3456be71a9bcf1c01c6953d590493027e04e82"
+   "sha256": "c9f3f0593d7e7c3b0de0c707fa24850e249fc498fcb7ca494855dfd0329c4428"
   },
   {
    "path": "data/tx/tx-2022.csv",
    "repo": "hazeydata/openmillage",
-   "commit": "2166c8454efef496886291b675b6f9ac5dc5382a",
+   "commit": "5ceed4f493b7b4283606da18c089f44cde2321bf",
    "source_path": "data/tx-2022.csv",
-   "sha256": "6d9bb606a557092fe80b1cb03a24f079deae38af138e23946f3ebe07476a4b3e"
+   "sha256": "bc1d8a65cdff9b6b2f418cab9de2935042ad18e6a827a9cd843481683e1a067b"
   },
   {
    "path": "data/tx/tx-2022.provenance.csv",
    "repo": "hazeydata/openmillage",
-   "commit": "2166c8454efef496886291b675b6f9ac5dc5382a",
+   "commit": "5ceed4f493b7b4283606da18c089f44cde2321bf",
    "source_path": "data/tx-2022.provenance.csv",
-   "sha256": "feb5849bc5b7081aa18ae6e0ae3cbd1adef0861e790f648b4f4de4d1ab6637dc"
+   "sha256": "1a47de8458c36957d75156ca0a2da8bf8aadde43eca276c058e2a1ff5b3423b3"
   },
   {
    "path": "data/tx/tx-2023.csv",
    "repo": "hazeydata/openmillage",
-   "commit": "2166c8454efef496886291b675b6f9ac5dc5382a",
+   "commit": "5ceed4f493b7b4283606da18c089f44cde2321bf",
    "source_path": "data/tx-2023.csv",
-   "sha256": "895d7bc11b86de1aced9f1d0ae86c93ea4958c551aa3568b54cecf0aa3f70c4d"
+   "sha256": "bffd88e29a6b761335bea9dac34e18688638d9fd4fd60ba34dd88970892387f1"
   },
   {
    "path": "data/tx/tx-2023.provenance.csv",
    "repo": "hazeydata/openmillage",
-   "commit": "2166c8454efef496886291b675b6f9ac5dc5382a",
+   "commit": "5ceed4f493b7b4283606da18c089f44cde2321bf",
    "source_path": "data/tx-2023.provenance.csv",
-   "sha256": "a74d1c3e3426eb1b63de0cf115c3a9688e928b0a9b5364dd4621c16a799d69b7"
+   "sha256": "f3fd7d40a3c35b3347bb476bb87d275e1f339f6df69ead04b2abf0c685260e64"
   },
   {
    "path": "data/tx/tx-2024.csv",
    "repo": "hazeydata/openmillage",
-   "commit": "2166c8454efef496886291b675b6f9ac5dc5382a",
+   "commit": "5ceed4f493b7b4283606da18c089f44cde2321bf",
    "source_path": "data/tx-2024.csv",
    "sha256": "add388dcbd0f00db8d680b0601eedc598d2157c9f519ed0df4470d76075d0c76"
   },
   {
    "path": "data/tx/tx-2024.provenance.csv",
    "repo": "hazeydata/openmillage",
-   "commit": "2166c8454efef496886291b675b6f9ac5dc5382a",
+   "commit": "5ceed4f493b7b4283606da18c089f44cde2321bf",
    "source_path": "data/tx-2024.provenance.csv",
-   "sha256": "4202fb8b586e1971de1be54d7faab24fae4d60e54d69bbd954bdcd246df563ab"
+   "sha256": "a7ceca0798d182c10e664df32655adfc5d9fcf79bb134fdd0a1887cf13d86151"
   },
   {
    "path": "data/tx/tx-2025.csv",
    "repo": "hazeydata/openmillage",
-   "commit": "2166c8454efef496886291b675b6f9ac5dc5382a",
+   "commit": "5ceed4f493b7b4283606da18c089f44cde2321bf",
    "source_path": "data/tx-2025.csv",
-   "sha256": "5c92207a0f8e00abdecf6e5b508e85f6923668903eb49663f42a501010b3c41d"
+   "sha256": "c2c2f3a75017f2ca229cb1f2827f7eb10f0a72774a1d7bcfad62e415e3ccc5eb"
   },
   {
    "path": "data/tx/tx-2025.provenance.csv",
    "repo": "hazeydata/openmillage",
-   "commit": "2166c8454efef496886291b675b6f9ac5dc5382a",
+   "commit": "5ceed4f493b7b4283606da18c089f44cde2321bf",
    "source_path": "data/tx-2025.provenance.csv",
-   "sha256": "356b4977d24d83cfab460128ee77836173e783fae0e08338faa3755f85648af8"
+   "sha256": "3ebb2ae494deb03903b8de86638e19181461ef94f34f36a1390010d948a91352"
   },
   {
    "path": "data/tx/tx_unit_basis.csv",
    "repo": "hazeydata/openmillage",
-   "commit": "2166c8454efef496886291b675b6f9ac5dc5382a",
+   "commit": "5ceed4f493b7b4283606da18c089f44cde2321bf",
    "source_path": "reference/tx_unit_basis.csv",
    "sha256": "29a39389919c8dd6ec348915acd39db7ab78303f9eee49c38685c72f215b8316"
   }
