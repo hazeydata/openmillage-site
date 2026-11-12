@@ -1,7 +1,7 @@
 {
  "source": {
   "repo": "hazeydata/openmillage",
-  "commit": "7c1a5259eb42384e64b957a6f809cb520f568ef8",
+  "commit": "5ceed4f493b7b4283606da18c089f44cde2321bf",
   "path": "data/fl_millage_history.csv"
  },
  "county": "Alachua",
@@ -280,7 +280,7 @@
    "entity_id": "",
    "entity_name": "Alachua",
    "component": "total",
-   "millage": "10.802999999999999",
+   "millage": "10.803",
    "rate_basis": "effective_dor_computed",
    "status": "published",
    "null_reason": "",
@@ -451,7 +451,7 @@
    "entity_id": "",
    "entity_name": "Alachua",
    "component": "total",
-   "millage": "9.831000000000001",
+   "millage": "9.831",
    "rate_basis": "effective_dor_computed",
    "status": "published",
    "null_reason": "",
