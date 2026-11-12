@@ -75,7 +75,7 @@ FILTER_JS = ("<script>(function(){var w=document.getElementById('county-filter-w
   "function f(){var q=i.value.trim().toLowerCase(),n=0;li.forEach(function(e){var a=e.querySelector('a'),m=!q||a.textContent.toLowerCase().indexOf(q)>-1;e.hidden=!m;if(m)n++;});"
   "o.textContent=q?n+' of '+li.length+' counties':'';}i.addEventListener('input',f);f();})();</script>")
 # --- History body pages (spec items 15/17): /fl/history/<county>-county/<level>/ with index.csv and index.json beside each page.
-# Data: data/history/fl_millage_history.csv, pinned in data/SOURCES.lock to hazeydata/openmillage@4f43c33.
+# Data: data/history/fl_millage_history.csv, pinned in data/SOURCES.lock to hazeydata/openmillage@5ceed4f.
 HIST_FILE = "data/history/fl_millage_history.csv"
 HIST_PIN = next(f["commit"] for f in sources.read_lock()["files"] if f["path"] == HIST_FILE)
 HIST_LEVELS = {"county": "County", "school": "School board"}

@@ -38,7 +38,7 @@ for p in hist:
         if not os.path.isfile(os.path.join(d, n)): missing.append(os.path.join(d, n))
     try:
         rows = list(csv.DictReader(open(f"{d}/index.csv", newline="", encoding="utf-8"))); j = json.load(open(f"{d}/index.json"))
-        if not rows or rows != j["rows"] or j["source"]["commit"][:7] != "4f43c33": unparse.append(d)
+        if not rows or rows != j["rows"] or j["source"]["commit"][:7] != "5ceed4f": unparse.append(d)
         h = rd(p)
         if "href='/" + d[5:] + "/index.csv'" not in h or "href='/" + d[5:] + "/index.json'" not in h: unparse.append(d + " (no links)")
     except Exception as e: unparse.append(f"{d}: {e}")
@@ -49,8 +49,8 @@ ok(any(r["year"] == "1996" and r["component"] == "operating" and r["millage"] ==
 
 # --- pin
 lock = json.load(open("data/SOURCES.lock")); hl = [f for f in lock["files"] if f["path"] == "data/history/fl_millage_history.csv"]
-ok(len(hl) == 1 and hl[0]["repo"] == "hazeydata/openmillage" and hl[0]["commit"].startswith("4f43c33") and hl[0]["source_path"] == "data/fl_millage_history.csv", "history CSV pinned in data/SOURCES.lock to hazeydata/openmillage@4f43c33")
-ok(hl and hashlib.sha256(open(hl[0]["path"], "rb").read()).hexdigest() == hl[0]["sha256"] == "ad1e00071bd55f05b861472995d9736ad271eddee240d0046f5394ac274b9cd7", "history CSV sha256 matches the lock and the 4f43c33 file")
+ok(len(hl) == 1 and hl[0]["repo"] == "hazeydata/openmillage" and hl[0]["commit"].startswith("5ceed4f") and hl[0]["source_path"] == "data/fl_millage_history.csv", "history CSV pinned in data/SOURCES.lock to hazeydata/openmillage@5ceed4f")
+ok(hl and hashlib.sha256(open(hl[0]["path"], "rb").read()).hexdigest() == hl[0]["sha256"] == "ad1e00071bd55f05b861472995d9736ad271eddee240d0046f5394ac274b9cd7", "history CSV sha256 matches the lock and the 5ceed4f file")
 ok(sources.read_lock() is not None, "sources.read_lock accepts the lock with the history entry")
 
 # --- slots (history chart, history line, credit) are present, marked, and filled from the source files

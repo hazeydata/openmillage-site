@@ -9,7 +9,7 @@ FAIL = []
 def ok(cond, msg): print(("PASS " if cond else "FAIL ") + msg); cond or FAIL.append(msg)
 rd = lambda p: open(p, encoding="utf-8").read()
 YEARS = [2021, 2022, 2023, 2024, 2025]
-PIN = "4f43c332e31e006ce83b10686e9b6795b3cc6c9e"
+PIN = "5ceed4f493b7b4283606da18c089f44cde2321bf"
 FACTS = {  # spec Facts table: file name under data/tx/ -> sha256 (OM-DATA-REPIN-001: 9 files re-hashed after float-noise removal)
     "tx-2021.csv": "9c560a6b12bc52d9f1d28c69e6c31aa6d153f30358f6dac4092ebf6f8dee63ac", "tx-2021.provenance.csv": "c9f3f0593d7e7c3b0de0c707fa24850e249fc498fcb7ca494855dfd0329c4428",
     "tx-2022.csv": "bc1d8a65cdff9b6b2f418cab9de2935042ad18e6a827a9cd843481683e1a067b", "tx-2022.provenance.csv": "1a47de8458c36957d75156ca0a2da8bf8aadde43eca276c058e2a1ff5b3423b3",
