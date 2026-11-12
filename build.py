@@ -146,7 +146,7 @@ def locator_label(loc):
     if m: return f"Scanned PDF, page {m.group(1)}"
     return "Source"
 def hist_tr(r):
-    v = f"{r['millage']} mills" if r["status"] == "published" and r["millage"] != "" else f"— no value in data ({html.escape(sc.label(r['null_reason'] or r['status']))})"
+    v = f"{sc.rate_text(r['millage'])} mills" if r["status"] == "published" and r["millage"] != "" else f"— no value in data ({html.escape(sc.label(r['null_reason'] or r['status']))})"
     return (f"<tr><td>{r['year']}</td><td>{html.escape(sc.label(r['component']))}</td><td class=num>{v}</td>"
             f"<td><a href='{html.escape(r['source_url'])}' data-locator='{html.escape(r['source_locator'] or '', quote=True)}' aria-label='Source for {r['year']} {html.escape(sc.label(r['component']))}'>{locator_label(r['source_locator'])}</a></td></tr>")
 for (co, lv), hrs in sorted(HIST.items()):

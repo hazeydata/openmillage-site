@@ -1,6 +1,11 @@
 """Shared page chrome for build.py and amend3.py: stylesheet, head tags, header, footer, readable labels, display names."""
 import html, re
+from decimal import Decimal
 import redo
+
+def rate_text(s):
+    if not s or len(Decimal(s).as_tuple().digits) <= 15: return s
+    return format(Decimal(f"{float(s):.15g}"), "f")
 
 CSS = """:root{--fg:#1a1a1a;--bg:#fff;--muted:#595959;--link:#0b57d0;--accent:#0b57d0;--border:#c8c8c8;--badge-fg:#6b4500;--badge-bg:#fff4d6;--row-agg:#fff8e6}
 @media (prefers-color-scheme:dark){:root{--fg:#e8e8e8;--bg:#121212;--muted:#b3b3b3;--link:#8ab4f8;--accent:#8ab4f8;--border:#3d3d3d;--badge-fg:#ffd98a;--badge-bg:#3d2e00;--row-agg:#2a2410}}
