@@ -17,8 +17,8 @@ E = lambda s: html.escape(str(s), quote=True)
 YEARS = [2021, 2022, 2023, 2024, 2025]
 FY = {y: f"FY{y}-{str(y+1)[2:]}" for y in YEARS}
 CHARTS = "assets/charts/om-2026-11-02"
-# Public copy of the pinned data: this (public) repo at a fixed commit (the #18 squash-merge commit on main). Checked 200 logged out on 2026-11-02.
-SITE_DATA = "https://github.com/hazeydata/openmillage-site/{}/1f1d9a3b8dea39062f91d96c0e06183202e6a805/data/{}"
+# Public copy of the pinned data: this (public) repo at a fixed commit (the OM-REPIN-LEFTOVERS-001 data merge commit, site#25). Checked 200 logged out on 2026-11-13.
+SITE_DATA = "https://github.com/hazeydata/openmillage-site/{}/c4c06dc21737d41a3dbfb0ac35b2fc3e3318c6f7/data/{}"
 F200 = "https://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0200-0299/0200/Sections/0200.065.html"
 NC_SLUG, FL_SLUG = "nc/property-tax-rates", "fl/rolled-back-rate"
 def slug(s): return re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")
@@ -183,7 +183,7 @@ def nc_pages(alts):
 TX_CHARTS = "assets/charts/om-2026-11-06"
 TX_SLUG = "tx/property-tax-rates"
 TX_FILES = [f"data/tx/tx-{y}{s}.csv" for y in YEARS for s in ("", ".provenance")] + ["data/tx/tx_unit_basis.csv"]
-TX_DATA_URL = "https://github.com/hazeydata/openmillage-site/tree/76bec7d974bb92cbe4e0636368f94b8ce20ca91b/data/tx"
+TX_DATA_URL = "https://github.com/hazeydata/openmillage-site/tree/c4c06dc21737d41a3dbfb0ac35b2fc3e3318c6f7/data/tx"
 TX_CHART_FILES = [f"tx-rates-{n}.{e}" for n in ("rose-held", "fell") for e in ("png", "svg")] + ["tx-yoy-counts.json", "tx-yoy-series.json"]
 TX_SCOPE = ("county", "municipal")  # v1 pages: body_type in TX_SCOPE and levy_component == total only
 UNIT_LOCATORS = ("Tex. Tax Code \u00a726.04(c)(1)-(2)", "Tex. Tax Code \u00a726.062(d)(1)", "Tex. Tax Code \u00a726.07")
