@@ -1,6 +1,6 @@
 {
   "pin_repo": "hazeydata/openmillage",
-  "pin_commit": "2166c8454efef496886291b675b6f9ac5dc5382a",
+  "pin_commit": "5ceed4f493b7b4283606da18c089f44cde2321bf",
   "filter": {
     "body_type": "county",
     "levy_component": "total",
@@ -13,11 +13,11 @@
   "source_files": {
     "tx-2021.csv": {
       "path": "data/tx-2021.csv",
-      "sha256": "fb201ce781b9208d00e4b9e7550e193121ef017653c74cfefc5cd7293cc44d09"
+      "sha256": "9c560a6b12bc52d9f1d28c69e6c31aa6d153f30358f6dac4092ebf6f8dee63ac"
     },
     "tx-2025.csv": {
       "path": "data/tx-2025.csv",
-      "sha256": "5c92207a0f8e00abdecf6e5b508e85f6923668903eb49663f42a501010b3c41d"
+      "sha256": "c2c2f3a75017f2ca229cb1f2827f7eb10f0a72774a1d7bcfad62e415e3ccc5eb"
     }
   },
   "unit": "per_100_valuation",
