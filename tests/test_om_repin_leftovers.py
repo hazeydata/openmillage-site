@@ -26,4 +26,16 @@ ok({e["commit"] for e in nc.values()} == {lock[TX[0]]["commit"]} == {lock[TX[1]]
 bad = [p for p, e in nc.items() if hashlib.sha256(open(p, "rb").read()).hexdigest() != e["sha256"]]
 ok(not bad, f"every data/nc file matches its lock sha256; mismatches {bad}")
 
+import ast, re  # statepages.py builds on import, so read the link constants from its AST
+SP = {n.targets[0].id: n.value.value for n in ast.parse(open("statepages.py").read()).body if isinstance(n, ast.Assign) and isinstance(n.targets[0], ast.Name) and isinstance(n.value, ast.Constant)}
+shas = {re.search(r"/([0-9a-f]{40})/", SP[k]).group(1) for k in ("TX_DATA_URL", "SITE_DATA")}
+ok(len(shas) == 1, f"TX_DATA_URL and SITE_DATA name the same 40-hex commit; found {shas}")
+sha = shas.pop()
+ok(SP["TX_DATA_URL"] == f"https://github.com/hazeydata/openmillage-site/tree/{sha}/data/tx", "TX_DATA_URL is the site tree link at that commit")
+ok(SP["SITE_DATA"] == f"https://github.com/hazeydata/openmillage-site/{{}}/{sha}/data/{{}}", "SITE_DATA is the site link template at that commit")
+ok(not any(o in SP[k] for k in ("TX_DATA_URL", "SITE_DATA") for o in ("76bec7d9", "1f1d9a3b")), "neither link constant names the old commits 76bec7d9 or 1f1d9a3b")
+for p in ("docs/tx/index.html", "docs/tx/property-tax-rates/index.html", "docs/nc/property-tax-rates/index.html", "docs/fl/rolled-back-rate/index.html"):
+    h = open(p, encoding="utf-8").read()
+    ok(re.search(r"github\.com/hazeydata/openmillage-site/[^\"']*" + sha, h) and "76bec7d9" not in h and "1f1d9a3b" not in h, f"{p} links the site data at {sha[:8]} and names no old commit")
+
 print(f"\n{len(FAIL)} failed" if FAIL else "\nall passed"); sys.exit(1 if FAIL else 0)
