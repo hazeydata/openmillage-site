@@ -1,6 +1,6 @@
 # CAPTIONS — OM-SITE-TX-001 dataviz (TX YoY county totals)
 
-Art slots per `/workspace/evidence/OM-SITE-TX-001/writing/LAYOUT.md`. Wording from `VOICE-DRAFT.md` chart captions / keynums. Numbers below are the recomputed pin counts (48 rose / 194 fell / 11 unchanged / 1 Culberson null pair at `2166c845…`); they match VOICE-DRAFT. Lucille 2’s second steering note said “48 rose / 194 held / 11 fell” — that swap is wrong; do not use it in page copy.
+Art slots per `evidence/OM-SITE-TX-001/writing/LAYOUT.md`. Wording from `VOICE-DRAFT.md` chart captions / keynums. Numbers below are the recomputed pin counts (48 rose / 194 fell / 11 unchanged / 1 Culberson null pair at `5ceed4f4…`); they match VOICE-DRAFT. Lucille 2’s second steering note said “48 rose / 194 held / 11 fell” — that swap is wrong; do not use it in page copy.
 
 No mismatch vs VOICE-DRAFT keynums (Jeff Davis +58.7, Willacy +56.3, Baylor +38.0; Cochran −26.1, Bee −25.2, Hopkins −24.8).
 

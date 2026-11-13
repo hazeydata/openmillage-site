@@ -19,6 +19,7 @@ jobs:
       - run: python3 tests/test_tx_statepages.py
       - run: python3 tests/test_rate_format.py
       - run: python3 tests/test_repin_lock.py
+      - run: python3 tests/test_om_repin_leftovers.py
       - run: python3 tests/test_design.py
       - run: python3 tests/test_source_lead.py
       - run: python3 tests/test_redo.py
