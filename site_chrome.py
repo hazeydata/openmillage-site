@@ -69,6 +69,29 @@ table.sd-rates caption{display:block}}
 .callout{border:1px solid var(--accent);border-left-width:6px;border-radius:.25rem;padding:.75rem 1rem}
 .banner{border:1px solid var(--border);border-left:6px solid var(--muted);border-radius:.25rem;padding:.75rem 1rem}
 """
+# OM-SITE-SPECIAL-ISD-001 TX ISD total-rate chart (CHART-SPEC sections 2-4, 9): the inline svg.isd-t takes the page's colour variables.
+ISD_STYLE = (".isd-t text{font-family:var(--font-body,system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif);font-size:13px;"
+             "font-variant-numeric:tabular-nums}"
+             ".isd-t .v{fill:var(--fg,#1a1a1a)}.isd-t .m{fill:var(--muted,#595959)}"
+             ".isd-t .base{stroke:var(--border,#c8c8c8);stroke-width:1}"
+             ".isd-t .ln{stroke:var(--accent,#0b57d0);stroke-width:2;fill:none}.isd-t .pre{stroke-dasharray:4 3}"
+             ".isd-t .pt{fill:var(--accent,#0b57d0)}.isd-t .hp{fill:var(--bg,#fff);stroke:var(--accent,#0b57d0);stroke-width:2}")
+ISD_DISPLAY = ".isd-t{display:block;width:100%;max-width:360px;height:auto}"
+# TX hub (LAYOUT (c), Lucille 2 L3): county groups as collapsed <details>, ISD lists in the ul.counties columns.
+TX_HUB_CSS = "\n".join([
+    '#isd-groups>details.cgroup{border-bottom:1px solid var(--border);padding:0}',
+    '#isd-groups>details.cgroup>summary{display:flex;align-items:center;gap:.6rem;box-sizing:border-box;min-height:44px;padding:.5rem 0;cursor:pointer;list-style:none;font:600 var(--fs1)/1.25 var(--font-head,inherit)}',
+    '#isd-groups>details.cgroup>summary::-webkit-details-marker{display:none}',
+    '#isd-groups>details.cgroup>summary::before{content:"";flex:none;width:.45em;height:.45em;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg)}',
+    '#isd-groups>details.cgroup[open]>summary::before{transform:rotate(45deg)}',
+    '#isd-groups>details.cgroup>summary:focus-visible{outline:3px solid var(--link);outline-offset:2px}',
+    '#isd-groups>details.cgroup>ul.counties{margin:0 0 var(--s1)}'
+])
+# TX rate tables (ISD year table, county/city tables; Lucille 2): a rate never wraps mid-number; tighter cells at <= 40rem so the
+# 5-column ISD table fits a 375 px viewport.
+TX_RATES_NOWRAP = "table.tx-rates td.num{white-space:nowrap}"
+TX_RATES_CSS = TX_RATES_NOWRAP + "@media (max-width:40rem){table.tx-rates th,table.tx-rates td{padding:.5rem .35rem}}"
+CSS += ISD_STYLE + ISD_DISPLAY + "\n" + TX_HUB_CSS + "\n" + TX_RATES_CSS + "\n"
 
 LABELS = {
     "county": "County", "school_district": "School district", "municipality": "Municipality", "special_district": "Special district",

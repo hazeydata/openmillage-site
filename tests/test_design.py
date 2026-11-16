@@ -18,9 +18,12 @@ ok(len(pages) > 60 and AMEND in pages, f"{len(pages)} html pages found")
 css = rd("docs/style.css") if os.path.exists("docs/style.css") else ""
 for needle in ("overflow-wrap:anywhere", ".tablewrap{overflow-x:auto", ":focus-visible", "prefers-color-scheme"):
     ok(needle in css, f"style.css contains {needle}")
-# the one allowed nowrap: FL body-page Rate and Source cells (OM-SITE-SPECIAL-ISD-001 LAYOUT (b)1, pick L2); nowhere else
+# the allowed nowraps: FL body-page Rate and Source cells (OM-SITE-SPECIAL-ISD-001 LAYOUT (b)1, pick L2) and TX rate-table numeric
+# cells (OM-SITE-SPECIAL-ISD-001 round 2, Lucille 2: no rate wraps mid-number at 390); nowhere else. The size cap was raised from
+# 4500 to 5800 bytes (round 3: the TX hub details rules) for the TX ISD chart style (CHART-SPEC section 9: STYLE lives in style.css once), the TX hub and those rules.
 SD_NOWRAP = "table.sd-rates td.num,table.sd-rates td.src{white-space:nowrap}"
-ok("nowrap" not in css.replace(SD_NOWRAP, "", 1) and len(css.encode()) < 4500, f"style.css has no nowrap outside the FL body-page rate/source cells and stays small ({len(css.encode())} bytes)")
+TX_NOWRAP = "table.tx-rates td.num{white-space:nowrap}"
+ok("nowrap" not in css.replace(SD_NOWRAP, "", 1).replace(TX_NOWRAP, "", 1) and len(css.encode()) < 5800, f"style.css has no nowrap outside the FL body-page rate/source cells and TX rate-table numeric cells, and stays small ({len(css.encode())} bytes)")
 
 RAW = ("'>operating_total", ">school_district<", ">dependent_special_district", ">less_than_countywide")
 def check_page(p):

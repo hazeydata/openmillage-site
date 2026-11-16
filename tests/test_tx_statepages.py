@@ -47,8 +47,13 @@ COUNTIES = sorted({r["county"] for r in tot(2025, "county")})
 CID = {r["county"]: b for b, r in CT[2025].items()}
 hub_p = "docs/tx/property-tax-rates/index.html"
 county_pages = sorted(glob.glob("docs/tx/*-county/index.html"))
-alltx = sorted(glob.glob("docs/tx/**/*.html", recursive=True))
-TXT = {p: rd(p) for p in alltx}
+# OM-SITE-SPECIAL-ISD-001: the school-district pages (/tx/<county>/<isd>/) and their hub (/tx/school-districts/) have their own test
+# (tests/test_tx_isd_pages.py: they show M&O / I&S columns by design); the checks here cover the hub, /tx/ and the 254 county pages.
+alltx_all = sorted(glob.glob("docs/tx/**/*.html", recursive=True))
+ISD_PAGES = set(glob.glob("docs/tx/*/*/index.html")) | {"docs/tx/school-districts/index.html"}
+alltx = [p for p in alltx_all if p not in ISD_PAGES]
+TXT_ALL = {p: rd(p) for p in alltx_all}
+TXT = {p: TXT_ALL[p] for p in alltx}
 def prose(p):
     t = re.sub(r"<script.*?</script>|<head>.*?</head>", " ", TXT[p], flags=re.S)
     return html.unescape(re.sub(r"<[^>]+>", " ", t))
@@ -160,7 +165,11 @@ ok(all(c[0] in csv_zero for _, c in zero), f"AC9 a rate cell reads 0 / 0.0 only 
 ok(len(hub) - 1 == 254 and len(county_pages) == 254, "AC10 hub table has 254 county rows; 254 county pages exist")
 ok({p.split("/")[2] for p in county_pages} == {slug(c) for c in COUNTIES} and "docs/tx/anderson-county/index.html" in county_pages and all(r[0][1] == f"/tx/{slug(r[0][0])}/" for r in hub[1:]),
    "AC10 county pages sit at /tx/<slug(CSV county)>/ (e.g. /tx/anderson-county/) and the hub links to them")
-ok(not any(re.search(r"school_district|special_district|Capital Creek", t) for t in TXT.values()), "AC11 no TX page mentions school_district, special_district or Capital Creek")
+# OM-SITE-SPECIAL-ISD-001 AC20 (deliberate update): school districts now have pages, so the check is: no TX page mentions special_district or
+# Capital Creek, and the raw token school_district appears nowhere in rendered TX HTML (text, attributes or JSON-LD).
+ok(not any(re.search(r"special_district|Capital Creek", t) for t in TXT_ALL.values()), f"AC11/AC20 no TX page ({len(TXT_ALL)}, incl. school-district pages) mentions special_district or Capital Creek")
+# (the FL Amendment 3 page keeps FL body_ids such as fl-alachua-school_district in data-body-id attributes; that FL page is out of this TX check)
+ok(not any("school_district" in t for t in TXT_ALL.values()), f"AC11/AC20 the raw token school_district appears nowhere in the rendered HTML of the {len(TXT_ALL)} TX pages")
 names = {n for p in alltx for tid, rs in tables(p).items() if tid in ("t-tx", "t-county", "t-muni") for row in rs[1:] for n in [row[0][0]]}
 okn = set(COUNTIES) | {r["taxing_body"] for y in YEARS for r in tot(y, "municipal")}
 ok(names <= okn, f"AC11 every body named in a TX table is a county or municipal total body; extras {sorted(names - okn)[:3]}")
@@ -188,8 +197,8 @@ ok(all("<p class=\"banner prelim\"><strong>2025 is preliminary</strong> (Texas C
    "AC15 preliminary banner on every TX page, stating a Working or Final label does not clear it")
 fin = [p for p in alltx if re.search(r"\bfinal\b", TXT[p].replace("A Working or Final label on the source does not clear this flag.", ""), re.I)]
 ok(not fin and not any(re.search(r"final", rd(f), re.I) for f in glob.glob("docs/charts/tx-*.json")), f"AC16 no TX page or chart JSON calls a rate final (only the banner's 'Working or Final label' clause); {fin[:2]}")
-ok(all("School districts and special districts: in the data, not on these pages yet." in t for t in TXT.values()) and not any("not collected" in prose(p).lower() for p in alltx) and "not collected" not in llms_tx,
-   "AC11/S1 coverage note says 'in the data, not on these pages yet' on every page; never 'not collected'")
+ok(all("Special districts: in the data, not on these pages yet." in t and "School districts and special districts" not in t for t in TXT_ALL.values()) and not any("not collected" in prose(p).lower() for p in alltx) and "not collected" not in llms_tx,
+   "AC11/S1/AC20 coverage note says special districts are 'in the data, not on these pages yet' on every TX page; never 'not collected'")
 
 # ---------------- T6 YoY ----------------
 moves = [(Decimal(RT(b["rate"])) - Decimal(RT(CT[2021][bid]["rate"])), b["county"], bid) for bid, b in CT[2025].items() if b["rate"] and CT[2021][bid]["rate"]]
@@ -219,12 +228,12 @@ ok(all(a.strip() in hubh.replace("&#x27;", "'") or html.escape(a.strip(), quote=
 
 # ---------------- T7 chrome ----------------
 ok(all(t.count(GOATCOUNTER_TAG) == 1 for t in TXT.values()), f"AC20 GoatCounter tag exactly once on all {len(alltx)} new TX pages")
-locs = re.findall(r"<loc>([^<]+)</loc>", sm); txl = [u for u in locs if "/tx/" in u]
+locs = re.findall(r"<loc>([^<]+)</loc>", sm); txl = [u for u in locs if "/tx/" in u and u.count("/") == 5 and not u.endswith("/tx/school-districts/")]  # school-district URLs: test_tx_isd_pages.py
 want_urls = ["https://openmillage.com/tx/property-tax-rates/"] + [f"https://openmillage.com/tx/{slug(c)}/" for c in COUNTIES]
 ok(sorted(txl) == sorted(want_urls) and len(set(txl)) == len(txl) == 255, "AC21 sitemap lists the hub and all 254 county URLs exactly once, https://openmillage.com")
 canon = {p: re.findall(r"<link rel=canonical href='([^']*)'>", TXT[p]) for p in alltx}
 ok(all(len(v) == 1 and v[0].startswith("https://openmillage.com/tx/") for v in canon.values()) and not any("github.io" in t.split("<body>")[0] for t in TXT.values()), "AC21 each TX page has one canonical on https://openmillage.com (no http:, no github.io)")
-ok(all(k in llms_tx for k in ("2021–2025", "$100 of taxable value", "statutory_per_100", "2025 is preliminary", "School-district and special-district rates are in the pinned data files but not listed on these pages yet", "/tx/property-tax-rates/", "/tx/<county-slug>/")),
+ok(all(k in llms_tx for k in ("2021–2025", "$100 of taxable value", "statutory_per_100", "2025 is preliminary", "Special-district rates are in the pinned data files but not listed on these pages yet", "/tx/property-tax-rates/", "/tx/<county-slug>/")),
    "AC22 llms.txt Texas line covers years, unit per $100, statutory basis, preliminary 2025, district note, hub and county URL pattern")
 ok(os.path.exists("docs/tx/index.html") and canon["docs/tx/index.html"] == ["https://openmillage.com/tx/property-tax-rates/"] and
    re.sub(r"<link rel=canonical[^>]*>", "", TXT["docs/tx/index.html"]) == re.sub(r"<link rel=canonical[^>]*>", "", hubh) and "https://openmillage.com/tx/" not in txl,
