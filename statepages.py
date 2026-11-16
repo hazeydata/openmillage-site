@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """NC rates (FY2021-22..FY2025-26), FL 2025 rolled-back vs adopted pages (OM-SITE-NC-ROLLBACK-001) and Texas county/city
-total rates (2021-2025, OM-SITE-TX-001).
+total rates (2021-2025, OM-SITE-TX-001), plus one page per Texas school district (ISD) and its hub (OM-SITE-SPECIAL-ISD-001).
 Run after build.py. Every number shown comes from a row of a pinned CSV (data/SOURCES.lock, hazeydata/openmillage)
 and sits next to a link to that row's official source. Fails closed (exit 1, nothing written) on a missing input; the Texas
 pins (data/tx/*) are verified against the lock before any page is written."""
@@ -31,11 +31,12 @@ def alt_text():
 SORT_JS = """<script>document.querySelectorAll('table.sortable').forEach(function(t){t.querySelectorAll('th').forEach(function(h,i){var b=document.createElement('button');b.type='button';b.textContent=h.textContent;b.className='sortbtn';h.textContent='';h.appendChild(b);b.onclick=function(){var tb=t.tBodies[0],r=[].slice.call(tb.rows),d=h.getAttribute('aria-sort')==='ascending'?-1:1;r.sort(function(x,y){var a=x.cells[i].dataset.v||x.cells[i].textContent.trim(),c=y.cells[i].dataset.v||y.cells[i].textContent.trim(),na=parseFloat(a),nc=parseFloat(c);return (isNaN(na)||isNaN(nc)?a.localeCompare(c):na-nc)*d});t.querySelectorAll('th').forEach(function(o){o.removeAttribute('aria-sort')});h.setAttribute('aria-sort',d>0?'ascending':'descending');r.forEach(function(x){tb.appendChild(x)})}})})</script>"""
 FILTER_JS = """<script>document.querySelectorAll('.filter input[data-g]').forEach(function(i){var g=document.getElementById(i.dataset.g);i.oninput=function(){var q=i.value.toLowerCase();[].forEach.call(g.children,function(d){var m=!q||d.dataset.q.indexOf(q)>=0;d.hidden=!m;d.open=!!q&&m})}});document.querySelectorAll('.filter input[data-t]').forEach(function(i){var t=document.getElementById(i.dataset.t);i.oninput=function(){var q=i.value.toLowerCase();[].forEach.call(t.tBodies[0].rows,function(r){r.hidden=q&&r.textContent.toLowerCase().indexOf(q)<0})}})</script>"""
 
-def doc(path, title, desc, inner, trail, updated, canonical=None):
+def doc(path, title, desc, inner, trail, updated, canonical=None, h1=None, jsonld=None):
     url = f"{BASE}/{path[:-10]}"
+    ld = f'<script type="application/ld+json">{json.dumps(jsonld, ensure_ascii=False)}</script>' if jsonld else ""
     page = (f"<!doctype html><html lang=en><head><meta charset=utf-8><title>{E(title)}</title><meta name=description content='{E(desc)}'>"
-            f"<link rel=canonical href='{canonical or url}'>{sc.head_extra(PATH)}{GOATCOUNTER_TAG}</head>"
-            + sc.body(PATH, E(title.split(':')[0]), inner, updated=updated, trail=trail) + SORT_JS + FILTER_JS + "</html>")
+            f"<link rel=canonical href='{canonical or url}'>{sc.head_extra(PATH)}{GOATCOUNTER_TAG}{ld}</head>"
+            + sc.body(PATH, E(h1 if h1 is not None else title.split(':')[0]), inner, updated=updated, trail=trail) + SORT_JS + FILTER_JS + "</html>")
     os.makedirs(os.path.dirname(f"{OUT}/{path}"), exist_ok=True); open(f"{OUT}/{path}", "w").write(page)
     return url
 
@@ -194,8 +195,53 @@ TX_UNIT_P = ("<p class=callout><strong>About the unit.</strong> Every rate here 
              "\u201cTotal tax rate (per $100 of value)\u201d (<a href='https://statutes.capitol.texas.gov/Docs/TX/htm/TX.26.htm'>\u00a726.062(d)(1)</a>), "
              "and for non-ISD bodies \u201cper $100 valuation\u201d (<a href='https://statutes.capitol.texas.gov/Docs/TX/htm/TX.26.htm'>\u00a726.07</a>). "
              "Unit basis: <code>statutory_per_100</code>.</p>")
-TX_COVER_P = ("<p><strong>School districts and special districts: in the data, not on these pages yet.</strong> This page shows county and city rates only. "
-              "School-district and special-district rates are in the pinned Texas data files but are not listed here yet.</p>")
+# PLACEHOLDER COPY pending Lindsay (writing brief OM-SITE-SPECIAL-ISD-001): every new reader-facing string for the Texas
+# school-district (ISD) pages, the ISD hub, the county-page ISD lists and the TX_COVER_P replacement lives here only, so her
+# approved strings drop in without structural change. Fixed strings that are NOT here and must not be reworded: TX_PRELIM_P,
+# TX_UNIT_P, "not listed", "not reported" (TX_NOT_LISTED / TX_NOT_REPORTED).
+TX_NOT_LISTED, TX_NOT_REPORTED = "not listed", "not reported"
+TX_ISD_COPY = {
+    "cover_p": ("<p><strong>Special districts: in the data, not on these pages yet.</strong> These pages show county, city and school-district rates. "
+                "Special-district rates are in the pinned Texas data files but are not listed here yet.</p>"),
+    "county_h2": "School districts based in {county}",
+    "county_intro": ("Each school district below has {county} as its home county in the Comptroller files and has its own page with its rates for every year. "
+                     "A district based in another county is listed on that county’s page, even if it also covers part of {county}."),
+    "county_none": "No school district has its home county here in the pinned data.",
+    "tx_hub_link": "Texas school districts (ISDs), one page each",
+    "title": "{name} tax rate {years}",
+    "title_shared": "{name} ({county}) tax rate {years}",  # a name printed for more than one district: the home county tells them apart
+    "desc": ("{name}, {county}, Texas: school district M&O, I&S and total tax rates per $100 of taxable value, {years}, "
+             "each linked to the Texas Comptroller. 2025 is preliminary."),
+    "intro": ("{name} is a Texas independent school district (ISD) whose home county in the Comptroller files is {county}. "
+              "The Comptroller publishes three rates for each district each year: maintenance and operations (M&O), which pays for running the schools; "
+              "interest and sinking (I&S), which pays debt on bonds; and the district’s total rate. All three are dollars per $100 of taxable value, not mills."),
+    "names_note": "The Comptroller printed this district under more than one name. Each year shows the name in that year’s file.",
+    "table_h2": "Tax rates by year",
+    "caption": "{name} tax rates, per $100 of value",
+    "cols": ("Year", "Name as printed", "M&O", "I&S", "Total"),
+    "legend": ("Each rate is the Comptroller’s figure as published and links to that year’s Comptroller file; hover for the site data file, row and the source file’s sha256. "
+               "“not listed” means that year’s file has no row for this district. “not reported” means the row has an empty rate. "
+               "Absent is not zero. Rates are shown as published, never summed or filled in."),
+    "county_link": "All rates in {county}",
+    "hub_link": "All Texas school districts",
+    "json_link": "JSON: ",
+    "hub_title": "Texas school district tax rates {years}",
+    "hub_h1": "Texas school districts (ISDs), {years}",
+    "hub_desc": ("Every Texas independent school district in the Comptroller’s {years} school-district files, one page each with its M&O, I&S and total "
+                 "tax rates per $100 of taxable value, each linked to the source. 2025 is preliminary."),
+    "hub_intro": ("{n} Texas independent school districts appear in the Comptroller’s school-district rate files for {years}. "
+                  "Each has one page with its M&O (maintenance and operations), I&S (interest and sinking) and total rate for every year, "
+                  "listed here under its home county. A district that covers several counties is listed once, under its home county."),
+    "hub_filter": "Find a district or county",
+    "hub_group": "{county} ({n})",
+    "hub_sources_h2": "Source files",
+    "hub_source_item": "{year}: Texas Comptroller school district rates and levies",
+    "llms_line": ("- Texas school district (ISD) pages, {years}: hub {hub}; one page per district at {base}/tx/<county-slug>/<district-slug>/ under its home county "
+                  "(the county field of the district's latest year), with the M&O, I&S and total rates per $100 of taxable value exactly as published by the Texas Comptroller "
+                  "(2025 is preliminary) and index.json beside each page holding exactly that page's rows. A year marked not listed has no row in that year's file; "
+                  "absent is not zero, never read it as a 0 rate. Rates are never summed.\n"),
+}
+TX_COVER_P = TX_ISD_COPY["cover_p"]  # OM-SITE-SPECIAL-ISD-001 AC20: school districts now have their own pages; special districts still do not
 TX_LEGEND_P = ("<p class=muted>Each rate links to the Comptroller source for its year; hover for the data file and row. \u201cnot reported\u201d means the pinned file has an empty rate "
                "for that body and year. \u201cnot listed\u201d means that year\u2019s file has no row for that body.</p>")
 TX_FELL_NOTE = ("Source: hazeydata/openmillage-site data/tx/tx-2021.csv and data/tx/tx-2025.csv (body_type = county, levy_component = total, one row per county; Texas Comptroller).\n"
@@ -300,8 +346,9 @@ def tx_lead_county(c, a, b):
     return (f"<p class=lead>{E(c)}\u2019s county total property tax rate for 2025 is <strong>not reported</strong> in the pinned Comptroller file{was}. "
             "Cities add their own rate on top for property inside their limits when listed.</p>")
 
-def tx_pages(data, st, alts):
+def tx_pages(data, st, alts, isds):
     by = {y: {r["body_id"]: r for r in data[y]} for y in YEARS}
+    by_county = tx_isd_by_county(isds)
     upd = tx_updated(data)
     hub_url = f"{BASE}/{TX_SLUG}/"
     urls = []
@@ -312,7 +359,7 @@ def tx_pages(data, st, alts):
                  + "<h2>County rate</h2>" + tx_table(f"{c} rate, per $100 of value", "t-county", [(cid, c)], by)
                  + (f"<h2>City rates in {E(c)}</h2>" + tx_table(f"City rates in {c}, per $100 of value", "t-muni", munis, by)
                     if munis else f"<h2>City rates in {E(c)}</h2><p>No city rates are listed for {E(c)} in the pinned files.</p>")
-                 + TX_COVER_P + TX_LEGEND_P + f"<p><a href='{PATH}/{TX_SLUG}/'>All {st['total']} Texas counties</a></p>")
+                 + tx_county_isds(c, by_county) + TX_COVER_P + TX_LEGEND_P + f"<p><a href='{PATH}/{TX_SLUG}/'>All {st['total']} Texas counties</a></p>")
         urls.append(doc(f"tx/{slug(c)}/index.html", f"{c} TX property tax rate, {YEARS[0]} to {YEARS[-1]}",
                         f"{c}, Texas county and city property tax rates per $100 of taxable value, {YEARS[0]} to {YEARS[-1]}, each linked to the Texas Comptroller. 2025 is preliminary.",
                         inner, [("Texas", f"{PATH}/{TX_SLUG}/"), (c, None)], upd))
@@ -336,7 +383,7 @@ def tx_pages(data, st, alts):
     inner = (TX_PRELIM_P
              + f"<p class=lead>Between {YEARS[0]} and {YEARS[-1]}, {dn} of Texas\u2019s {n} counties lowered their county total property tax rate, {up} raised it and {same} kept it the same. "
                f"{exwhy} Rates below are per $100 of taxable value, straight from Texas Comptroller files.</p>"
-             + TX_UNIT_P + TX_COVER_P
+             + TX_UNIT_P + TX_COVER_P + f"<p><a href='{PATH}/{TX_ISD_HUB}/'>{E(TX_ISD_COPY['tx_hub_link'])}</a></p>"
              + fig("rose-held", "Counties whose county total rate rose or held, 2021 vs 2025, per $100 of value. Source: Texas Comptroller, via the table below.") + keys_rose
              + fig("fell", "Counties whose county total rate fell, 2021 vs 2025, per $100 of value. Source: Texas Comptroller, via the table below.", note=note) + keys_fell
              + "<h2>Every county, five years</h2><div class=filter><label for=f-tx>Find a county</label><input id=f-tx data-t=t-tx></div>" + hub_tbl
@@ -345,14 +392,143 @@ def tx_pages(data, st, alts):
                f"<a href='{TX_DATA_URL}'>tx-2021.csv to tx-2025.csv</a>.</p>")
     title = f"Texas property tax rates by county, {YEARS[0]} to {YEARS[-1]}"
     desc = ("Texas county and city property tax rates for 2021\u20132025, per $100 of taxable value, from Texas Comptroller files. 2025 is preliminary. "
-            "School and special districts are in the data files but not listed on these pages yet.")
+            "School districts have their own pages; special districts are in the data files but not listed on these pages yet.")
     trail = [("Texas", None)]
     hub = doc(f"{TX_SLUG}/index.html", title, desc, inner, trail, upd)
     doc("tx/index.html", title, desc, inner, trail, upd, canonical=hub)  # OQ-5: same hub at /tx/, canonical on the property-tax-rates URL
     return [hub] + urls
 
+# ---------- Texas school districts (OM-SITE-SPECIAL-ISD-001 Phase 2) ----------
+# One page per body_type=school_district body_id in any year, at /tx/<slug(latest county)>/<slug(latest taxing_body)>/, with
+# index.json beside it. Rates are the CSV rate strings (sc.rate_text); nothing is summed, ranked, estimated or renamed.
+TX_ISD_HUB = "tx/school-districts"
+TX_ISD_COMPONENTS = ("mo", "is", "total")  # table column order: M&O, I&S, total
+TX_ISD_PROV_KEYS = ("preliminary", "unit_basis")  # provenance keys already shown on TX pages (banner, unit callout), copied verbatim into index.json
+TX_YEARS_TXT = f"{YEARS[0]}–{YEARS[-1]}"
+
+def tx_isds():
+    """{body_id: {"name", "county", "names", "path", "by_year": {year: {"name", "county", "mo"/"is"/"total": row, "rows": [row...]}}}}
+    from body_type == school_district rows of the lock-verified data/tx/tx-YYYY.csv (call after tx_load). Name and home county are
+    the latest year's taxing_body and county. Raises sources.DataError (nothing written) on an unknown component, a duplicate
+    component, a unit/year mismatch, an empty slug or two bodies sharing a page path."""
+    out = {}
+    for y in YEARS:
+        prov = {(p["body_id"], p["levy_component"]): p for p in rows(f"data/tx/tx-{y}.provenance.csv")}
+        for i, r in enumerate(rows(f"data/tx/tx-{y}.csv"), start=2):
+            if r["body_type"] != "school_district": continue
+            if r["unit"] != "per_100_valuation" or r["year"] != str(y): raise sources.DataError(f"unexpected unit/year in tx-{y}.csv row {i}")
+            c = r["levy_component"]
+            if c not in TX_ISD_COMPONENTS: raise sources.DataError(f"unexpected school-district levy_component {c!r} in tx-{y}.csv row {i}")
+            r["_row"], r["_prov"] = i, prov.get((r["body_id"], c), {})
+            yr = out.setdefault(r["body_id"], {"by_year": {}})["by_year"].setdefault(y, {"name": r["taxing_body"], "county": r["county"], "rows": []})
+            if c in yr: raise sources.DataError(f"duplicate {r['body_id']} / {c} in tx-{y}.csv row {i}")
+            if (yr["name"], yr["county"]) != (r["taxing_body"], r["county"]): raise sources.DataError(f"{r['body_id']} has two names or counties in tx-{y}.csv (row {i})")
+            yr[c] = r; yr["rows"].append(r)
+    paths = {}
+    for bid in sorted(out):
+        b = out[bid]; last = b["by_year"][max(b["by_year"])]
+        b["name"], b["county"] = last["name"], last["county"]
+        b["names"] = list(dict.fromkeys(b["by_year"][y]["name"] for y in YEARS if y in b["by_year"]))
+        if not slug(b["county"]) or not slug(b["name"]): raise sources.DataError(f"{bid}: empty page slug for {b['county']!r} / {b['name']!r}")
+        b["path"] = f"tx/{slug(b['county'])}/{slug(b['name'])}/index.html"
+        if b["path"] in paths: raise sources.DataError(f"school-district page path collision: /{b['path'][:-10]} ({paths[b['path']]}, {bid})")
+        paths[b["path"]] = bid
+    return out
+
+def tx_isd_by_county(isds):
+    """{home county: [(body_id, body)] sorted by (name, body_id)}."""
+    g = {}
+    for bid, b in isds.items(): g.setdefault(b["county"], []).append((bid, b))
+    return {c: sorted(v, key=lambda x: (x[1]["name"], x[0])) for c, v in g.items()}
+
+def isd_href(b): return f"{PATH}/{b['path'][:-10]}"
+
+def isd_cell(r, y):
+    if r is None: return f"<td class=num>{TX_NOT_LISTED}</td>"
+    p = r["_prov"]
+    t = (f"data/tx/tx-{y}.csv row {r['_row']}" + (f"; Comptroller sheet '{p.get('source_sheet','')}' cell {p.get('source_cell','')}" if p.get("source_cell") else "")
+         + f"; sha256 {r['sha256']}")
+    if not r["rate"]: return f"<td class=num title='{E(t)}'>{TX_NOT_REPORTED}</td>"
+    rt = sc.rate_text(r["rate"])
+    return f"<td class=num><a href='{E(r['source_url'])}' title='{E(t)}'>{E(rt)}</a></td>"
+
+def isd_json_rows(b):
+    """The page's rows: year order, file order within a year; the 17 base keys in CSV order and value, then the provenance keys."""
+    return [{**{k: r[k] for k in sources.BASE_KEYS}, **{k: r["_prov"].get(k) for k in TX_ISD_PROV_KEYS}}
+            for y in YEARS if y in b["by_year"] for r in b["by_year"][y]["rows"]]
+
+def tx_isd_pages(isds, upd):
+    C = TX_ISD_COPY
+    shared = {}
+    for b in isds.values(): shared[b["name"]] = shared.get(b["name"], 0) + 1
+    hub_url = f"{BASE}/{TX_ISD_HUB}/"
+    urls, titles = [], {}
+    for bid in sorted(isds, key=lambda x: isds[x]["path"]):
+        b = isds[bid]; name, county = b["name"], b["county"]
+        multi = len(b["names"]) > 1
+        trs = []
+        for y in YEARS:
+            yr = b["by_year"].get(y, {})
+            ncell = f"<td>{E(yr['name'])}</td>" if yr else "<td></td>"
+            trs.append(f"<tr><td>{y}</td>" + (ncell if multi else "") + "".join(isd_cell(yr.get(c), y) for c in TX_ISD_COMPONENTS) + "</tr>")
+        cols = [C["cols"][0]] + ([C["cols"][1]] if multi else []) + list(C["cols"][2:])
+        head = "".join(f"<th scope=col{'' if i < (2 if multi else 1) else ' class=num'}>{E(h)}</th>" for i, h in enumerate(cols))
+        cap = C["caption"].format(name=name)
+        tbl = sc.tablewrap(cap, f"<table id=t-isd><caption>{E(cap)}</caption><thead><tr>{head}</tr></thead><tbody>{''.join(trs)}</tbody></table>")
+        d = os.path.dirname(f"{OUT}/{b['path']}"); os.makedirs(d, exist_ok=True)
+        jr = isd_json_rows(b)
+        with open(f"{d}/index.json", "w", encoding="utf-8") as f: json.dump(jr, f, indent=1, ensure_ascii=False); f.write("\n")
+        rel = b["path"][:-10]
+        inner = (TX_PRELIM_P + f"<p class=lead>{E(C['intro'].format(name=name, county=county))}</p>" + TX_UNIT_P
+                 + f"<h2>{E(C['table_h2'])}</h2>" + (f"<p>{E(C['names_note'])}</p>" if multi else "") + tbl
+                 + f"<p class=muted>{E(C['legend'])}</p>" + TX_COVER_P
+                 + f"<p>{E(C['json_link'])}<a href='{PATH}/{rel}index.json'>index.json</a> · <a href='{PATH}/tx/{slug(county)}/'>{E(C['county_link'].format(county=county))}</a>"
+                   f" · <a href='{PATH}/{TX_ISD_HUB}/'>{E(C['hub_link'])}</a></p>")
+        title = C["title_shared" if shared[name] > 1 else "title"].format(name=name, county=county, years=TX_YEARS_TXT)
+        if title in titles: raise sources.DataError(f"duplicate school-district page title {title!r} ({titles[title]}, {bid})")
+        titles[title] = bid
+        url = f"{BASE}/{rel}"
+        ds = {"@context": "https://schema.org", "@type": "Dataset", "name": f"{name}, {county}, Texas school district tax rates {TX_YEARS_TXT}",
+              "description": C["desc"].format(name=name, county=county, years=TX_YEARS_TXT) + " Absent is not zero.",
+              "license": "https://creativecommons.org/licenses/by/4.0/", "temporalCoverage": f"{min(b['by_year'])}/{max(b['by_year'])}", "url": url,
+              "dateModified": max(r["retrieved_at"] for r in jr)[:10], "creator": {"@type": "Organization", "name": "Hazey Data"},
+              "spatialCoverage": f"{county}, TX", "isBasedOn": sorted({r["source_url"] for r in jr if r["rate"]}),
+              "distribution": [{"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": f"{url}index.json"}]}
+        urls.append(doc(b["path"], title, C["desc"].format(name=name, county=county, years=TX_YEARS_TXT), inner,
+                        [("Texas", f"{PATH}/{TX_SLUG}/"), (county, f"{PATH}/tx/{slug(county)}/"), (name, None)], upd, h1=name, jsonld=ds))
+    # hub: every page, grouped by home county (county order, then name); no rates, no ranking
+    groups = []
+    for county, bs in sorted(tx_isd_by_county(isds).items()):
+        q = " ".join([county.lower()] + [b["name"].lower() for _, b in bs])
+        groups.append(f"<section class=cgroup data-q='{E(q)}'><h2>{E(C['hub_group'].format(county=county, n=len(bs)))}</h2><ul>"
+                      + "".join(f"<li><a href='{isd_href(b)}'>{E(b['name'])}</a></li>" for _, b in bs) + "</ul></section>")
+    srcs = {}
+    for b in isds.values():
+        for y, yr in b["by_year"].items():
+            for r in yr["rows"]: srcs[(y, r["source_url"])] = r["sha256"]
+    src_li = "".join(f"<li>{E(C['hub_source_item'].format(year=y))} (<a href='{E(u)}' title='sha256 {E(h)}'>source file</a>)</li>" for (y, u), h in sorted(srcs.items()))
+    hub_h1 = C["hub_h1"].format(years=TX_YEARS_TXT)
+    inner = (TX_PRELIM_P + f"<p class=lead>{E(C['hub_intro'].format(n=len(isds), years=TX_YEARS_TXT))}</p>" + TX_UNIT_P
+             + f"<div class=filter><label for=f-isd>{E(C['hub_filter'])}</label><input id=f-isd data-g=isd-groups></div>"
+             + "<div id=isd-groups>" + "".join(groups) + "</div>"
+             + f"<h2>{E(C['hub_sources_h2'])}</h2><ul>{src_li}</ul>" + TX_COVER_P
+             + f"<p><a href='{PATH}/{TX_SLUG}/'>All Texas counties</a></p>")
+    ds = {"@context": "https://schema.org", "@type": "Dataset", "name": hub_h1, "description": C["hub_desc"].format(years=TX_YEARS_TXT) + " Absent is not zero.",
+          "license": "https://creativecommons.org/licenses/by/4.0/", "temporalCoverage": f"{YEARS[0]}/{YEARS[-1]}", "url": hub_url,
+          "creator": {"@type": "Organization", "name": "Hazey Data"}, "isBasedOn": sorted({u for _, u in srcs})}
+    hub = doc(f"{TX_ISD_HUB}/index.html", C["hub_title"].format(years=TX_YEARS_TXT), C["hub_desc"].format(years=TX_YEARS_TXT), inner,
+              [("Texas", f"{PATH}/{TX_SLUG}/"), (hub_h1, None)], upd, h1=hub_h1, jsonld=ds)
+    return [hub] + urls
+
+def tx_county_isds(c, by_county):
+    C = TX_ISD_COPY; bs = by_county.get(c, [])
+    h = f"<h2 id=school-districts>{E(C['county_h2'].format(county=c))}</h2>"
+    if not bs: return h + f"<p>{E(C['county_none'])}</p>"
+    return (h + f"<p>{E(C['county_intro'].format(county=c))}</p><ul class=isds>"
+            + "".join(f"<li><a href='{isd_href(b)}'>{E(b['name'])}</a></li>" for _, b in bs) + "</ul>")
+
 TX_LLMS = ("- Texas county and city total property tax rates, 2021\u20132025, dollars per $100 of taxable value (statutory_per_100), every rate linked to the Texas Comptroller. "
-           "2025 is preliminary (Comptroller Working version). School-district and special-district rates are in the pinned data files but not listed on these pages yet. "
+           "2025 is preliminary (Comptroller Working version). School districts have their own pages (Texas school district line below). Special-district rates are in the pinned data files but not listed on these pages yet. "
            "Hub: {hub} \u2014 one page per county: {base}/tx/<county-slug>/ (for example {base}/tx/anderson-county/).\n")
 
 def tx_copy_charts():
@@ -412,7 +588,7 @@ def main():
     miss = [p for p in need if not os.path.exists(p)]
     if miss: print(f"statepages: BUILD FAILED, missing {miss}", file=sys.stderr); return 1
     try:  # verify and parse every Texas pin before anything is written
-        tx_data = tx_load(); tx_st = tx_stats(tx_data)
+        tx_data = tx_load(); tx_st = tx_stats(tx_data); tx_isd = tx_isds()
     except sources.DataError as e: print(f"statepages: BUILD FAILED, {e}", file=sys.stderr); return 1
     alts = alt_text()
     tx_alts = {m[0]: m[1].strip() for m in re.findall(r"^## (\S+)\.png\n(.+?)(?=\n## |\Z)", open(f"{TX_CHARTS}/alt-text.md").read(), flags=re.S | re.M)}
@@ -421,17 +597,18 @@ def main():
         for ext in ("png", "svg"): shutil.copyfile(f"{CHARTS}/{n}.{ext}", f"{OUT}/charts/{n}.{ext}")
     tx_copy_charts()
     urls = nc_pages(alts); fl, stats = fl_page(alts); urls += fl
-    tx = tx_pages(tx_data, tx_st, tx_alts)
+    tx = tx_pages(tx_data, tx_st, tx_alts, tx_isd)
+    isd = tx_isd_pages(tx_isd, tx_updated({y: [r for b in tx_isd.values() for r in b['by_year'].get(y, {}).get('rows', [])] for y in YEARS}))
     sm = f"{OUT}/sitemap.xml"; s = open(sm).read()
     lm = (re.findall(r"<lastmod>([^<]+)</lastmod>", s) or [""])[0]
-    add = "".join(f"<url><loc>{u}</loc>" + (f"<lastmod>{lm}</lastmod>" if lm else "") + "</url>" for u in urls + tx if f"<loc>{u}</loc>" not in s)
+    add = "".join(f"<url><loc>{u}</loc>" + (f"<lastmod>{lm}</lastmod>" if lm else "") + "</url>" for u in urls + tx + isd if f"<loc>{u}</loc>" not in s)
     open(sm, "w").write(s.replace("</urlset>", add + "</urlset>"))
     lt = f"{OUT}/llms.txt"; txt = open(lt).read()
     for line in (f"- North Carolina property tax rates by county, FY2021-22 to FY2025-26: {urls[0]}\n", f"- Florida 2025 rolled-back vs adopted millage: {fl[0]}\n",
-                 TX_LLMS.format(hub=tx[0], base=BASE)):
+                 TX_LLMS.format(hub=tx[0], base=BASE), TX_ISD_COPY["llms_line"].format(years=TX_YEARS_TXT, hub=isd[0], base=BASE)):
         if line not in txt:
             txt = txt[:-len(sc.FEEDBACK)] + line + sc.FEEDBACK if txt.endswith(sc.FEEDBACK) else txt + line
     open(lt, "w").write(txt)
-    print(f"statepages: wrote {len(urls) + len(tx) + 1} pages ({len(tx)} Texas incl. /tx/ alias); TX rose/fell/unchanged/excluded = {tx_st['up']}/{tx_st['dn']}/{tx_st['same']}/{len(tx_st['excl'])}; FL rows/compared/above/equal/below/skipped = {stats}"); return 0
+    print(f"statepages: wrote {len(urls) + len(tx) + len(isd) + 1} pages ({len(tx)} Texas incl. /tx/ alias, {len(isd)} Texas school-district incl. hub); TX rose/fell/unchanged/excluded = {tx_st['up']}/{tx_st['dn']}/{tx_st['same']}/{len(tx_st['excl'])}; FL rows/compared/above/equal/below/skipped = {stats}"); return 0
 
 if __name__ == "__main__": sys.exit(main())
