@@ -54,6 +54,17 @@ details.cgroup summary{cursor:pointer;padding:.6rem 0;min-height:44px}
 .chart img{width:100%;height:auto}
 .chart>div{overflow-x:auto}
 @media (max-width:40rem){.chart img{width:auto;max-width:none;min-width:60rem;height:auto}}
+table.sd-rates td.num,table.sd-rates td.src{white-space:nowrap}
+table.sd-rates tbody th,table.sd-rates tbody td{border-bottom:0}
+table.sd-rates tbody+tbody{border-top:1px solid var(--border)}
+@media (max-width:40rem){table.sd-rates thead{position:absolute;left:-9999px}
+table.sd-rates,table.sd-rates tbody{display:block}
+table.sd-rates tbody{padding:.5rem 0;border-top:1px solid var(--border)}
+table.sd-rates tr{display:grid;grid-template-columns:1fr auto;column-gap:.75rem;border:0}
+table.sd-rates th[scope=rowgroup]{grid-column:1/-1;display:block;padding:.25rem 0}
+table.sd-rates td{border:0;padding:.15rem 0}
+table.sd-rates td.src{grid-column:1/-1;font-size:.8rem;color:var(--muted)}
+table.sd-rates caption{display:block}}
 .sortbtn{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
 .callout{border:1px solid var(--accent);border-left-width:6px;border-radius:.25rem;padding:.75rem 1rem}
 .banner{border:1px solid var(--border);border-left:6px solid var(--muted);border-radius:.25rem;padding:.75rem 1rem}

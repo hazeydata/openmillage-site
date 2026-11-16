@@ -130,17 +130,15 @@ def alt_counts(alt, state="FL", year="2025"):
 
 
 def alt_sentence(counts):
-    """Body text: counties whose special-district rows come only from county property appraisers (not in the baseline CSV)."""
+    """Body text: counties whose special-district rows come only from county property appraisers (not in the baseline CSV).
+    Wording: FL_SD_COPY (placeholder pending Lindsay); it no longer says the rows are on county pages only (OQ-11)."""
     names = join_names([c + " (" + plural(n, "row") + ")" for c, n in counts.items()])
-    if len(counts) == 1:
-        return f"{names} has special-district rates from its county property appraiser. It's on that county page but not in the baseline CSV."
-    return f"{names} have special-district rates from their county property appraisers. They're on those county pages but not in the baseline CSV."
+    return FL_SD_COPY["alt_tail_one" if len(counts) == 1 else "alt_tail_many"].format(names=names)
 
 
 def alt_meta_sentence(counts):
     """Meta description / JSON-LD wording for the same counties."""
-    where = "its county page" if len(counts) == 1 else "their county pages"
-    return f"{join_names(list(counts))} special-district rows come from county appraisers and are on {where} only."
+    return FL_SD_COPY["alt_tail_meta"].format(names=join_names(list(counts)))
 
 
 def coverage_sentence(cov, meta=False):
@@ -150,3 +148,108 @@ def coverage_sentence(cov, meta=False):
     tail = (" " + (alt_meta_sentence if meta else alt_sentence)(counts) if counts else "")
     return (f"{cov['checked']} of {cov['total']} Florida counties checked against official sources; {cov['in_csv']} have special-district rows "
             f"in the Amendment 3 baseline CSV.{tail}")
+
+
+# ---------- FL independent special-district body pages (OM-SITE-SPECIAL-ISD-001) ----------
+H1_FILE = "data/ref/fl_special_body_h1.csv"  # site-authored H1 picks for bodies printed under more than one name (not a data file; not lock-pinned)
+SD_HUB = "fl/special-districts"
+# PLACEHOLDER COPY pending Lindsay (writing brief OM-SITE-SPECIAL-ISD-001): every new reader-facing string for the FL
+# special-district pages, the reworded alt-source tail of the coverage sentence and the home-page lead tail live here only,
+# so her approved strings drop in without structural change. Fixed strings that must not be reworded are NOT here: the computed
+# coverage head (coverage_sentence), "No special-district rows published yet for this county." (build.NO_ROWS), "not yet sourced".
+FL_SD_COPY = {
+    "alt_tail_one": "{names} has special-district rates from its county property appraiser, not the baseline CSV.",  # kept (OQ-11 OK)
+    "alt_tail_many": "{names} have special-district rates from their county property appraisers, not the baseline CSV.",  # kept (OQ-11 OK)
+    "alt_tail_meta": "{names} special-district rows come from county appraisers, not the baseline CSV.",  # kept (OQ-11 OK)
+    "home_lead_tail": "more come from county property appraisers, not the baseline CSV.",  # new (OQ-11 rewrite)
+    "home_link": "Florida independent special districts: one page each, every rate sourced",  # new
+    "county_link": "All Florida independent special districts",  # kept
+    "hub_title": "Florida special district millage rates 2025",  # new
+    "hub_h1": "Florida independent special districts, 2025",  # kept
+    "hub_desc": "Every Florida independent special district with a sourced 2025 millage rate, one page each, every rate linked to its official source.",  # new
+    "hub_intro": ("Independent special districts are local taxing bodies with their own boards, such as water management, fire, hospital and children's services districts. "
+                  "Each sets its own millage (dollars per $1,000 of taxable value), and it applies only to property inside the district. "
+                  "Pick a district to see its 2025 rate in every county where we have a sourced row."),  # new
+    "hub_filter": "Filter by district or county",  # kept
+    "hub_sources": "Source files",  # kept
+    "hub_sources_summary": "Every source file behind these pages, by county",  # kept
+    "body_title": "{name} millage rate 2025",  # new
+    "body_desc": "{name} 2025 millage {rates} in {counties}, Florida, as published, each linked to its official source.",  # new
+    "body_intro": ("An independent special district has its own board, which sets a millage that applies only to property inside the district. "
+                   "Rates are in mills: dollars per $1,000 of taxable value. "
+                   "This page lists every 2025 rate we have sourced for this district, by county."),  # new
+    "also_printed": "Also printed as",  # kept
+    "rows_note": ("One row per published rate, linked to its source file. The short code is the start of that file's sha256 fingerprint; hover it for the full value. "
+                  "Rates are never added together."),  # new
+    "absent_note": "A county missing from this table has no sourced row for this district. That doesn't mean the district levies nothing there: absent is not zero.",  # new
+    "nys_lead": "Independent special districts in these counties are not yet sourced (absent is not zero):",  # new
+    "nys_reason": {"no_file": "no 2025 TACD file", "exception": "2025 TACD file not yet verified"},  # no_file kept (spec wording); exception new
+    "coverage_h2": "Coverage",  # kept
+    "llms_line": ("- Florida independent special-district pages, 2025: hub {hub}; one page per district at {base}/fl/special-districts/<slug>/ "
+                  "(slug = body_id without the leading 'fl-' and trailing '-special_district'), with index.json beside each page holding exactly that page's rows. "
+                  "A county missing from a district's page has no sourced row there; absent is not zero, never read it as a 0 rate.\n"),  # kept
+}
+
+
+def sd_slug(body_id):
+    m = re.fullmatch(r"fl-(.+)-special_district", body_id)
+    if not m:
+        raise DataError(f"special-district body_id not of the form fl-<slug>-special_district: {body_id}")
+    return m.group(1)
+
+
+# LAYOUT (b)3 / L1: inside a county the SFWMD-style parts read Operating, Okeechobee Basin, Everglades Construction; any other
+# component follows in file order. Rows are reordered only: never relabelled, merged or summed.
+SD_PART_ORDER = ("operating", "okeechobee_basin", "everglades_construction")
+
+
+def sd_row_order(r):
+    c = r["levy_component"]
+    return (r["county"], SD_PART_ORDER.index(c) if c in SD_PART_ORDER else len(SD_PART_ORDER))
+
+
+def fl_bodies(rows, h1_path=H1_FILE, display=lambda s: s):
+    """{body_id: {"slug", "names": [published taxing_body strings, display form], "h1", "rows": [row...]}} for every
+    special_district row of the merged FL set (TACD + alt-source special rows; cite-only rows are never special_district).
+    The H1 is the published name; bodies printed under more than one name take theirs from h1_path, and that pick must be one of
+    the body's published names. Raises DataError (before anything is written) on a bad pick, a missing pick or a slug collision."""
+    out = {}
+    for r in rows:
+        if r["body_type"] == "special_district":
+            out.setdefault(r["body_id"], {"rows": []})["rows"].append(r)
+    picks = {}
+    for p in _csv(h1_path) if os.path.exists(h1_path) else []:
+        if p["body_id"] in picks:
+            raise DataError(f"{h1_path}: duplicate body_id {p['body_id']}")
+        picks[p["body_id"]] = p["h1"]
+    for bid in picks:
+        if bid not in out:
+            raise DataError(f"{h1_path}: {bid} is not a special-district body in the data")
+    slugs = {}
+    for bid in sorted(out):
+        b = out[bid]
+        b["rows"].sort(key=sd_row_order)  # counties A-Z; inside a county SD_PART_ORDER, then any other component in file order (stable)
+        names = []
+        for r in b["rows"]:
+            n = display(r["taxing_body"])
+            if n not in names:
+                names.append(n)
+        b["names"] = names
+        if bid in picks:
+            if picks[bid] not in names:
+                raise DataError(f"{h1_path}: h1 {picks[bid]!r} for {bid} is not one of its published names {names}")
+            b["h1"] = picks[bid]
+        elif len(names) > 1:
+            raise DataError(f"{bid} is printed under {len(names)} names {names}; pick one of them in {h1_path}")
+        else:
+            b["h1"] = names[0]
+        b["slug"] = sd_slug(bid)
+        if b["slug"] in slugs:
+            raise DataError(f"special-district page slug collision: {b['slug']} ({slugs[b['slug']]}, {bid})")
+        slugs[b["slug"]] = bid
+    return out
+
+
+def open_counties():
+    """[(county, status, reason)] from the pinned TACD status file, file order."""
+    return [(r["county"], r["status"], r["reason"]) for r in _csv(STATUS_FILE)]

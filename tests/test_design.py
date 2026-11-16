@@ -18,7 +18,9 @@ ok(len(pages) > 60 and AMEND in pages, f"{len(pages)} html pages found")
 css = rd("docs/style.css") if os.path.exists("docs/style.css") else ""
 for needle in ("overflow-wrap:anywhere", ".tablewrap{overflow-x:auto", ":focus-visible", "prefers-color-scheme"):
     ok(needle in css, f"style.css contains {needle}")
-ok("nowrap" not in css and len(css.encode()) < 4500, f"style.css has no nowrap and stays small ({len(css.encode())} bytes)")
+# the one allowed nowrap: FL body-page Rate and Source cells (OM-SITE-SPECIAL-ISD-001 LAYOUT (b)1, pick L2); nowhere else
+SD_NOWRAP = "table.sd-rates td.num,table.sd-rates td.src{white-space:nowrap}"
+ok("nowrap" not in css.replace(SD_NOWRAP, "", 1) and len(css.encode()) < 4500, f"style.css has no nowrap outside the FL body-page rate/source cells and stays small ({len(css.encode())} bytes)")
 
 RAW = ("'>operating_total", ">school_district<", ">dependent_special_district", ">less_than_countywide")
 def check_page(p):
@@ -32,8 +34,8 @@ def check_page(p):
     if not re.search(r"<body><a class=skip href='#main'>", h): errs.append("skip link not first in body")
     tables = re.findall(r"<table", h)
     if len(tables) != len(re.findall(r"<div class=tablewrap tabindex=0 role=region aria-label=\"[^\"]+\"><table", h)): errs.append("table not in tablewrap")
-    if len(tables) != len(re.findall(r"<caption>", h)) or len(tables) != len(re.findall(r"<thead>", h)): errs.append("caption/thead")
-    if re.search(r"<th(?![^>]*scope=col)[ >]", h): errs.append("th without scope=col")
+    if len(tables) != len(re.findall(r"<caption>", h)) or len(tables) != len(re.findall(r"<thead(?: role=rowgroup)?>", h)): errs.append("caption/thead")
+    if re.search(r"<th(?![^>]*scope=col)(?! scope=rowgroup rowspan=\d+ role=rowheader>)[ >]", h): errs.append("th without scope=col")  # FL body pages: county th scope=rowgroup (LAYOUT (b)2)
     for raw in RAW:
         if raw in h: errs.append(f"raw enum {raw}")
     if re.search(r">https?://", re.sub(r"<svg\b.*?</svg>", "", h, flags=re.S)) and "/fl/" in p and "amendment" not in p: errs.append("raw URL as link text")  # inline chart text (Her?'s SVG source notes) is not link text
@@ -125,7 +127,7 @@ _pub_c = {r["county"] for r in _pub}
 ok(len(_pub_c) == n and f"Special districts: {len(_pub_c)} of 67 Florida counties have special-district rows in this baseline ({len(_pub)} rows)" in ah_txt,
    f"amendment page matches published baseline CSV: {len(_pub)} special-district rows in {len(_pub_c)} counties")
 _api_sd = sum(r["body_type"] == "special_district" for r in rows)
-ok(f"{len(_pub)} baseline rows are independent special districts. {_api_sd - len(_pub)} more, from county property appraisers, appear only on county pages." in html.unescape(idx), f"home lead states {len(_pub)} baseline special-district rows and {_api_sd - len(_pub)} more")
+ok(f"{len(_pub)} baseline rows are independent special districts. {_api_sd - len(_pub)} more come from county property appraisers, not the baseline CSV." in html.unescape(idx), f"home lead states {len(_pub)} baseline special-district rows and {_api_sd - len(_pub)} more")
 _corr = "Correction, Oct 23, 2026: we earlier said 165 special districts across 45 counties. The numbers above match the baseline CSV."
 _h = idx.index("<h2>How to read this</h2>"); _c = idx.index("<h2 id=counties>")
 ok(f"<p id=correction>{html.escape(_corr)}</p>" in idx[_h:_c], "correction line sits under 'How to read this' on the home page")
@@ -141,6 +143,15 @@ for p in pages + ["docs/llms.txt"]:
 ok(found == {str(n)}, f"every stated count equals {n}: {sorted(found)}")
 src = rd("build.py").replace(_corr, "") + rd("amend3.py") + rd("sources.py") + rd("site_chrome.py")
 ok("45 have" not in src and "43 of" not in src and "165" not in src and "161" not in src, "no literal '45 have' / '43 of' in generator source")
+# OM-SITE-SPECIAL-ISD-001 AC25: page-family counts (84 FL special-district bodies, 1,015 TX ISDs) are computed, never literal.
+# A count literal is the number standing alone: not part of a longer number, a decimal, a hex colour or an identifier.
+COUNT_LIT = re.compile(r"(?<![\w.,#])(?:84|1,015|1015)(?![\w]|[.,]\d)")
+_hit = ["84 pages", "(84)", "all 84.", "1,015 pages", "1015", "== 84", "'84'"]
+_miss = ["184", "848", "0.0848", "8.84", "#848484", "84px", "x84", "1,0150", "21015", "1015.5"]
+ok(all(COUNT_LIT.search(x) for x in _hit) and not any(COUNT_LIT.search(x) for x in _miss), "AC25 count-literal regex catches 84 / 1,015 / 1015 standing alone and spares longer numbers, decimals, hex and CSS units")
+_gen = {f: rd(f) for f in ("build.py", "amend3.py", "sources.py", "site_chrome.py", "redo.py", "statepages.py")}
+_lit = {f: COUNT_LIT.findall(t) for f, t in _gen.items() if COUNT_LIT.search(t)}
+ok(not _lit, f"AC25 no literal '84', '1,015' or '1015' in generator source ({', '.join(_gen)}): {_lit}")
 # --- Tobias #3: county pages group rows as County / School / Municipalities / Special districts
 GROUP_OF = {"county": "County", "school_district": "School", "municipality": "Municipalities", "special_district": "Special districts"}
 gbad = []

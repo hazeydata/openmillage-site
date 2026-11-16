@@ -1,0 +1,28 @@
+[
+ {
+  "state": "FL",
+  "year": "2025",
+  "county": "Pinellas",
+  "taxing_body": "Pinellas Park Water (printed header 'Pinellas Park Water')",
+  "body_type": "special_district",
+  "body_id": "fl-pinellas-park-water-special_district",
+  "nces_leaid": "",
+  "fips": "",
+  "levy_component": "operating",
+  "levy_scope": "county:Pinellas;tacd:KCPW;LFPW;PFW;PPW;SPPW",
+  "rate_kind": "adopted",
+  "rate": "1.8670",
+  "unit": "mills",
+  "source_agency": "Florida Department of Revenue, Property Tax Oversight (2025 TACD, as filed by the county property appraiser)",
+  "source_url": "https://floridarevenue.com/property/dataportal/Documents/PTO%20Data%20Portal/TACD%20History/2025%20Taxing%20Authority%20Code%20Descriptions/2025%20Pinellas%20TACD.pdf",
+  "sha256": "152c118616e22f386b217ef0bbab421a690a489f75aa4f61312d79cf7683120b",
+  "retrieved_at": "2026-10-19T19:13:06+00:00",
+  "source_page": "1;2",
+  "extraction": "pdftotext-layout-pinellas",
+  "printed_label": "Pinellas Park Water",
+  "independence": null,
+  "note": null,
+  "also_cited": null,
+  "additional_sources": null
+ }
+]

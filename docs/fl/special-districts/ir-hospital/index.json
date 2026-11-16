@@ -1,0 +1,28 @@
+[
+ {
+  "state": "FL",
+  "year": "2025",
+  "county": "Indian River",
+  "taxing_body": "Indian River County Hospital District",
+  "body_type": "special_district",
+  "body_id": "fl-ir-hospital-special_district",
+  "nces_leaid": "",
+  "fips": "",
+  "levy_component": "operating",
+  "levy_scope": "county:Indian River;tacd:1;1D;2;2A;3C;3F;4B;4C;6;7;7B;7E;7G;7I;7J;7K;7M;7N;7Q;7R;7S;7T;7U;7V;8;8A",
+  "rate_kind": "adopted",
+  "rate": "0.7450",
+  "unit": "mills",
+  "source_agency": "Florida Department of Revenue, Property Tax Oversight (2025 TACD, as filed by the county property appraiser)",
+  "source_url": "https://floridarevenue.com/property/dataportal/Documents/PTO%20Data%20Portal/TACD%20History/2025%20Taxing%20Authority%20Code%20Descriptions/2025%20Indian%20River%20TACD.pdf",
+  "sha256": "7730505bce8dfd11755a6e956fb2763ba5c974c9b5e5ecc264a82b8caa42e81d",
+  "retrieved_at": "2026-10-19T19:12:50+00:00",
+  "source_page": "1;10;11;2;3;4;5;6;7;8;9",
+  "extraction": "pdftotext-layout",
+  "printed_label": "Hospital Dist - ISD",
+  "independence": null,
+  "note": null,
+  "also_cited": null,
+  "additional_sources": null
+ }
+]

@@ -1,0 +1,28 @@
+[
+ {
+  "state": "FL",
+  "year": "2025",
+  "county": "Charlotte",
+  "taxing_body": "Manasota Key Street & Drainage (Charlotte)",
+  "body_type": "special_district",
+  "body_id": "fl-manasota-key-sd-charlotte-special_district",
+  "nces_leaid": "",
+  "fips": "",
+  "levy_component": "operating",
+  "levy_scope": "county:Charlotte;tacd:003",
+  "rate_kind": "adopted",
+  "rate": "0.7798",
+  "unit": "mills",
+  "source_agency": "Florida Department of Revenue, Property Tax Oversight (2025 TACD, as filed by the county property appraiser)",
+  "source_url": "https://floridarevenue.com/property/dataportal/Documents/PTO%20Data%20Portal/TACD%20History/2025%20Taxing%20Authority%20Code%20Descriptions/2025%20Charlotte%20TACD.pdf",
+  "sha256": "228653593999c134990be914a3d89d80a0cfccabf367a1c29782ee5ecbfd95bd",
+  "retrieved_at": "2026-10-19T19:13:31+00:00",
+  "source_page": "1",
+  "extraction": "pdftotext-layout",
+  "printed_label": "County Manasota Key S&D",
+  "independence": null,
+  "note": null,
+  "also_cited": null,
+  "additional_sources": null
+ }
+]

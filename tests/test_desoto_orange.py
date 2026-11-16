@@ -60,8 +60,8 @@ finally:
     sources.ALT_FILE, sources.read_lock = orig_file, orig_lock
 
 # Singular wording
-ok(sources.alt_sentence({"DeSoto": 1}) == "DeSoto (1 row) has special-district rates from its county property appraiser. It's on that county page but not in the baseline CSV.", "one alt county: singular wording")
-ok(sources.alt_meta_sentence({"DeSoto": 1, "Orange": 3}) == "DeSoto and Orange special-district rows come from county appraisers and are on their county pages only.", "meta wording")
+ok(sources.alt_sentence({"DeSoto": 1}) == "DeSoto (1 row) has special-district rates from its county property appraiser, not the baseline CSV.", "one alt county: singular wording")
+ok(sources.alt_meta_sentence({"DeSoto": 1, "Orange": 3}) == "DeSoto and Orange special-district rows come from county appraisers, not the baseline CSV.", "meta wording")
 
 # Built output, if present
 for p in ("docs/index.html", "docs/fl/amendment-3/index.html", "docs/llms.txt"):
