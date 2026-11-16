@@ -196,6 +196,16 @@ def sd_slug(body_id):
     return m.group(1)
 
 
+# LAYOUT (b)3 / L1: inside a county the SFWMD-style parts read Operating, Okeechobee Basin, Everglades Construction; any other
+# component follows in file order. Rows are reordered only: never relabelled, merged or summed.
+SD_PART_ORDER = ("operating", "okeechobee_basin", "everglades_construction")
+
+
+def sd_row_order(r):
+    c = r["levy_component"]
+    return (r["county"], SD_PART_ORDER.index(c) if c in SD_PART_ORDER else len(SD_PART_ORDER))
+
+
 def fl_bodies(rows, h1_path=H1_FILE, display=lambda s: s):
     """{body_id: {"slug", "names": [published taxing_body strings, display form], "h1", "rows": [row...]}} for every
     special_district row of the merged FL set (TACD + alt-source special rows; cite-only rows are never special_district).
@@ -216,7 +226,7 @@ def fl_bodies(rows, h1_path=H1_FILE, display=lambda s: s):
     slugs = {}
     for bid in sorted(out):
         b = out[bid]
-        b["rows"].sort(key=lambda r: r["county"])  # stable: keeps file order within a county
+        b["rows"].sort(key=sd_row_order)  # counties A-Z; inside a county SD_PART_ORDER, then any other component in file order (stable)
         names = []
         for r in b["rows"]:
             n = display(r["taxing_body"])

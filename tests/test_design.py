@@ -18,7 +18,9 @@ ok(len(pages) > 60 and AMEND in pages, f"{len(pages)} html pages found")
 css = rd("docs/style.css") if os.path.exists("docs/style.css") else ""
 for needle in ("overflow-wrap:anywhere", ".tablewrap{overflow-x:auto", ":focus-visible", "prefers-color-scheme"):
     ok(needle in css, f"style.css contains {needle}")
-ok("nowrap" not in css and len(css.encode()) < 4500, f"style.css has no nowrap and stays small ({len(css.encode())} bytes)")
+# the one allowed nowrap: FL body-page Rate and Source cells (OM-SITE-SPECIAL-ISD-001 LAYOUT (b)1, pick L2); nowhere else
+SD_NOWRAP = "table.sd-rates td.num,table.sd-rates td.src{white-space:nowrap}"
+ok("nowrap" not in css.replace(SD_NOWRAP, "", 1) and len(css.encode()) < 4500, f"style.css has no nowrap outside the FL body-page rate/source cells and stays small ({len(css.encode())} bytes)")
 
 RAW = ("'>operating_total", ">school_district<", ">dependent_special_district", ">less_than_countywide")
 def check_page(p):
@@ -32,8 +34,8 @@ def check_page(p):
     if not re.search(r"<body><a class=skip href='#main'>", h): errs.append("skip link not first in body")
     tables = re.findall(r"<table", h)
     if len(tables) != len(re.findall(r"<div class=tablewrap tabindex=0 role=region aria-label=\"[^\"]+\"><table", h)): errs.append("table not in tablewrap")
-    if len(tables) != len(re.findall(r"<caption>", h)) or len(tables) != len(re.findall(r"<thead>", h)): errs.append("caption/thead")
-    if re.search(r"<th(?![^>]*scope=col)[ >]", h): errs.append("th without scope=col")
+    if len(tables) != len(re.findall(r"<caption>", h)) or len(tables) != len(re.findall(r"<thead(?: role=rowgroup)?>", h)): errs.append("caption/thead")
+    if re.search(r"<th(?![^>]*scope=col)(?! scope=rowgroup rowspan=\d+ role=rowheader>)[ >]", h): errs.append("th without scope=col")  # FL body pages: county th scope=rowgroup (LAYOUT (b)2)
     for raw in RAW:
         if raw in h: errs.append(f"raw enum {raw}")
     if re.search(r">https?://", re.sub(r"<svg\b.*?</svg>", "", h, flags=re.S)) and "/fl/" in p and "amendment" not in p: errs.append("raw URL as link text")  # inline chart text (Her?'s SVG source notes) is not link text
