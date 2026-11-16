@@ -157,7 +157,7 @@ ok(all(PROV[2025][(r["body_id"], r["levy_component"])]["preliminary"] == "true" 
 hub, hubh = parse(HUB), rd(HUB)
 isd_links = [h for h, _ in hub.links if h and re.fullmatch(r"/tx/[a-z0-9-]+-county/[a-z0-9-]+/", h)]
 ok(sorted(isd_links) == sorted(f"/{p}" for p in PATH.values()) and len(isd_links) == N, f"AC18 hub links every ISD page exactly once ({len(isd_links)} links, computed {N})")
-groups = re.findall(r"<section class=cgroup data-q='[^']*'><h2>(.*?)</h2><ul>(.*?)</ul></section>", hubh)
+groups = re.findall(r"<section class=cgroup data-q='[^']*'><h2>(.*?)</h2><ul class=counties>(.*?)</ul></section>", hubh)
 gc = [(html.unescape(h2).rsplit(" (", 1)[0], re.findall(r"href='([^']+)'", ul)) for h2, ul in groups]
 ok([c for c, _ in gc] == sorted(HOME) and all(sorted(l) == sorted(f"/{PATH[b]}" for b in HOME[c]) for c, l in gc)
    and all(html.unescape(h2).endswith(f"({len(HOME[html.unescape(h2).rsplit(' (', 1)[0]])})") for h2, _ in groups),

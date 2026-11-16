@@ -5,7 +5,7 @@ Run after build.py. Every number shown comes from a row of a pinned CSV (data/SO
 and sits next to a link to that row's official source. Fails closed (exit 1, nothing written) on a missing input; the Texas
 pins (data/tx/*) are verified against the lock before any page is written."""
 import csv, datetime, html, json, os, re, shutil, struct, sys
-from decimal import Decimal
+from decimal import Decimal, ROUND_CEILING
 import site_chrome as sc
 import sources
 from analytics import GOATCOUNTER_TAG
@@ -241,6 +241,14 @@ TX_ISD_COPY = {
                   "(the county field of the district's latest year), with the M&O, I&S and total rates per $100 of taxable value exactly as published by the Texas Comptroller "
                   "(2025 is preliminary) and index.json beside each page holding exactly that page's rows. A year marked not listed has no row in that year's file; "
                   "absent is not zero, never read it as a 0 rate. Rates are never summed.\n"),  # kept
+    # OM-SITE-SPECIAL-ISD-001 AC29 chart claim (CHART-SPEC section 7, Lucille 2 Q1): the visible <h3> above the chart AND the SVG
+    # aria-label, byte-identical. Values are generated from the rows: {a}/{b} verbatim rate strings, {y0}/{y1} years, {p} = claim_prelim
+    # or "", {status} = "not listed" / "not reported", {years} = runs such as "2021 and 2023–2025". Reword freely; keep the fields.
+    "claim_went": "{name}’s total tax rate went from {a} per $100 of taxable value in {y0} to {b} in {y1}{p}.",
+    "claim_same": "{name}’s total tax rate was {a} per $100 of taxable value in both {y0} and {y1}{p}.",
+    "claim_one": "{name}’s total tax rate was {a} per $100 of taxable value in {y0}{p}.",
+    "claim_prelim": " ({prelim})",
+    "claim_missing": " Years {status}: {years}.",
 }
 TX_COVER_P = TX_ISD_COPY["cover_p"]  # OM-SITE-SPECIAL-ISD-001 AC20: school districts now have their own pages; special districts still do not
 TX_LEGEND_P = ("<p class=muted>Each rate links to the Comptroller source for its year; hover for the data file and row. \u201cnot reported\u201d means the pinned file has an empty rate "
@@ -319,7 +327,7 @@ def tx_table(cap, tid, bodies, by, link=False):
         lab = f"<a href='{PATH}/tx/{slug(name)}/'>{E(name)}</a>" if link else E(name)
         trs.append(f"<tr><td>{lab}</td>" + "".join(tx_cell(r, y) for r, y in zip(rs, YEARS)) + change(rs[0], rs[-1]) + "</tr>")
     head = "<th scope=col>Taxing body</th>" + "".join(f"<th scope=col class=num>{y}</th>" for y in YEARS) + f"<th scope=col class=num>Change {YEARS[0]} to {YEARS[-1]}</th>"
-    return sc.tablewrap(cap, f"<table class=sortable id={tid}><caption>{E(cap)}</caption><thead><tr>{head}</tr></thead><tbody>{''.join(trs)}</tbody></table>")
+    return sc.tablewrap(cap, f"<table class='sortable tx-rates' id={tid}><caption>{E(cap)}</caption><thead><tr>{head}</tr></thead><tbody>{''.join(trs)}</tbody></table>")
 
 def tx_muni_list(data, c):
     """(body_id, taxing_body from the latest year that has the body) for municipal totals whose CSV county field is c, sorted by (name, body_id)."""
@@ -458,8 +466,116 @@ def isd_json_rows(b):
     return [{**{k: r[k] for k in sources.BASE_KEYS}, **{k: r["_prov"].get(k) for k in TX_ISD_PROV_KEYS}}
             for y in YEARS if y in b["by_year"] for r in b["by_year"][y]["rows"]]
 
-def tx_isd_pages(isds, upd):
+# ---------- TX ISD total-rate small chart (OM-SITE-SPECIAL-ISD-001 AC29; CHART-SPEC.md, reference renderer isd_trend.py) ----------
+# Hand-written inline SVG, stdlib only. Rates are the CSV strings verbatim (the table's text); positions use Decimal. Nothing is
+# filled, interpolated or zeroed: a year with no total row ("not listed") or an empty rate ("not reported") has no point and no segment.
+ISD_YEARS = tuple(YEARS)
+ISD_PRELIM_WORD = "preliminary"                                   # from TX_PRELIM_P "2025 is preliminary"
+ISD_W, ISD_H = 360, 164                                           # viewBox; 1 unit = 1 CSS px at the 360 px desktop display width
+ISD_X = {2021: 72, 2022: 126, 2023: 180, 2024: 234, 2025: 288}    # fixed slots: a missing year keeps its place
+ISD_Y_BASE, ISD_Y_TOP = 118, 14                                   # y of rate 0 and of the shared ceiling
+ISD_YEAR_Y, ISD_NOTE_Y = 138, 155                                 # year row; note row ("preliminary" / "not listed")
+ISD_FONT = 13                                                     # one size for every text element (12.10 px at a 375 px viewport)
+ISD_R = 4                                                         # point radius
+ISD_LABEL_GAP = 8                                                 # point centre -> end label
+ISD_STYLE, ISD_DISPLAY = sc.ISD_STYLE, sc.ISD_DISPLAY   # the reference STYLE and display rule; live in site_chrome.CSS (style.css) once
+
+class ChartError(ValueError):
+    """Two touching missing-year runs of different status (notes would collide): the build fails and a person decides."""
+
+def ceiling(totals):
+    """Shared y ceiling for every ISD page: smallest multiple of 0.25 >= the largest ISD total in the pinned files."""
+    m = max(Decimal(t) for t in totals if t)
+    return (m / Decimal("0.25")).to_integral_value(ROUND_CEILING) * Decimal("0.25")
+
+def series(by_year):
+    """by_year: {year: {"rate": str, "preliminary": "true"/"false"/""}} for years that have a total row.
+    Returns [(year, status, rate_str, prelim_bool)] for all five years; status 'ok' / TX_NOT_LISTED / TX_NOT_REPORTED."""
+    out = []
+    for y in ISD_YEARS:
+        r = by_year.get(y)
+        if r is None: out.append((y, TX_NOT_LISTED, None, False))
+        elif not r["rate"]: out.append((y, TX_NOT_REPORTED, None, False))
+        else: out.append((y, "ok", r["rate"], r.get("preliminary") == "true"))
+    return out
+
+def runs(s):
+    """Maximal runs of consecutive missing years with the same status: [(status, first, last)]. Touching runs of different status raise ChartError."""
+    out = []
+    for y, st, _, _ in s:
+        if st == "ok": continue
+        if out and out[-1][0] == st and out[-1][2] == y - 1: out[-1] = (st, out[-1][1], y)
+        else: out.append((st, y, y))
+    for a, b in zip(out, out[1:]):
+        if a[2] + 1 == b[1]: raise ChartError(f"adjacent {a[0]} / {b[0]} runs at {a[2]}-{b[1]}: needs a human layout call")
+    return out
+
+def years_txt(rs):
+    parts = [f"{a}" if a == b else f"{a}\u2013{b}" for _, a, b in rs]
+    return parts[0] if len(parts) == 1 else ", ".join(parts[:-1]) + " and " + parts[-1]
+
+def isd_claim(name, by_year):
+    """The chart's claim (TX_ISD_COPY claim_* templates): the visible <h3> above the chart AND the SVG aria-label. None if no year has a rate."""
     C = TX_ISD_COPY
+    s = series(by_year)
+    pts = [p for p in s if p[1] == "ok"]
+    if not pts: return None
+    pre = lambda p: C["claim_prelim"].format(prelim=ISD_PRELIM_WORD) if p[3] else ""
+    (y0, _, a, _), (y1, _, b, _) = pts[0], pts[-1]
+    if len(pts) == 1: c = C["claim_one"].format(name=name, a=a, y0=y0, p=pre(pts[0]))
+    elif Decimal(a) == Decimal(b): c = C["claim_same"].format(name=name, a=a, y0=y0, y1=y1, p=pre(pts[-1]))
+    else: c = C["claim_went"].format(name=name, a=a, b=b, y0=y0, y1=y1, p=pre(pts[-1]))
+    for st in (TX_NOT_LISTED, TX_NOT_REPORTED):
+        rs = [r for r in runs(s) if r[0] == st]
+        if rs: c += C["claim_missing"].format(status=st, years=years_txt(rs))
+    return c
+
+def _isd_y(v, ceil): return ISD_Y_BASE - (Decimal(v) / ceil) * (ISD_Y_BASE - ISD_Y_TOP)
+def _isd_f(v): return format(Decimal(v).quantize(Decimal("0.01")), "f").rstrip("0").rstrip(".")
+
+def isd_trend_svg(name, by_year, ceil, standalone=False):
+    """One inline <svg class=isd-t> ("" when no year has a rate). standalone=True adds xmlns, width/height and the <style> block
+    (the reference files); the site calls it with standalone=False and carries ISD_STYLE + ISD_DISPLAY once in style.css."""
+    s = series(by_year)
+    claim = isd_claim(name, by_year)
+    if claim is None: return ""
+    pts = [p for p in s if p[1] == "ok"]
+    X, F = ISD_X, _isd_f
+    o = [f'<line class="base" x1="{X[2021] - 8}" y1="{ISD_Y_BASE}" x2="{X[2025] + 8}" y2="{ISD_Y_BASE}"/>',
+         f'<text class="m" x="{X[2021] - 14}" y="{ISD_Y_BASE}" dy=".35em" text-anchor="end">0</text>']
+    for (ya, sa, va, _), (yb, sb, vb, pb) in zip(s, s[1:]):   # segments only between consecutive years that both have a rate
+        if sa == sb == "ok":
+            o.append(f'<line class="{"ln pre" if pb else "ln"}" x1="{X[ya]}" y1="{F(_isd_y(va, ceil))}" x2="{X[yb]}" y2="{F(_isd_y(vb, ceil))}"/>')
+    for y, st, v, p in pts:
+        o.append(f'<circle class="{"hp" if p else "pt"}" cx="{X[y]}" cy="{F(_isd_y(v, ceil))}" r="{ISD_R}"/>')
+    def lab(p, side):   # end labels at the outer ends: first on the left, last on the right; a lone point goes left unless it is 2025
+        y, _, v, _ = p
+        x = X[y] - ISD_LABEL_GAP if side == "l" else X[y] + ISD_LABEL_GAP
+        return f'<text class="v" x="{x}" y="{F(_isd_y(v, ceil))}" dy=".35em" text-anchor="{"end" if side == "l" else "start"}">{E(v)}</text>'
+    if len(pts) == 1: o.append(lab(pts[0], "r" if pts[0][0] == 2025 else "l"))
+    else: o += [lab(pts[0], "l"), lab(pts[-1], "r")]
+    for y in ISD_YEARS: o.append(f'<text class="m" x="{X[y]}" y="{ISD_YEAR_Y}" text-anchor="middle">{y}</text>')
+    p25, rs = s[-1], runs(s)
+    if p25[1] == "ok" and p25[3]:   # centred under 2025; right-aligned to the frame only when a 2024 gap note shares the row
+        x, anc = ((ISD_W - 4, "end") if any(b == 2024 for _, _, b in rs) else (X[2025], "middle"))
+        o.append(f'<text class="m" x="{x}" y="{ISD_NOTE_Y}" text-anchor="{anc}">{ISD_PRELIM_WORD}</text>')
+    for st, a, b in rs: o.append(f'<text class="m" x="{(X[a] + X[b]) // 2}" y="{ISD_NOTE_Y}" text-anchor="middle">{st}</text>')
+    head = (f'<svg xmlns="http://www.w3.org/2000/svg" width="{ISD_W}" height="{ISD_H}" ' if standalone else '<svg ')
+    head += f'class="isd-t" viewBox="0 0 {ISD_W} {ISD_H}" role="img" aria-label="{E(claim)}" focusable="false">'
+    return head + (f"<style>{ISD_STYLE}</style>" if standalone else "") + "".join(o) + "</svg>"
+
+def isd_chart_rows(b):
+    """{year: {"rate", "preliminary"}} for the years with a total row: rate = the table's text, preliminary = the provenance flag."""
+    return {y: {"rate": sc.rate_text(yr["total"]["rate"]), "preliminary": yr["total"]["_prov"].get("preliminary", "")}
+            for y, yr in b["by_year"].items() if "total" in yr}
+
+def isd_ceiling(isds):
+    """The shared ceiling, from every ISD total in tx_isds() output."""
+    return ceiling([yr["total"]["rate"] for b in isds.values() for yr in b["by_year"].values() if "total" in yr])
+
+def tx_isd_pages(isds, upd, ceil=None):
+    C = TX_ISD_COPY
+    if ceil is None: ceil = isd_ceiling(isds)
     shared = {}
     for b in isds.values(): shared[b["name"]] = shared.get(b["name"], 0) + 1
     hub_url = f"{BASE}/{TX_ISD_HUB}/"
@@ -475,13 +591,15 @@ def tx_isd_pages(isds, upd):
         cols = [C["cols"][0]] + ([C["cols"][1]] if multi else []) + list(C["cols"][2:])
         head = "".join(f"<th scope=col{'' if i < (2 if multi else 1) else ' class=num'}>{E(h)}</th>" for i, h in enumerate(cols))
         cap = C["caption"].format(name=name)
-        tbl = sc.tablewrap(cap, f"<table id=t-isd><caption>{E(cap)}</caption><thead><tr>{head}</tr></thead><tbody>{''.join(trs)}</tbody></table>")
+        tbl = sc.tablewrap(cap, f"<table class=tx-rates id=t-isd><caption>{E(cap)}</caption><thead><tr>{head}</tr></thead><tbody>{''.join(trs)}</tbody></table>")
         d = os.path.dirname(f"{OUT}/{b['path']}"); os.makedirs(d, exist_ok=True)
         jr = isd_json_rows(b)
         with open(f"{d}/index.json", "w", encoding="utf-8") as f: json.dump(jr, f, indent=1, ensure_ascii=False); f.write("\n")
         rel = b["path"][:-10]
+        cr = isd_chart_rows(b); claim = isd_claim(name, cr)
+        chart = "" if claim is None else f"<h3>{E(claim)}</h3>" + isd_trend_svg(name, cr, ceil)
         inner = (TX_PRELIM_P + f"<p class=lead>{E(C['intro'].format(name=name, county=county))}</p>" + TX_UNIT_P
-                 + f"<h2>{E(C['table_h2'])}</h2>" + (f"<p>{E(C['names_note'])}</p>" if multi else "") + tbl
+                 + f"<h2>{E(C['table_h2'])}</h2>" + (f"<p>{E(C['names_note'])}</p>" if multi else "") + chart + tbl
                  + f"<p class=muted>{E(C['legend'])}</p>" + TX_COVER_P
                  + f"<p>{E(C['json_link'])}<a href='{PATH}/{rel}index.json'>index.json</a> · <a href='{PATH}/tx/{slug(county)}/'>{E(C['county_link'].format(county=county))}</a>"
                    f" · <a href='{PATH}/{TX_ISD_HUB}/'>{E(C['hub_link'])}</a></p>")
@@ -501,7 +619,7 @@ def tx_isd_pages(isds, upd):
     groups = []
     for county, bs in sorted(tx_isd_by_county(isds).items()):
         q = " ".join([county.lower()] + [b["name"].lower() for _, b in bs])
-        groups.append(f"<section class=cgroup data-q='{E(q)}'><h2>{E(C['hub_group'].format(county=county, n=len(bs)))}</h2><ul>"
+        groups.append(f"<section class=cgroup data-q='{E(q)}'><h2>{E(C['hub_group'].format(county=county, n=len(bs)))}</h2><ul class=counties>"
                       + "".join(f"<li><a href='{isd_href(b)}'>{E(b['name'])}</a></li>" for _, b in bs) + "</ul></section>")
     srcs = {}
     for b in isds.values():
@@ -589,8 +707,9 @@ def main():
     miss = [p for p in need if not os.path.exists(p)]
     if miss: print(f"statepages: BUILD FAILED, missing {miss}", file=sys.stderr); return 1
     try:  # verify and parse every Texas pin before anything is written
-        tx_data = tx_load(); tx_st = tx_stats(tx_data); tx_isd = tx_isds()
-    except sources.DataError as e: print(f"statepages: BUILD FAILED, {e}", file=sys.stderr); return 1
+        tx_data = tx_load(); tx_st = tx_stats(tx_data); tx_isd = tx_isds(); isd_ceil = isd_ceiling(tx_isd)
+        for b in tx_isd.values(): isd_claim(b["name"], isd_chart_rows(b))  # ChartError (touching gap runs) fails the build before any write
+    except (sources.DataError, ChartError) as e: print(f"statepages: BUILD FAILED, {e}", file=sys.stderr); return 1
     alts = alt_text()
     tx_alts = {m[0]: m[1].strip() for m in re.findall(r"^## (\S+)\.png\n(.+?)(?=\n## |\Z)", open(f"{TX_CHARTS}/alt-text.md").read(), flags=re.S | re.M)}
     os.makedirs(f"{OUT}/charts", exist_ok=True)
@@ -599,7 +718,7 @@ def main():
     tx_copy_charts()
     urls = nc_pages(alts); fl, stats = fl_page(alts); urls += fl
     tx = tx_pages(tx_data, tx_st, tx_alts, tx_isd)
-    isd = tx_isd_pages(tx_isd, tx_updated({y: [r for b in tx_isd.values() for r in b['by_year'].get(y, {}).get('rows', [])] for y in YEARS}))
+    isd = tx_isd_pages(tx_isd, ceil=isd_ceil, upd=tx_updated({y: [r for b in tx_isd.values() for r in b['by_year'].get(y, {}).get('rows', [])] for y in YEARS}))
     sm = f"{OUT}/sitemap.xml"; s = open(sm).read()
     lm = (re.findall(r"<lastmod>([^<]+)</lastmod>", s) or [""])[0]
     add = "".join(f"<url><loc>{u}</loc>" + (f"<lastmod>{lm}</lastmod>" if lm else "") + "</url>" for u in urls + tx + isd if f"<loc>{u}</loc>" not in s)

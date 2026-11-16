@@ -26,6 +26,7 @@ jobs:
       - run: python3 tests/test_desoto_orange.py
       - run: python3 tests/test_fl_special_bodies.py
       - run: python3 tests/test_tx_isd_pages.py
+      - run: python3 tests/test_isd_trend.py
       - run: |
           git config user.name "openmillage-build"
           git config user.email "actions@users.noreply.github.com"
