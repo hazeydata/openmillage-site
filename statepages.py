@@ -202,44 +202,45 @@ TX_UNIT_P = ("<p class=callout><strong>About the unit.</strong> Every rate here 
 TX_NOT_LISTED, TX_NOT_REPORTED = "not listed", "not reported"
 TX_ISD_COPY = {
     "cover_p": ("<p><strong>Special districts: in the data, not on these pages yet.</strong> These pages show county, city and school-district rates. "
-                "Special-district rates are in the pinned Texas data files but are not listed here yet.</p>"),
-    "county_h2": "School districts based in {county}",
-    "county_intro": ("Each school district below has {county} as its home county in the Comptroller files and has its own page with its rates for every year. "
-                     "A district based in another county is listed on that county’s page, even if it also covers part of {county}."),
-    "county_none": "No school district has its home county here in the pinned data.",
-    "tx_hub_link": "Texas school districts (ISDs), one page each",
-    "title": "{name} tax rate {years}",
-    "title_shared": "{name} ({county}) tax rate {years}",  # a name printed for more than one district: the home county tells them apart
+                "Special-district rates are in the Texas data files but don’t have pages yet.</p>"),  # new body; bold head kept
+    "county_h2": "School districts based in {county}",  # kept
+    "county_intro": ("These school districts list {county} as their home county in the Comptroller files, and each has its own page with every year’s rates. "
+                     "A district based in another county is listed on that county’s page, even if it also covers part of {county}."),  # new
+    "county_none": ("No school district lists this county as its home county in the Comptroller files we use. "
+                    "A district based in another county can still cover part of it; it’s listed on that county’s page."),  # new (Loving County line)
+    "tx_hub_link": "Texas school district tax rates, one page per ISD",  # new
+    "title": "{name} tax rate {years}",  # kept
+    "title_shared": "{name} ({county}) tax rate {years}",  # kept; a name printed for more than one district: the home county tells them apart
     "desc": ("{name}, {county}, Texas: school district M&O, I&S and total tax rates per $100 of taxable value, {years}, "
-             "each linked to the Texas Comptroller. 2025 is preliminary."),
-    "intro": ("{name} is a Texas independent school district (ISD) whose home county in the Comptroller files is {county}. "
-              "The Comptroller publishes three rates for each district each year: maintenance and operations (M&O), which pays for running the schools; "
-              "interest and sinking (I&S), which pays debt on bonds; and the district’s total rate. All three are dollars per $100 of taxable value, not mills."),
-    "names_note": "The Comptroller printed this district under more than one name. Each year shows the name in that year’s file.",
-    "table_h2": "Tax rates by year",
-    "caption": "{name} tax rates, per $100 of value",
-    "cols": ("Year", "Name as printed", "M&O", "I&S", "Total"),
-    "legend": ("Each rate is the Comptroller’s figure as published and links to that year’s Comptroller file; hover for the site data file, row and the source file’s sha256. "
-               "“not listed” means that year’s file has no row for this district. “not reported” means the row has an empty rate. "
-               "Absent is not zero. Rates are shown as published, never summed or filled in."),
-    "county_link": "All rates in {county}",
-    "hub_link": "All Texas school districts",
-    "json_link": "JSON: ",
-    "hub_title": "Texas school district tax rates {years}",
-    "hub_h1": "Texas school districts (ISDs), {years}",
+             "each linked to the Texas Comptroller. 2025 is preliminary."),  # kept
+    "intro": ("{name} appears in the Texas Comptroller’s school-district rate files as an independent school district (ISD), with {county} as its home county. "
+              "The Comptroller publishes three rates for it each year: maintenance and operations (M&O), which runs the schools; "
+              "interest and sinking (I&S), which pays off bonds; and the total. Texas rates are dollars per $100 of taxable value, not mills."),  # new
+    "names_note": "The Comptroller’s files print this district under more than one name. Each year shows the name from that year’s file.",  # new
+    "table_h2": "Tax rates by year",  # kept
+    "caption": "{name} tax rates, per $100 of value",  # kept
+    "cols": ("Year", "Name as printed", "M&O", "I&S", "Total"),  # kept
+    "legend": ("Each rate is the Comptroller’s figure as published, linked to that year’s file; hover a rate for the site data file, row and source sha256. "
+               "“not listed” means that year’s file has no row for this district, and “not reported” means the row’s rate is empty. "
+               "Absent is not zero, and we never sum or fill in rates."),  # new
+    "county_link": "All rates in {county}",  # kept
+    "hub_link": "All Texas school districts",  # kept
+    "json_link": "JSON: ",  # kept
+    "hub_title": "Texas school district tax rates {years}",  # kept
+    "hub_h1": "Texas school district tax rates, {years}",  # new
     "hub_desc": ("Every Texas independent school district in the Comptroller’s {years} school-district files, one page each with its M&O, I&S and total "
-                 "tax rates per $100 of taxable value, each linked to the source. 2025 is preliminary."),
-    "hub_intro": ("{n} Texas independent school districts appear in the Comptroller’s school-district rate files for {years}. "
-                  "Each has one page with its M&O (maintenance and operations), I&S (interest and sinking) and total rate for every year, "
-                  "listed here under its home county. A district that covers several counties is listed once, under its home county."),
-    "hub_filter": "Find a district or county",
-    "hub_group": "{county} ({n})",
-    "hub_sources_h2": "Source files",
-    "hub_source_item": "{year}: Texas Comptroller school district rates and levies",
+                 "tax rates per $100 of taxable value, each linked to the source. 2025 is preliminary."),  # kept
+    "hub_intro": ("The Comptroller’s school-district rate files for {years} list {n:,} Texas independent school districts (ISDs), and each has its own page. "
+                  "A page shows the district’s M&O (maintenance and operations), I&S (interest and sinking, for bonds) and total rate for every year. "
+                  "Each district is listed once, under its home county, even if it covers several counties."),  # new
+    "hub_filter": "Find a district or county",  # kept
+    "hub_group": "{county} ({n})",  # kept
+    "hub_sources_h2": "Source files",  # kept
+    "hub_source_item": "{year}: Texas Comptroller school district rates and levies",  # kept
     "llms_line": ("- Texas school district (ISD) pages, {years}: hub {hub}; one page per district at {base}/tx/<county-slug>/<district-slug>/ under its home county "
                   "(the county field of the district's latest year), with the M&O, I&S and total rates per $100 of taxable value exactly as published by the Texas Comptroller "
                   "(2025 is preliminary) and index.json beside each page holding exactly that page's rows. A year marked not listed has no row in that year's file; "
-                  "absent is not zero, never read it as a 0 rate. Rates are never summed.\n"),
+                  "absent is not zero, never read it as a 0 rate. Rates are never summed.\n"),  # kept
 }
 TX_COVER_P = TX_ISD_COPY["cover_p"]  # OM-SITE-SPECIAL-ISD-001 AC20: school districts now have their own pages; special districts still do not
 TX_LEGEND_P = ("<p class=muted>Each rate links to the Comptroller source for its year; hover for the data file and row. \u201cnot reported\u201d means the pinned file has an empty rate "

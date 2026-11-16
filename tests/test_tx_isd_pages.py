@@ -24,7 +24,7 @@ HUB = "docs/tx/school-districts/index.html"
 SP = {n.targets[0].id: n.value.value for n in ast.parse(rd("statepages.py")).body
       if isinstance(n, ast.Assign) and isinstance(n.targets[0], ast.Name) and isinstance(n.value, ast.Constant) and isinstance(n.value.value, str)}
 PRELIM, UNIT = SP["TX_PRELIM_P"], SP["TX_UNIT_P"]
-LOVING_LINE = "No school district has its home county here in the pinned data."
+LOVING_LINE = "No school district lists this county as its home county in the Comptroller files we use."
 COVER = "Special districts: in the data, not on these pages yet."
 
 # ---------------- pinned data, read independently of the builder ----------------
@@ -239,7 +239,7 @@ for b in B:
 ok(not bad25, f"AC25 every decimal on an ISD page is one of that body's CSV rate strings (outside the unchanged TX_UNIT_P callout); no estimate/rank wording: {bad25[:3]}")
 COUNT_LIT = re.compile(r"(?<![\w.,#])(?:1,015|1015)(?![\w]|[.,]\d)")
 ok(not COUNT_LIT.search(rd("statepages.py")), "AC25 no literal '1,015' / '1015' in statepages.py")
-ok(f"{N} Texas independent school districts" in prose(main_of(hubh)), "AC25 the hub's district count is the computed body count")
+ok(f"{N:,} Texas independent school districts" in prose(main_of(hubh)), "AC25 the hub's district count is the computed body count")
 llms = rd("docs/llms.txt")
 lines = [l for l in llms.splitlines() if f"{BASE}/tx/<county-slug>/<district-slug>/" in l]
 ok(len(lines) == 1 and "absent is not zero" in lines[0].lower() and f"{BASE}/tx/school-districts/" in lines[0] and "index.json" in lines[0] and not re.search(r"\b\d\.\d{3,}\b", lines[0]),
