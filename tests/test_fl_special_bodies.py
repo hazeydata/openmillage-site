@@ -295,7 +295,7 @@ for p in newp:
     srcs = {u for u in x.main_links if u and re.match(r"https?://", u)}
     good = (GOATCOUNTER_TAG in head and f"<link rel=canonical href='{url}'>" in head and url.startswith("https://openmillage.com/") and len(titles[x.title]) == 1 and x.desc
             and len(lds) == 1 and lds[0]["@type"] == "Dataset" and set(lds[0]["isBasedOn"]) == srcs and srcs and lds[0]["url"] == url)
-    if p != HUB: good = good and x.title == f"{x.h1} property tax rate 2025"
+    if p != HUB: good = good and x.title == f"{x.h1} millage rate 2025"
     if not good: bad23.append(p)
 descs = [parse(p).desc for p in newp]
 ok(not bad23 and len(set(descs)) == len(descs), f"AC23 GoatCounter tag, canonical openmillage.com URL, unique title ('<Name> property tax rate 2025'), unique meta description, Dataset JSON-LD with isBasedOn == source URLs on the page: {bad23[:3]}")

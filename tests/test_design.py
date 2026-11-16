@@ -127,7 +127,7 @@ _pub_c = {r["county"] for r in _pub}
 ok(len(_pub_c) == n and f"Special districts: {len(_pub_c)} of 67 Florida counties have special-district rows in this baseline ({len(_pub)} rows)" in ah_txt,
    f"amendment page matches published baseline CSV: {len(_pub)} special-district rows in {len(_pub_c)} counties")
 _api_sd = sum(r["body_type"] == "special_district" for r in rows)
-ok(f"{len(_pub)} baseline rows are independent special districts. {_api_sd - len(_pub)} more, from county property appraisers, are not in the baseline CSV." in html.unescape(idx), f"home lead states {len(_pub)} baseline special-district rows and {_api_sd - len(_pub)} more")
+ok(f"{len(_pub)} baseline rows are independent special districts. {_api_sd - len(_pub)} more come from county property appraisers, not the baseline CSV." in html.unescape(idx), f"home lead states {len(_pub)} baseline special-district rows and {_api_sd - len(_pub)} more")
 _corr = "Correction, Oct 23, 2026: we earlier said 165 special districts across 45 counties. The numbers above match the baseline CSV."
 _h = idx.index("<h2>How to read this</h2>"); _c = idx.index("<h2 id=counties>")
 ok(f"<p id=correction>{html.escape(_corr)}</p>" in idx[_h:_c], "correction line sits under 'How to read this' on the home page")
