@@ -619,8 +619,8 @@ def tx_isd_pages(isds, upd, ceil=None):
     groups = []
     for county, bs in sorted(tx_isd_by_county(isds).items()):
         q = " ".join([county.lower()] + [b["name"].lower() for _, b in bs])
-        groups.append(f"<section class=cgroup data-q='{E(q)}'><h2>{E(C['hub_group'].format(county=county, n=len(bs)))}</h2><ul class=counties>"
-                      + "".join(f"<li><a href='{isd_href(b)}'>{E(b['name'])}</a></li>" for _, b in bs) + "</ul></section>")
+        groups.append(f"<details class=cgroup data-q='{E(q)}'><summary>{E(C['hub_group'].format(county=county, n=len(bs)))}</summary><ul class=counties>"
+                      + "".join(f"<li><a href='{isd_href(b)}'>{E(b['name'])}</a></li>" for _, b in bs) + "</ul></details>")
     srcs = {}
     for b in isds.values():
         for y, yr in b["by_year"].items():

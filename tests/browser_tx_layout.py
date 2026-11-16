@@ -86,6 +86,15 @@ srv = http.server.ThreadingHTTPServer(("127.0.0.1", 0), functools.partial(Quiet,
 threading.Thread(target=srv.serve_forever, daemon=True).start()
 base = f"http://127.0.0.1:{srv.server_address[1]}"
 out = {}
+HUB = {}
+HUB_JS = """new Promise(function(done){
+var inp=document.getElementById('f-isd'),g=[].slice.call(document.querySelectorAll('#isd-groups>details.cgroup'));
+function st(){var vis=g.filter(function(d){return !d.hidden});return {total:g.length,visible:vis.length,open:vis.filter(function(d){return d.open}).length,
+ openAll:g.filter(function(d){return d.open}).length,names:vis.slice(0,3).map(function(d){return d.querySelector('summary').textContent}),
+ bexar:vis.filter(function(d){return d.querySelector('summary').textContent.indexOf('Bexar County')==0&&d.open}).length}}
+var r={initial:st(),h:document.documentElement.scrollHeight};
+inp.value='bexar';inp.dispatchEvent(new Event('input',{bubbles:true}));r.typed=st();
+inp.value='';inp.dispatchEvent(new Event('input',{bubbles:true}));r.cleared=st();done(r);})"""
 try:
     with tempfile.TemporaryDirectory(prefix="om-tx-layout-") as tmp:
         ctmp = os.path.join(tmp, "chrome-tmp"); os.makedirs(ctmp)
@@ -94,6 +103,7 @@ try:
             for p in ISD_PAGES + OTHER:
                 c.goto(f"{base}/{p}/", WIDTH, 800)
                 out[p] = c.eval(MEASURE)
+                if p == "tx/school-districts": HUB.update(c.eval(HUB_JS) or {})
         finally:
             c.close()
 finally:
@@ -111,5 +121,12 @@ for p, o in out.items():
         ok("svg_min_px" in o and o["svg_min_px"] >= 12, f"CHART-SPEC 10.6 {p}: min rendered text in svg.isd-t {o.get('svg_min_px')} px >= 12 (display {o.get('svg_w')} px, {o.get('svg_n_text')} texts)")
         ok(o.get("svg_text_outside") == [], f"{p}: no chart text outside the svg box {o.get('svg_text_outside')}")
         ok(o["isd_table"] <= o["isd_wrap"], f"{p}: ISD year table {o['isd_table']} px fits its wrapper {o['isd_wrap']} px")
+if HUB:
+    print("HUB_FILTER", json.dumps(HUB))
+    ok(HUB["initial"]["total"] == 253 and HUB["initial"]["openAll"] == 0, f"hub: {HUB['initial']['total']} groups, all closed on load")
+    ok(HUB["typed"]["visible"] >= 1 and HUB["typed"]["visible"] == HUB["typed"]["open"] and HUB["typed"]["bexar"] == 1, f"hub filter 'bexar': {HUB['typed']['visible']} group(s) visible, all open, Bexar County open")
+    ok(HUB["cleared"]["visible"] == 253 and HUB["cleared"]["openAll"] == 0, f"hub filter cleared: {HUB['cleared']['visible']} visible, {HUB['cleared']['openAll']} open")
+    ok(HUB["h"] < 20000, f"hub height {HUB['h']} px < 20000")
+    print(f"HUB_HEIGHT {WIDTH} {HUB['h']}")
 print(f"TX hub height @{WIDTH}: {out.get('tx/school-districts', {}).get('doc_h')} px")
 print("FAILURES", len(FAIL)); sys.exit(1 if FAIL else 0)

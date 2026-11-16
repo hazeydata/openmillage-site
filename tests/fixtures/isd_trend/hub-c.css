@@ -1,0 +1,7 @@
+#isd-groups>details.cgroup{border-bottom:1px solid var(--border);padding:0}
+#isd-groups>details.cgroup>summary{display:flex;align-items:center;gap:.6rem;box-sizing:border-box;min-height:44px;padding:.5rem 0;cursor:pointer;list-style:none;font:600 var(--fs1)/1.25 var(--font-head,inherit)}
+#isd-groups>details.cgroup>summary::-webkit-details-marker{display:none}
+#isd-groups>details.cgroup>summary::before{content:"";flex:none;width:.45em;height:.45em;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg)}
+#isd-groups>details.cgroup[open]>summary::before{transform:rotate(45deg)}
+#isd-groups>details.cgroup>summary:focus-visible{outline:3px solid var(--link);outline-offset:2px}
+#isd-groups>details.cgroup>ul.counties{margin:0 0 var(--s1)}

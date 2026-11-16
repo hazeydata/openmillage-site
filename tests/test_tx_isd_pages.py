@@ -157,11 +157,12 @@ ok(all(PROV[2025][(r["body_id"], r["levy_component"])]["preliminary"] == "true" 
 hub, hubh = parse(HUB), rd(HUB)
 isd_links = [h for h, _ in hub.links if h and re.fullmatch(r"/tx/[a-z0-9-]+-county/[a-z0-9-]+/", h)]
 ok(sorted(isd_links) == sorted(f"/{p}" for p in PATH.values()) and len(isd_links) == N, f"AC18 hub links every ISD page exactly once ({len(isd_links)} links, computed {N})")
-groups = re.findall(r"<section class=cgroup data-q='[^']*'><h2>(.*?)</h2><ul class=counties>(.*?)</ul></section>", hubh)
+groups = re.findall(r"<details class=cgroup data-q='[^']*'><summary>(.*?)</summary><ul class=counties>(.*?)</ul></details>", hubh)
 gc = [(html.unescape(h2).rsplit(" (", 1)[0], re.findall(r"href='([^']+)'", ul)) for h2, ul in groups]
 ok([c for c, _ in gc] == sorted(HOME) and all(sorted(l) == sorted(f"/{PATH[b]}" for b in HOME[c]) for c, l in gc)
    and all(html.unescape(h2).endswith(f"({len(HOME[html.unescape(h2).rsplit(' (', 1)[0]])})") for h2, _ in groups),
    f"AC18 hub groups ISD links by home county ({len(gc)} groups, county order) with the computed count per county")
+ok(len(groups) == hubh.count("<details class=cgroup") and not re.search(r"<details[^>]*\bopen\b", hubh), "AC18 hub county groups are <details> and none is open by default")
 hm = main_of(hubh).replace(UNIT, "")
 ok("<table" not in hm and "sortable" not in hm and not re.search(r"\d\.\d{3}", prose(hm)), "AC18 hub has no table, no ranking and no rates")
 ok(all(f"href='/tx/school-districts/'" in rd(p) for p in ("docs/tx/property-tax-rates/index.html", "docs/tx/index.html")), "AC18 the TX hub (/tx/property-tax-rates/ and /tx/) links /tx/school-districts/")

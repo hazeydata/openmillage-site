@@ -174,9 +174,10 @@ ok(txc and not badtx, f"every TX county-page rate table is table.tx-rates with c
 ok("tx-rates" in rd("docs/tx/property-tax-rates/index.html"), "the TX county hub table is table.tx-rates")
 ok("tx-rates" not in "".join(rd(p) for p in glob.glob("docs/nc/**/*.html", recursive=True) + glob.glob("docs/fl/**/*.html", recursive=True)), "NC and FL tables are unchanged (no tx-rates class)")
 hub = rd("docs/tx/school-districts/index.html")
-ok(sc.TX_HUB_CSS == ".cgroup h2{font-size:var(--fs1);margin:var(--s3) 0 var(--s0)}" and sc.TX_HUB_CSS in css, "LAYOUT (c) L3: .cgroup h2 group-label rule in style.css")
-ng = len(re.findall(r"<section class=cgroup data-q='[^']*'><h2>[^<]*</h2><ul class=counties>", hub))
-ok(ng > 200 and ng == hub.count("<section class=cgroup") and ng == hub.count("<h2>") - 1, f"LAYOUT (c) L3: {ng} county groups keep their <h2> and use ul.counties columns")
+hubcss = rd(f"{FIX}/hub-c.css").rstrip("\n")
+ok(sc.TX_HUB_CSS.rstrip("\n") == hubcss and sc.TX_HUB_CSS in css and all(l.startswith("#isd-groups>details.cgroup") for l in sc.TX_HUB_CSS.split("\n")) and len(sc.TX_HUB_CSS.split("\n")) == 7, "LAYOUT (c) round 3: TX_HUB_CSS is hub-c.css (7 rules, all scoped to #isd-groups>details.cgroup) and is in style.css")
+ng = len(re.findall(r"<details class=cgroup data-q='[^']*'><summary>[^<]*</summary><ul class=counties>", hub))
+ok(ng > 200 and ng == hub.count("<details class=cgroup") and ng == hub.count("<summary>") and ng == len(T.tx_isd_by_county(ISDS)) and "<section class=cgroup" not in hub, f"LAYOUT (c) round 3: {ng} county groups are <details> with <summary> and ul.counties")
 ok("<svg" not in hub.split("<main")[1] and "isd-t" not in hub, "Q4: no chart on the TX ISD hub")
 ok(not [p for p in glob.glob(f"{FIX}/*") if re.search("/" + "workspace|/" + "home/box", rd(p))], "fixtures carry no local paths")
 
