@@ -37,7 +37,7 @@ Here's how each layer has moved since 1996. Missing years show as gaps, not zero
 These are the 2025 adopted rates, as a baseline for whatever comes next. We don't predict the measure's effect, and we don't take a position.
 
 ### Who sets what
-Every rate comes from a named board. This table lists each one and links to its official filing. DeSoto (1 row) and Orange (3 rows) have special-district rates from their county property appraisers. They're on those county pages but not in the baseline CSV.
+Every rate comes from a named board. This table lists each one and links to its official filing. DeSoto (1 row) and Orange (3 rows) have special-district rates from their county property appraisers, not the baseline CSV.
 
 ### Get the data (home, county and ballot measure pages)
 Everything here comes as CSV and JSON, with a source link on every row. Cite it, check it, build on it.

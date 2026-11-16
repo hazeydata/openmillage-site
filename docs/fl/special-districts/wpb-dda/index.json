@@ -1,0 +1,28 @@
+[
+ {
+  "state": "FL",
+  "year": "2025",
+  "county": "Palm Beach",
+  "taxing_body": "West Palm Beach DDA (Palm Beach)",
+  "body_type": "special_district",
+  "body_id": "fl-wpb-dda-special_district",
+  "nces_leaid": "",
+  "fips": "",
+  "levy_component": "operating",
+  "levy_scope": "county:Palm Beach;tacd:84402;84407",
+  "rate_kind": "adopted",
+  "rate": "0.97",
+  "unit": "mills",
+  "source_agency": "Florida Department of Revenue, Property Tax Oversight (2025 TACD, as filed by the county property appraiser)",
+  "source_url": "https://floridarevenue.com/property/dataportal/Documents/PTO%20Data%20Portal/TACD%20History/2025%20Taxing%20Authority%20Code%20Descriptions/2025%20Palm%20Beach%20TACD.xlsx",
+  "sha256": "d9a7d794dc9b6c0bb544e94d34c60fe195021a04f752e405bebf7ea539881aab",
+  "retrieved_at": "2026-10-19T19:11:53+00:00",
+  "source_page": "Sheet 1",
+  "extraction": "xlsx",
+  "printed_label": "Independent Districts | West Palm Beach DDA",
+  "independence": "printed: 'Independent Districts'",
+  "note": null,
+  "also_cited": null,
+  "additional_sources": null
+ }
+]

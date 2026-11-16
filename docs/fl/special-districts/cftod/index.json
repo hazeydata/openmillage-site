@@ -1,0 +1,28 @@
+[
+ {
+  "state": "FL",
+  "year": "2025",
+  "county": "Orange",
+  "taxing_body": "Central Florida Tourism Oversight District",
+  "body_type": "special_district",
+  "body_id": "fl-cftod-special_district",
+  "nces_leaid": "",
+  "fips": "",
+  "levy_component": "all_components_combined",
+  "levy_scope": "county:Orange;alt:70",
+  "rate_kind": "adopted",
+  "rate": "12.4236",
+  "unit": "mills",
+  "source_agency": "Orange County Property Appraiser (2025 Final Millage Rates, taxing authorities by mill code)",
+  "source_url": "https://ocpaimages.ocpafl.org/api/Content/GetContentDynamicFile?contentFileID=416847",
+  "sha256": "1f4e3b57663e35703d71d5338c0add294164c90813ef78275af7d978a9486a68",
+  "retrieved_at": "2026-10-20T18:12:57+00:00",
+  "source_page": "1",
+  "extraction": "pdftotext-layout",
+  "printed_label": "REEDY CREEK IMPR. DIST. & DEBT",
+  "independence": null,
+  "note": "Formerly Reedy Creek Improvement District. Independent special district. Printed as one combined operating and debt rate, levied only in mill code 70 (Bay Lake, Lake Buena Vista and unincorporated Reedy Creek).",
+  "also_cited": "corroboration only (document not on file; the row cites the printed 12.4236 total): Central Florida Tourism Oversight District 2025 Continuing Disclosure https://www.oversightdistrict.org/wp-content/uploads/2026/03/2025-Continuing-Disclosure.pdf (FY2026 3.8400 debt + 8.5836 operating)",
+  "additional_sources": null
+ }
+]

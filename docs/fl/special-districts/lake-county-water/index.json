@@ -1,0 +1,28 @@
+[
+ {
+  "state": "FL",
+  "year": "2025",
+  "county": "Lake",
+  "taxing_body": "Lake County Water District (printed name)",
+  "body_type": "special_district",
+  "body_id": "fl-lake-county-water-special_district",
+  "nces_leaid": "",
+  "fips": "",
+  "levy_component": "operating",
+  "levy_scope": "county:Lake;tacd:0001;0002/CG02 SP02;0003/BC03 GH03;0004;0005/AV05 PA05/WC05;0006/MP06;DI02;F001;GG05/GL05;IT02;WW03",
+  "rate_kind": "adopted",
+  "rate": "0.2940",
+  "unit": "mills",
+  "source_agency": "Florida Department of Revenue, Property Tax Oversight (2025 TACD, as filed by the county property appraiser)",
+  "source_url": "https://floridarevenue.com/property/dataportal/Documents/PTO%20Data%20Portal/TACD%20History/2025%20Taxing%20Authority%20Code%20Descriptions/2025%20Lake%20TACD.pdf",
+  "sha256": "b7ae99a72acab61c62504024a1cf8d95a6eda065b978d59d565ccbdf65baff68",
+  "retrieved_at": "2026-10-19T19:13:39+00:00",
+  "source_page": "1",
+  "extraction": "pdftotext-layout-grid",
+  "printed_label": "9 Lake County Water District",
+  "independence": null,
+  "note": null,
+  "also_cited": null,
+  "additional_sources": null
+ }
+]

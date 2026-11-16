@@ -1,0 +1,28 @@
+[
+ {
+  "state": "FL",
+  "year": "2025",
+  "county": "Hillsborough",
+  "taxing_body": "Children's Board (Hillsborough County)",
+  "body_type": "special_district",
+  "body_id": "fl-childrens-board-hillsborough-special_district",
+  "nces_leaid": "",
+  "fips": "",
+  "levy_component": "operating",
+  "levy_scope": "county:Hillsborough;tacd:PC;TA;TT;U",
+  "rate_kind": "adopted",
+  "rate": "0.4589",
+  "unit": "mills",
+  "source_agency": "Florida Department of Revenue, Property Tax Oversight (2025 TACD, as filed by the county property appraiser)",
+  "source_url": "https://floridarevenue.com/property/dataportal/Documents/PTO%20Data%20Portal/TACD%20History/2025%20Taxing%20Authority%20Code%20Descriptions/2025%20Hillsborough%20TACD.pdf",
+  "sha256": "60ce75c46aaf79f0523f09537ab1357a90d0c515d729a15daee3c831718233cd",
+  "retrieved_at": "2026-10-19T19:13:01+00:00",
+  "source_page": "1",
+  "extraction": "pdftotext-layout-hillsborough",
+  "printed_label": "Independent Special Districts Children's Board 430",
+  "independence": "independent",
+  "note": null,
+  "also_cited": null,
+  "additional_sources": null
+ }
+]

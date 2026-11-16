@@ -1,0 +1,28 @@
+[
+ {
+  "state": "FL",
+  "year": "2025",
+  "county": "Broward",
+  "taxing_body": "Tindall Hammock (Broward)",
+  "body_type": "special_district",
+  "body_id": "fl-tindall-hammock-special_district",
+  "nces_leaid": "",
+  "fips": "",
+  "levy_component": "operating",
+  "levy_scope": "county:Broward;tacd:0012J;2412J;2413J",
+  "rate_kind": "adopted",
+  "rate": "1.3307",
+  "unit": "mills",
+  "source_agency": "Florida Department of Revenue, Property Tax Oversight (2025 TACD, as filed by the county property appraiser)",
+  "source_url": "https://floridarevenue.com/property/dataportal/Documents/PTO%20Data%20Portal/TACD%20History/2025%20Taxing%20Authority%20Code%20Descriptions/2025%20Broward%20TACD.xlsx",
+  "sha256": "31de269d9d5f8f412d8118b4b35f83044936b0ceba1429c7af2c87261ccc870e",
+  "retrieved_at": "2026-10-19T19:13:27+00:00",
+  "source_page": "Sheet1",
+  "extraction": "xlsx",
+  "printed_label": "Tindall Hammock",
+  "independence": null,
+  "note": null,
+  "also_cited": null,
+  "additional_sources": null
+ }
+]

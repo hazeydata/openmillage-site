@@ -125,7 +125,7 @@ _pub_c = {r["county"] for r in _pub}
 ok(len(_pub_c) == n and f"Special districts: {len(_pub_c)} of 67 Florida counties have special-district rows in this baseline ({len(_pub)} rows)" in ah_txt,
    f"amendment page matches published baseline CSV: {len(_pub)} special-district rows in {len(_pub_c)} counties")
 _api_sd = sum(r["body_type"] == "special_district" for r in rows)
-ok(f"{len(_pub)} baseline rows are independent special districts. {_api_sd - len(_pub)} more, from county property appraisers, appear only on county pages." in html.unescape(idx), f"home lead states {len(_pub)} baseline special-district rows and {_api_sd - len(_pub)} more")
+ok(f"{len(_pub)} baseline rows are independent special districts. {_api_sd - len(_pub)} more, from county property appraisers, are not in the baseline CSV." in html.unescape(idx), f"home lead states {len(_pub)} baseline special-district rows and {_api_sd - len(_pub)} more")
 _corr = "Correction, Oct 23, 2026: we earlier said 165 special districts across 45 counties. The numbers above match the baseline CSV."
 _h = idx.index("<h2>How to read this</h2>"); _c = idx.index("<h2 id=counties>")
 ok(f"<p id=correction>{html.escape(_corr)}</p>" in idx[_h:_c], "correction line sits under 'How to read this' on the home page")
@@ -141,6 +141,15 @@ for p in pages + ["docs/llms.txt"]:
 ok(found == {str(n)}, f"every stated count equals {n}: {sorted(found)}")
 src = rd("build.py").replace(_corr, "") + rd("amend3.py") + rd("sources.py") + rd("site_chrome.py")
 ok("45 have" not in src and "43 of" not in src and "165" not in src and "161" not in src, "no literal '45 have' / '43 of' in generator source")
+# OM-SITE-SPECIAL-ISD-001 AC25: page-family counts (84 FL special-district bodies, 1,015 TX ISDs) are computed, never literal.
+# A count literal is the number standing alone: not part of a longer number, a decimal, a hex colour or an identifier.
+COUNT_LIT = re.compile(r"(?<![\w.,#])(?:84|1,015|1015)(?![\w]|[.,]\d)")
+_hit = ["84 pages", "(84)", "all 84.", "1,015 pages", "1015", "== 84", "'84'"]
+_miss = ["184", "848", "0.0848", "8.84", "#848484", "84px", "x84", "1,0150", "21015", "1015.5"]
+ok(all(COUNT_LIT.search(x) for x in _hit) and not any(COUNT_LIT.search(x) for x in _miss), "AC25 count-literal regex catches 84 / 1,015 / 1015 standing alone and spares longer numbers, decimals, hex and CSS units")
+_gen = {f: rd(f) for f in ("build.py", "amend3.py", "sources.py", "site_chrome.py", "redo.py", "statepages.py")}
+_lit = {f: COUNT_LIT.findall(t) for f, t in _gen.items() if COUNT_LIT.search(t)}
+ok(not _lit, f"AC25 no literal '84', '1,015' or '1015' in generator source ({', '.join(_gen)}): {_lit}")
 # --- Tobias #3: county pages group rows as County / School / Municipalities / Special districts
 GROUP_OF = {"county": "County", "school_district": "School", "municipality": "Municipalities", "special_district": "Special districts"}
 gbad = []

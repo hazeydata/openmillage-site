@@ -9,7 +9,7 @@ def ok(cond, msg): print(("PASS " if cond else "FAIL ") + msg); cond or FAIL.app
 API = "docs/api/v1/fl/2025"
 def js(c): return json.load(open(f"{API}/{c}.json"))
 def pg(c): return open(f"docs/fl/2025/{c}-county/index.html", encoding="utf-8").read()
-SENT = "57 of 67 Florida counties checked against official sources; 43 have special-district rows in the Amendment 3 baseline CSV. DeSoto (1 row) and Orange (3 rows) have special-district rates from their county property appraisers. They're on those county pages but not in the baseline CSV."
+SENT = "57 of 67 Florida counties checked against official sources; 43 have special-district rows in the Amendment 3 baseline CSV. DeSoto (1 row) and Orange (3 rows) have special-district rates from their county property appraisers, not the baseline CSV."  # OM-SITE-SPECIAL-ISD-001: alt tail reworded (OQ-11)
 NO_ROWS = "No special-district rows published yet for this county."
 NO_ROWS_COUNTIES = ["Bradford", "Citrus", "Franklin", "Glades", "Hardee", "Highlands", "Nassau", "Okeechobee", "Pasco", "Polk", "Wakulla", "Walton"]
 OPEN = ["Calhoun", "Clay", "Columbia", "Monroe", "Collier", "Sumter", "Gadsden", "Levy", "Taylor", "Liberty"]
@@ -120,7 +120,7 @@ oh = pg("orange")
 ok(len(cf) == 1 and cf[0]["taxing_body"] == "Central Florida Tourism Oversight District" and "display_rate" not in cf[0] and cf[0]["levy_component"] == "all_components_combined"
    and cf[0]["rate"] == "12.4236" and cf[0]["sha256"] == CFTOD_SHA and "Formerly Reedy Creek" in cf[0]["note"] and "contentFileID=416847" in cf[0]["source_url"],
    "AC9 CFTOD JSON row golden")
-ok(any("<td>Central Florida Tourism Oversight District<br>" in tr and re.findall(r"<td>([^<]*)</td>", tr)[0] == "(operating + debt, combined)"
+ok(any("<td><a href='/fl/special-districts/cftod/'>Central Florida Tourism Oversight District</a><br>" in tr and re.findall(r"<td>([^<]*)</td>", tr)[0] == "(operating + debt, combined)"
    and "<td class=num>12.4236 mills</td>" in tr for tr in oh.split("<tr>")) and "Formerly Reedy Creek" in oh
    and "contentFileID=416847" in oh and f"title='{CFTOD_SHA}'" in oh, "AC9 CFTOD on the Orange page")
 ch = [r for r in js("alachua") if r["taxing_body"] == "Children's Trust of Alachua County"]

@@ -1,0 +1,28 @@
+[
+ {
+  "state": "FL",
+  "year": "2025",
+  "county": "Manatee",
+  "taxing_body": "East Manatee Fire Rescue District",
+  "body_type": "special_district",
+  "body_id": "fl-east-manatee-fire-special_district",
+  "nces_leaid": "",
+  "fips": "",
+  "levy_component": "operating",
+  "levy_scope": "county:Manatee;tacd:0310",
+  "rate_kind": "adopted",
+  "rate": "0.8500",
+  "unit": "mills",
+  "source_agency": "Florida Department of Revenue, Property Tax Oversight (2025 TACD, as filed by the county property appraiser)",
+  "source_url": "https://floridarevenue.com/property/dataportal/Documents/PTO%20Data%20Portal/TACD%20History/2025%20Taxing%20Authority%20Code%20Descriptions/2025%20Manatee%20TACD.pdf",
+  "sha256": "57b3eea91eb0177ed605588fe79019c9dfedc4db501dacb0a17790942b7dd16a",
+  "retrieved_at": "2026-10-19T19:11:53+00:00",
+  "source_page": "1",
+  "extraction": "pdftotext-layout",
+  "printed_label": "East Manatee Fire Rescue",
+  "independence": "independent",
+  "note": null,
+  "also_cited": null,
+  "additional_sources": null
+ }
+]
