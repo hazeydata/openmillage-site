@@ -183,16 +183,30 @@ def nys_block():
 def cov_block():
     return f"<h2 id=coverage>{html.escape(FL_SD_COPY['coverage_h2'])}</h2><p class=muted>{COV}</p>" + nys_block()
 def county_href(co): return f"{PATH}/fl/2025/{slug(co)}-county/"
-def body_tr(r):
-    note = f"<br><small class=muted>{html.escape(r['note'])}</small>" if r['note'] else ""
-    return (f"<tr><td><a href='{county_href(r['county'])}'>{html.escape(r['county'])}</a>{note}</td><td>{html.escape(sd_levy(r))}</td><td class=num>{float(r['rate']):.4f} {r['unit']}</td>"
-            f"<td>{src_link(r)} <code title='{r['sha256']}'>{r['sha256'][:8]}</code></td></tr>")
+def body_table(caption, brs):
+    """LAYOUT (b): one <tbody> per county (rows already in sources.sd_row_order), county as <th scope=rowgroup rowspan=n> on the
+    group's first row; explicit ARIA roles so the table keeps its semantics when stacked at <= 40rem (CSS table.sd-rates)."""
+    groups = {}
+    for r in brs: groups.setdefault(r["county"], []).append(r)
+    note = lambda r: f"<br><small class=muted>{html.escape(r['note'])}</small>" if r['note'] else ""
+    tbodies = []
+    for co, g in groups.items():
+        trs = []
+        for i, r in enumerate(g):
+            head = (f"<th scope=rowgroup rowspan={len(g)} role=rowheader><a href='{county_href(co)}'>{html.escape(co)}</a>{note(r)}</th>" if i == 0 else "")
+            trs.append(f"<tr role=row>{head}<td role=cell>{html.escape(sd_levy(r))}{'' if i == 0 else note(r)}</td><td class=num role=cell>{float(r['rate']):.4f} {r['unit']}</td>"
+                       f"<td class=src role=cell>{src_link(r)} <code title='{r['sha256']}'>{r['sha256'][:8]}</code></td></tr>")
+        tbodies.append("<tbody role=rowgroup>" + "".join(trs) + "</tbody>")
+    th = "".join(f"<th scope=col role=columnheader{' class=num' if n else ''}>{c}</th>" for c, n in [("County", 0), ("Levy", 0), ("Rate", 1), ("Source", 0)])
+    return sc.tablewrap(caption, f"<table class=sd-rates role=table><caption>{html.escape(caption)}</caption><thead role=rowgroup><tr role=row>{th}</tr></thead>{''.join(tbodies)}</table>")
 def footnote(key):
     fc = CFG["footnote_citations"][key]
     return (f"<p class=footnote>Note {fc['n']}: &ldquo;{html.escape(_a3.FOOT[fc['n']])}&rdquo; Source: "
             + "; ".join(f"<a href='{html.escape(_a3.SRC[f]['url'])}'>{html.escape('DOR 2025 TACD (' + _a3.SRC[f]['county'] + ')')}</a>, {html.escape(w)}" for f, w in fc["cites"]) + ".</p>")
 hub_trs = []
-for bid, b in sorted(SD_BODIES.items(), key=lambda kv: kv[1]["slug"]):
+def hub_key(b):  # hub caption says "by name": the displayed name, case-insensitive, a leading "The " ignored; slug breaks ties
+    return (re.sub(r"^the\s+", "", b["h1"].casefold()), b["slug"])
+for bid, b in sorted(SD_BODIES.items(), key=lambda kv: hub_key(kv[1])):
     brs, name = b["rows"], b["h1"]
     sp = f"{SD_HUB}/{b['slug']}/index.html"; d = os.path.dirname(f"{OUT}/{sp}"); os.makedirs(d, exist_ok=True); urls.append(f"{BASE}/{sp[:-10]}")
     json.dump(brs, open(f"{d}/index.json", "w"), indent=1)
@@ -201,7 +215,7 @@ for bid, b in sorted(SD_BODIES.items(), key=lambda kv: kv[1]["slug"]):
     inner = (f"<p class=lead>{html.escape(FL_SD_COPY['body_intro'].format(name=name))}</p>"
              + (f"<p>{html.escape(FL_SD_COPY['also_printed'])}: " + "; ".join(f"<q>{html.escape(n)}</q>" for n in also) + "</p>" if also else "")
              + f"<h2 id=rates>2025 rates</h2><p class=muted>{html.escape(FL_SD_COPY['rows_note'])}</p>"
-             + table(f"{name}, 2025 rates by county", [("County", 0), ("Levy", 0), ("Rate", 1), ("Source", 0)], "".join(body_tr(r) for r in brs))
+             + body_table(f"{name}, 2025 rates by county", brs)
              + (footnote(SD_FOOTNOTES[bid]) if bid in SD_FOOTNOTES else "")
              + f"<p>{html.escape(FL_SD_COPY['absent_note'])}</p>" + cov_block()
              + f"<p>JSON: <a href='{PATH}/{sp[:-10]}index.json'>index.json</a> · <a href='{PATH}/{SD_HUB}/'>{html.escape(FL_SD_COPY['county_link'])}</a></p>")

@@ -158,34 +158,36 @@ SD_HUB = "fl/special-districts"
 # so her approved strings drop in without structural change. Fixed strings that must not be reworded are NOT here: the computed
 # coverage head (coverage_sentence), "No special-district rows published yet for this county." (build.NO_ROWS), "not yet sourced".
 FL_SD_COPY = {
-    "alt_tail_one": "{names} has special-district rates from its county property appraiser, not the baseline CSV.",
-    "alt_tail_many": "{names} have special-district rates from their county property appraisers, not the baseline CSV.",
-    "alt_tail_meta": "{names} special-district rows come from county appraisers, not the baseline CSV.",
-    "home_lead_tail": "more, from county property appraisers, are not in the baseline CSV.",
-    "home_link": "Every Florida independent special district, one page each",
-    "county_link": "All Florida independent special districts",
-    "hub_title": "Florida special district property tax rates 2025",
-    "hub_h1": "Florida independent special districts, 2025",
-    "hub_desc": "Every Florida independent special district with a sourced 2025 millage rate, one page each, every rate linked to its government source.",
-    "hub_intro": ("Independent special districts are taxing bodies with their own elected or appointed boards, such as water management, "
-                  "fire, hospital and children's services districts. Each sets its own millage, and it applies only to property inside the district. "
-                  "Pick a district to see its 2025 rate in every county where we have a sourced row."),
-    "hub_filter": "Filter by district or county",
-    "hub_sources": "Source files",
-    "hub_sources_summary": "Every source file behind these pages, by county",
-    "body_title": "{name} property tax rate 2025",
-    "body_desc": "{name}: official 2025 millage {rates} in {counties}, Florida, each linked to its government source.",
-    "body_intro": ("{name} is an independent special district. Its board sets its own millage, which applies only to property inside the district. "
-                   "Rates are in mills: dollars per $1,000 of taxable value."),
-    "also_printed": "Also printed as",
-    "rows_note": "One row per published rate. Each rate links to its source file; hover the short code for the file's full sha256. Rates are shown as published, never summed.",
-    "absent_note": "Counties not listed here have no sourced row for this district. That does not mean the district levies nothing there; absent is not zero.",
-    "nys_lead": "Independent special districts not yet sourced in these counties (absent is not zero):",
-    "nys_reason": {"no_file": "no 2025 TACD file", "exception": "2025 TACD file not yet reconciled"},
-    "coverage_h2": "Coverage",
+    "alt_tail_one": "{names} has special-district rates from its county property appraiser, not the baseline CSV.",  # kept (OQ-11 OK)
+    "alt_tail_many": "{names} have special-district rates from their county property appraisers, not the baseline CSV.",  # kept (OQ-11 OK)
+    "alt_tail_meta": "{names} special-district rows come from county appraisers, not the baseline CSV.",  # kept (OQ-11 OK)
+    "home_lead_tail": "more come from county property appraisers, not the baseline CSV.",  # new (OQ-11 rewrite)
+    "home_link": "Florida independent special districts: one page each, every rate sourced",  # new
+    "county_link": "All Florida independent special districts",  # kept
+    "hub_title": "Florida special district millage rates 2025",  # new
+    "hub_h1": "Florida independent special districts, 2025",  # kept
+    "hub_desc": "Every Florida independent special district with a sourced 2025 millage rate, one page each, every rate linked to its official source.",  # new
+    "hub_intro": ("Independent special districts are local taxing bodies with their own boards, such as water management, fire, hospital and children's services districts. "
+                  "Each sets its own millage (dollars per $1,000 of taxable value), and it applies only to property inside the district. "
+                  "Pick a district to see its 2025 rate in every county where we have a sourced row."),  # new
+    "hub_filter": "Filter by district or county",  # kept
+    "hub_sources": "Source files",  # kept
+    "hub_sources_summary": "Every source file behind these pages, by county",  # kept
+    "body_title": "{name} millage rate 2025",  # new
+    "body_desc": "{name} 2025 millage {rates} in {counties}, Florida, as published, each linked to its official source.",  # new
+    "body_intro": ("An independent special district has its own board, which sets a millage that applies only to property inside the district. "
+                   "Rates are in mills: dollars per $1,000 of taxable value. "
+                   "This page lists every 2025 rate we have sourced for this district, by county."),  # new
+    "also_printed": "Also printed as",  # kept
+    "rows_note": ("One row per published rate, linked to its source file. The short code is the start of that file's sha256 fingerprint; hover it for the full value. "
+                  "Rates are never added together."),  # new
+    "absent_note": "A county missing from this table has no sourced row for this district. That doesn't mean the district levies nothing there: absent is not zero.",  # new
+    "nys_lead": "Independent special districts in these counties are not yet sourced (absent is not zero):",  # new
+    "nys_reason": {"no_file": "no 2025 TACD file", "exception": "2025 TACD file not yet verified"},  # no_file kept (spec wording); exception new
+    "coverage_h2": "Coverage",  # kept
     "llms_line": ("- Florida independent special-district pages, 2025: hub {hub}; one page per district at {base}/fl/special-districts/<slug>/ "
                   "(slug = body_id without the leading 'fl-' and trailing '-special_district'), with index.json beside each page holding exactly that page's rows. "
-                  "A county missing from a district's page has no sourced row there; absent is not zero, never read it as a 0 rate.\n"),
+                  "A county missing from a district's page has no sourced row there; absent is not zero, never read it as a 0 rate.\n"),  # kept
 }
 
 
@@ -194,6 +196,16 @@ def sd_slug(body_id):
     if not m:
         raise DataError(f"special-district body_id not of the form fl-<slug>-special_district: {body_id}")
     return m.group(1)
+
+
+# LAYOUT (b)3 / L1: inside a county the SFWMD-style parts read Operating, Okeechobee Basin, Everglades Construction; any other
+# component follows in file order. Rows are reordered only: never relabelled, merged or summed.
+SD_PART_ORDER = ("operating", "okeechobee_basin", "everglades_construction")
+
+
+def sd_row_order(r):
+    c = r["levy_component"]
+    return (r["county"], SD_PART_ORDER.index(c) if c in SD_PART_ORDER else len(SD_PART_ORDER))
 
 
 def fl_bodies(rows, h1_path=H1_FILE, display=lambda s: s):
@@ -216,7 +228,7 @@ def fl_bodies(rows, h1_path=H1_FILE, display=lambda s: s):
     slugs = {}
     for bid in sorted(out):
         b = out[bid]
-        b["rows"].sort(key=lambda r: r["county"])  # stable: keeps file order within a county
+        b["rows"].sort(key=sd_row_order)  # counties A-Z; inside a county SD_PART_ORDER, then any other component in file order (stable)
         names = []
         for r in b["rows"]:
             n = display(r["taxing_body"])

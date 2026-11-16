@@ -24,24 +24,32 @@ ok(all(r["body_type"] == "special_district" for r in RAW) and not any(r["body_ty
    "AC1 input = TACD special rows + alt-source special rows; the Pasco cite-only row is not a special-district row")
 BODIES = {}
 for r in RAW: BODIES.setdefault(r["body_id"], []).append(r)
-for b in BODIES.values(): b.sort(key=lambda r: r["county"])  # county order, file order within a county
+PART = ("operating", "okeechobee_basin", "everglades_construction")  # LAYOUT (b)3 / L1, written out here, not imported from the builder
+for b in BODIES.values(): b.sort(key=lambda r: (r["county"], PART.index(r["levy_component"]) if r["levy_component"] in PART else 3))  # counties A-Z; parts in PART order, others in file order
 SLUG = {b: re.fullmatch(r"fl-(.+)-special_district", b).group(1) for b in BODIES}
 LOADED = {sources.key(r): r for r in sources.load_rows()}
 N = len(BODIES)
 print(f"computed: {N} FL special-district bodies, {len(RAW)} rows, {len({r['county'] for r in RAW})} counties")
 
 class Page(html.parser.HTMLParser):
-    """Tables (rows of cells: text, [(href, title)], code titles), h1, links in <main>, title, meta description, JSON-LD."""
+    """Tables (rows of cells: text, [(href, title)], code titles, tag, section, attrs), h1, links in <main>, title, meta description, JSON-LD.
+    A cell with rowspan=n is repeated at the start of the next n-1 rows of its section (flag "spanned"), so each logical row has all its cells."""
     def __init__(self):
         super().__init__(convert_charrefs=True)
         self.tables, self.cell, self.row, self.h1, self.main_links, self.in_main, self.title, self.desc, self.ld = [], None, None, "", [], False, "", "", []
         self._t = self._h1 = self._ld = False
+        self.sec, self.span = None, None
     def handle_starttag(self, tag, a):
         a = dict(a)
         if tag == "main": self.in_main = True
-        elif tag == "table": self.tables.append([])
-        elif tag == "tr": self.row = []
-        elif tag in ("td", "th"): self.cell = {"text": "", "links": [], "codes": [], "tag": tag}
+        elif tag == "table": self.tables.append([]); self.sec = None; self.span = None
+        elif tag in ("thead", "tbody"): self.sec = tag; self.span = None
+        elif tag == "tr":
+            self.row = []
+            if self.span and self.span[1] > 0: self.row.append(dict(self.span[0], spanned=True)); self.span[1] -= 1
+        elif tag in ("td", "th"):
+            self.cell = {"text": "", "links": [], "codes": [], "tag": tag, "sec": self.sec, "attrs": a}
+            if int(a.get("rowspan") or 1) > 1: self.span = [self.cell, int(a["rowspan"]) - 1]
         elif tag == "a":
             if self.cell is not None: self.cell["links"].append((a.get("href"), a.get("title")))
             if self.in_main: self.main_links.append(a.get("href"))
@@ -66,7 +74,7 @@ def parse(p):
     x = Page(); x.feed(rd(p)); x.close(); return x
 def body_path(b): return f"docs/fl/special-districts/{SLUG[b]}/index.html"
 def levy(r): return "(operating + debt, combined)" if r["levy_component"] == "all_components_combined" else sc.label(r["levy_component"])
-def data_rows(t): return [row for row in t if row[0]["tag"] == "td"]
+def data_rows(t): return [row for row in t if row[-1]["sec"] != "thead" and (row[-1]["sec"] == "tbody" or row[0]["tag"] == "td")]
 
 # ---------------- AC1: one page per body, computed ----------------
 dirs = sorted(os.path.basename(os.path.dirname(p)) for p in glob.glob("docs/fl/special-districts/*/index.html"))
@@ -117,6 +125,48 @@ ok(len(sf) == 26 == len(BODIES["fl-sfwmd-special_district"]) and len(bro) == 1 a
 fn3 = re.search(r'^3\. .*?\nWording: "(.*)"\s*$', rd("data/ref/fl_special_district_footnotes.md"), re.M | re.S)
 ok(fn3 and html.escape(fn3.group(1)) in sf_h and "Note 3:" in sf_h, "AC6 footnote 3 from data/ref/fl_special_district_footnotes.md shown on the SFWMD page")
 ok(not re.search(r"(?i)<t[dh][^>]*>\s*(total|sum)\b", sf_h), "AC6 no total/sum row added by the site")
+
+# ---------------- LAYOUT (b) / L1: row order inside a county ----------------
+sf_rows = BODIES["fl-sfwmd-special_district"]
+sf_cty = [cty(r) for r in sf]
+ok([r["county"] for r in sf_rows] == sorted(r["county"] for r in sf_rows)
+   and list(dict.fromkeys(sf_cty)) == [slug(c) for c in sorted({r["county"] for r in sf_rows})], "L1 SFWMD counties in alphabetical order, each county's rows contiguous")
+ok(len(parts) == 8 and all([lv for lv, _ in v] == ["Operating", "Okeechobee Basin", "Everglades Construction"] for v in parts.values())
+   and {"lee", "miami-dade"} <= set(parts), "L1 every 3-part SFWMD county (incl. Lee and Miami-Dade, whose file order differs) reads Operating, Okeechobee Basin, Everglades Construction")
+_hh = [row[1]["text"] for row in data_rows(P["fl-hendry-hospital-special_district"].tables[0])]
+ok(len(_hh) == 2 and _hh[0] == "Operating" and _hh == [levy(r) for r in BODIES["fl-hendry-hospital-special_district"]], f"L1 other components follow the fixed parts in file order (Hendry hospital: {_hh})")
+ok(len(sf) == 26 and not re.search(r"(?i)<t[dh][^>]*>\s*(total|sum)\b", sf_h), "L1 AC6 unchanged: 26 SFWMD rows, no sum row")
+
+# ---------------- LAYOUT (b) / L2: grouped, ARIA-roled markup on every body page ----------------
+bad_l2 = []
+for b, rs in BODIES.items():
+    h = rd(body_path(b))
+    m = re.search(r"<table class=sd-rates role=table>.*?</table>", h, re.S)
+    if not m: bad_l2.append((b, "no table.sd-rates[role=table]")); continue
+    t = m.group(0)
+    tb = re.findall(r"<tbody role=rowgroup>(.*?)</tbody>", t, re.S)
+    want = {}
+    for r in rs: want[r["county"]] = want.get(r["county"], 0) + 1
+    heads = [re.findall(r"<th scope=rowgroup rowspan=(\d+) role=rowheader><a href='([^']+)'", g) for g in tb]
+    good = (len(tb) == len(want) == t.count("<tbody") and "<thead role=rowgroup><tr role=row>" in t
+            and t.count("role=columnheader") == 4 and t.count("<th scope=col role=columnheader") == 4
+            and all(len(hd) == 1 for hd in heads)
+            and [(int(hd[0][0]), hd[0][1]) for hd in heads] == [(n, f"{PATH}/fl/2025/{slug(c)}-county/") for c, n in want.items()]
+            and all(g.count("<tr role=row>") == n and g.count("<tr") == n for g, n in zip(tb, want.values()))
+            and t.count("<td") == len(re.findall(r"<td(?: class=(?:num|src))? role=cell>", t)) == 3 * len(rs)
+            and t.count("<td class=num role=cell>") == len(rs) and t.count("<td class=src role=cell>") == len(rs)
+            and t.count("<tr") == t.count("<tr role=row>") == len(rs) + 1)
+    if not good: bad_l2.append(b)
+ok(not bad_l2, f"L2 every body page: table.sd-rates role=table, thead/tbody role=rowgroup, one tbody per county, county th scope=rowgroup rowspan=n role=rowheader, roles on every row and cell: {bad_l2[:3]}")
+ok(all(row[2]["text"] == f"{float(r['rate']):.4f} {r['unit']}" for row, r in zip(sf, sf_rows)) and any(row[2]["text"] == "0.0948 mills" for row in sf),
+   "L2 rate cells keep their text with the unit (e.g. '0.0948 mills')")
+import site_chrome as _sc
+_css = _sc.CSS
+ok("table.sd-rates td.num,table.sd-rates td.src{white-space:nowrap}" in _css and "table.sd-rates tbody+tbody{border-top:1px solid var(--border)}" in _css
+   and "table.sd-rates tbody th,table.sd-rates tbody td{border-bottom:0}" in _css and re.search(r"@media \(max-width:40rem\)\{table\.sd-rates thead\{position:absolute;left:-9999px\}", _css)
+   and "table.sd-rates tr{display:grid;grid-template-columns:1fr auto;column-gap:.75rem;border:0}" in _css
+   and "td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}" in _css,
+   "L2 CSS: rate right/tabular/nowrap, source nowrap, rule between county groups only, stacks at <= 40rem with a visually hidden thead")
 
 # ---------------- AC7: names ----------------
 picks = {r["body_id"]: r["h1"] for r in csvrows(H1_FILE)}
@@ -201,8 +251,17 @@ ht = data_rows(hub.tables[0])
 ok(all(set(row[1]["text"].split(", ")) == {r["county"] for r in BODIES[next(b for b in BODIES if SLUG[b] == row[0]["links"][0][0].split("/")[-2])]} for row in ht)
    and "id=sd-filter" in hh, "AC9 hub is filterable by county: each row lists the body's counties; filter input present")
 main = hh.split("<main id=main>")[1].split("</main>")[0]
-ok(" mills" not in main and not re.search(r"\d\.\d{4}", main) and "sortable" not in main and [row[0]["text"] for row in ht] == [P[b].h1 for b in sorted(BODIES, key=lambda b: SLUG[b])],
-   "AC9 no rates, no ranking or sort-by-rate on the hub (rows in slug order)")
+BYNAME = sorted(BODIES, key=lambda b: (re.sub(r"^the\s+", "", P[b].h1.casefold()), SLUG[b]))  # displayed name, casefold, leading "The " ignored
+ok(" mills" not in main and not re.search(r"\d\.\d{4}", main) and "sortable" not in main and [row[0]["text"] for row in ht] == [P[b].h1 for b in BYNAME],
+   "AC9 no rates, no ranking or sort-by-rate on the hub (rows by displayed name)")
+_hub_names = [row[0]["text"] for row in ht]
+_ct = "The Children's Trust (Miami-Dade)"
+ok("by name</caption>" in hh and _ct in _hub_names and all(_hub_names.index(_ct) > _hub_names.index(n) for n in _hub_names if n.casefold() < "children's trust")
+   and all(_hub_names.index(_ct) < _hub_names.index(n) for n in _hub_names if not n.startswith("The ") and n.casefold() > "children's trust (miami-dade)")
+   and "14 counties:" not in hh,
+   "LAYOUT (c) FL hub: caption 'by name'; 'The Children's Trust (Miami-Dade)' sorts as 'Children's Trust' (under C); no optional county count")
+_byslug = [P[b].h1 for b in sorted(BODIES, key=lambda b: SLUG[b])]
+ok(_byslug != [P[b].h1 for b in BYNAME] and _hub_names != _byslug, "LAYOUT (c) FL hub order is by displayed name, not slug order (the two differ in this data)")
 
 # ---------------- AC10/11: county pages ----------------
 bad10 = []
@@ -236,7 +295,7 @@ for p in newp:
     srcs = {u for u in x.main_links if u and re.match(r"https?://", u)}
     good = (GOATCOUNTER_TAG in head and f"<link rel=canonical href='{url}'>" in head and url.startswith("https://openmillage.com/") and len(titles[x.title]) == 1 and x.desc
             and len(lds) == 1 and lds[0]["@type"] == "Dataset" and set(lds[0]["isBasedOn"]) == srcs and srcs and lds[0]["url"] == url)
-    if p != HUB: good = good and x.title == f"{x.h1} property tax rate 2025"
+    if p != HUB: good = good and x.title == f"{x.h1} millage rate 2025"
     if not good: bad23.append(p)
 descs = [parse(p).desc for p in newp]
 ok(not bad23 and len(set(descs)) == len(descs), f"AC23 GoatCounter tag, canonical openmillage.com URL, unique title ('<Name> property tax rate 2025'), unique meta description, Dataset JSON-LD with isBasedOn == source URLs on the page: {bad23[:3]}")
