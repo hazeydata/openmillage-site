@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 """OM-SITE-SPECIAL-ISD-001 LAYOUT (b)6: FL body-page county table at 375 px, measured in headless Chrome with the built CSS.
 Not part of CI (needs Chrome). Run by hand from the repo root after the build:
-    python3 tests/browser_fl_layout.py            # CHROME=/path/to/chrome to override /usr/bin/google-chrome
+    python3 tests/browser_fl_layout.py [--width N]   # default 375; CHROME=/path/to/chrome to override /usr/bin/google-chrome
 Serves docs/ on 127.0.0.1 (every other host resolves to nothing), drives one headless Chrome over --remote-debugging-pipe with a
-throwaway profile (closed in finally; Chrome's own /tmp scratch dirs created during the run are removed), sets a 375 px viewport and checks:
+throwaway profile (closed in finally; Chrome's TMPDIR/TMP/TEMP and profile all live inside this script's own TemporaryDirectory), sets the viewport (default 375 px) and checks:
   table.scrollWidth <= wrapper.clientWidth (no horizontal scroll), one line box per td.num (no rate wraps), min text in <main> >= 12 px.
 Nothing in docs/ is changed."""
-import functools, glob, http.server, json, os, shutil, signal, subprocess, sys, tempfile, threading, time
+import argparse, functools, http.server, json, os, signal, subprocess, sys, tempfile, threading, time
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__))); os.chdir(ROOT)
 CHROME = os.environ.get("CHROME", "/usr/bin/google-chrome")
 PAGES = ["fl/special-districts/sfwmd", "fl/special-districts/cftod", "fl/special-districts/sjrwmd"]
-WIDTH = 375
+ap = argparse.ArgumentParser(); ap.add_argument("--width", type=int, default=375); WIDTH = ap.parse_args().width
 FAIL = []
 def ok(cond, msg): print(("PASS " if cond else "FAIL ") + msg); cond or FAIL.append(msg)
 
@@ -29,13 +29,13 @@ class Quiet(http.server.SimpleHTTPRequestHandler):
 
 class Chrome:
     """Minimal DevTools client over --remote-debugging-pipe (stdlib only): one headless Chrome, one throwaway profile."""
-    def __init__(self, profile):
+    def __init__(self, profile, tmpdir):
         r1, w1 = os.pipe(); r2, w2 = os.pipe()  # we write w1 -> Chrome reads fd 3; Chrome writes fd 4 -> we read r2
         def child(): os.dup2(r1, 3); os.dup2(w2, 4)
         self.p = subprocess.Popen([CHROME, "--headless=new", "--no-sandbox", "--disable-gpu", "--hide-scrollbars", "--no-first-run", "--no-default-browser-check",
                                    "--disable-extensions", "--disable-background-networking", "--disable-component-update", "--disable-sync",
                                    "--host-resolver-rules=MAP * ~NOTFOUND, EXCLUDE 127.0.0.1", "--remote-debugging-pipe", f"--user-data-dir={profile}", "about:blank"],
-                                  pass_fds=(3, 4), close_fds=True, preexec_fn=child, start_new_session=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                                  pass_fds=(3, 4), close_fds=True, preexec_fn=child, start_new_session=True, env=dict(os.environ, TMPDIR=tmpdir, TMP=tmpdir, TEMP=tmpdir), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         os.close(r1); os.close(w2)
         self.w, self.r, self.buf, self.n = os.fdopen(w1, "wb", 0), os.fdopen(r2, "rb", 0), b"", 0
         tid = self.call("Target.createTarget", url="about:blank")["targetId"]
@@ -77,17 +77,14 @@ class Chrome:
         if self.p.poll() is None: self.p.wait()
         for f in (self.w, self.r): f.close()
 
-def chrome_tmp():  # Chrome's own scratch dirs in /tmp; only the ones that appear during this run are removed
-    return set(glob.glob("/tmp/.org.chromium.*") + glob.glob("/tmp/scoped_dir*"))
-
 srv = http.server.ThreadingHTTPServer(("127.0.0.1", 0), functools.partial(Quiet, directory=os.path.join(ROOT, "docs")))
 threading.Thread(target=srv.serve_forever, daemon=True).start()
 base = f"http://127.0.0.1:{srv.server_address[1]}"
-before = chrome_tmp()
 out = {}
 try:
     with tempfile.TemporaryDirectory(prefix="om-fl-layout-") as tmp:
-        c = Chrome(os.path.join(tmp, "profile"))
+        ctmp = os.path.join(tmp, "chrome-tmp"); os.makedirs(ctmp)
+        c = Chrome(os.path.join(tmp, "profile"), ctmp)
         try:
             for p in PAGES:
                 c.goto(f"{base}/{p}/", WIDTH, 800)
@@ -96,8 +93,6 @@ try:
             c.close()
 finally:
     srv.shutdown(); srv.server_close()
-    for d in sorted(chrome_tmp() - before):
-        shutil.rmtree(d, ignore_errors=True)
 
 for p, o in out.items():
     print(f"{p} @{WIDTH}: {json.dumps(o)}")
