@@ -137,6 +137,13 @@ _hh = [row[1]["text"] for row in data_rows(P["fl-hendry-hospital-special_distric
 ok(len(_hh) == 2 and _hh[0] == "Operating" and _hh == [levy(r) for r in BODIES["fl-hendry-hospital-special_district"]], f"L1 other components follow the fixed parts in file order (Hendry hospital: {_hh})")
 ok(len(sf) == 26 and not re.search(r"(?i)<t[dh][^>]*>\s*(total|sum)\b", sf_h), "L1 AC6 unchanged: 26 SFWMD rows, no sum row")
 
+# ---------------- LAYOUT caption: stacked-table caption is block-level at <=40rem ----------------
+_css = rd("docs/style.css"); _i = _css.find("table.sd-rates thead"); _s = _css.rfind("@media", 0, _i); _d = 0; _blk = ""
+for _k in range(_css.find("{", _s), len(_css)):
+    _d += {"{": 1, "}": -1}.get(_css[_k], 0)
+    if _d == 0: _blk = _css[_s:_k + 1]; break
+ok(_i > 0 and _blk.replace(" ", "").startswith("@media(max-width:40rem)") and "table.sd-rates caption{display:block}" in _blk, "LAYOUT caption: table.sd-rates caption{display:block} sits inside the @media (max-width:40rem) block with the sd-rates rules")
+
 # ---------------- LAYOUT (b) / L2: grouped, ARIA-roled markup on every body page ----------------
 bad_l2 = []
 for b, rs in BODIES.items():

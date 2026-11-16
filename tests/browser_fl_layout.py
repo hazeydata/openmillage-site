@@ -16,7 +16,7 @@ def ok(cond, msg): print(("PASS " if cond else "FAIL ") + msg); cond or FAIL.app
 
 MEASURE = """new Promise(function(done){document.fonts.ready.then(function(){
 var w=document.querySelector('.tablewrap'),t=w&&w.querySelector('table.sd-rates'),o={vw:window.innerWidth};
-if(t){o.wrap=w.clientWidth;o.table=t.scrollWidth;o.rows=t.querySelectorAll('tbody tr').length;
+if(t){o.wrap=w.clientWidth;o.table=t.scrollWidth;var cp=t.querySelector('caption');o.cap=cp?cp.getBoundingClientRect().width:-1;o.tbl=t.getBoundingClientRect().width;o.rows=t.querySelectorAll('tbody tr').length;
 o.num_lines=[].map.call(t.querySelectorAll('td.num'),function(td){var r=document.createRange();r.selectNodeContents(td);
 var tops={};[].forEach.call(r.getClientRects(),function(q){if(q.width>0)tops[Math.round(q.top)]=1});return Object.keys(tops).length});}
 var f=[].filter.call(document.querySelectorAll('main *'),function(e){return [].some.call(e.childNodes,function(n){return n.nodeType==3&&n.textContent.trim()})})
@@ -100,6 +100,7 @@ for p, o in out.items():
     ok(o["vw"] == WIDTH, f"{p}: viewport {o['vw']} px == {WIDTH}")
     ok(o["table"] <= o["wrap"], f"LAYOUT (b)6 {p}: table.scrollWidth {o['table']} <= wrapper.clientWidth {o['wrap']} (no horizontal scroll)")
     ok(o["num_lines"] and all(n == 1 for n in o["num_lines"]), f"LAYOUT (b)6 {p}: one line box per td.num ({len(o['num_lines'])} rate cells, line counts {sorted(set(o['num_lines']))})")
+    if WIDTH <= 640: ok(o["cap"] > 0 and abs(o["cap"] - o["tbl"]) < 0.5, f"LAYOUT caption {p}: caption width {o['cap']} == table width {o['tbl']}")
     ok(o["min_text_px"] >= 12, f"LAYOUT (b)6 {p}: min text {o['min_text_px']} px >= 12")
     ok(not o["doc_overflow"], f"{p}: page does not scroll sideways")
 print("FAILURES", len(FAIL)); sys.exit(1 if FAIL else 0)
