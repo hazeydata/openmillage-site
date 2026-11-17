@@ -166,7 +166,7 @@ def render_amend3(rows, districts, ballot, counties, sd_counties=None):
     title = ballot["title"]
     page = (f"<!doctype html><html lang=en><head><meta charset=utf-8><title>{E(title)}: Florida 2025 adopted millage baseline</title>"
             f"<link rel=canonical href='{BASE}/{SLUG}/'>{sc.head_extra(PATH)}{GOATCOUNTER_TAG}</head>"
-            f"{sc.body(PATH, H1, body, 'amend', SLUG, '', sources.data_updated(sources.load_rows()), [('2025 adopted millage baseline', None)], kicker=kicker)}</html>\n")
+            f"{sc.body(PATH, H1, body, 'amend', SLUG, '', sources.data_updated(sources.load_rows()), [(sources.FL_HUB_COPY['crumb'], f"{PATH}/{sources.FL_HUB}/"), ('2025 adopted millage baseline', None)], kicker=kicker)}</html>\n")
     return page, allrows
 
 H1 = "Florida 2025 adopted millage baseline"

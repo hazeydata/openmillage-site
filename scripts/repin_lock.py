@@ -14,6 +14,12 @@ Without --write it only reports. --replace-pin OLD also rewrites the exact OLD c
 7- and 8-char prefixes) to the new one in PIN_TEXT_FILES, so a branch-head pin can be re-pointed to the squash-merge
 commit with one command:
     python3 scripts/repin_lock.py --product P --commit MERGE_SHA --replace-pin BRANCH_HEAD_SHA --write
+
+Sanctioned data change (OM-FL-COVERAGE-001): --data-change PATH [PATH ...] re-pins exactly the listed lock paths to
+<commit>:<source_path>, whatever changed (rows added, values changed), and nothing else. Every listed path must be a lock
+entry and must exist at the commit; any other entry stays byte-unchanged. The noise-only check is not applied to these
+paths, so use it only for a data change merged in the product repo. --group and --replace-pin do not apply.
+    python3 scripts/repin_lock.py --product P --commit SHA --data-change data/special/a.csv data/special/b.csv --write
 """
 import argparse, csv, hashlib, io, json, re, subprocess, sys
 from decimal import Decimal
@@ -80,10 +86,13 @@ def main(argv):
     ap.add_argument("--audit", action="store_true")
     ap.add_argument("--write", action="store_true")
     ap.add_argument("--replace-pin")
+    ap.add_argument("--data-change", nargs="+", metavar="PATH")
     a = ap.parse_args(argv)
     commit = subprocess.run(["git", "-C", a.product, "rev-parse", "--verify", a.commit + "^{commit}"],
                             capture_output=True, text=True, check=True).stdout.strip()
     lock = json.load(open(LOCK))
+    if a.data_change:
+        return data_change(a, commit, lock)
     prefixes = [GROUPS[g] for g in a.group.split(",")]
     refused, plan = [], []
     for f in lock["files"]:
@@ -118,6 +127,37 @@ def main(argv):
                 open(p, "w", encoding="utf-8").write(u)
                 print(f"pin text updated: {p}")
     print(f"wrote {LOCK}: {len(plan)} entries -> {commit}")
+    return 0
+
+
+def data_change(a, commit, lock):
+    """Re-pin exactly the listed lock paths (a sanctioned data change); refuse unknown or missing paths before writing."""
+    if a.audit or a.replace_pin:
+        print("REFUSED: --data-change cannot be combined with --audit or --replace-pin", file=sys.stderr)
+        return 1
+    by_path = {f["path"]: f for f in lock["files"]}
+    want = list(dict.fromkeys(a.data_change))
+    unknown = [p for p in want if p not in by_path]
+    if unknown:
+        print(f"REFUSED: not lock entries: {unknown}; nothing written", file=sys.stderr)
+        return 1
+    plan = []
+    for p in want:
+        f = by_path[p]
+        new = show(a.product, commit, f["source_path"])
+        if new is None:
+            print(f"REFUSED: {f['source_path']} missing at {commit[:8]}; nothing written", file=sys.stderr)
+            return 1
+        kind = classify(open(p, "rb").read(), new)[0]
+        print(f"DATA\t{p}\t{f['commit'][:8]}->{commit[:8]}\t{kind}\tsha256={hashlib.sha256(new).hexdigest()[:12]}")
+        plan.append((f, new))
+    if not a.write:
+        return 0
+    for f, new in plan:
+        open(f["path"], "wb").write(new)
+        f["commit"], f["sha256"] = commit, hashlib.sha256(new).hexdigest()
+    open(LOCK, "w").write(json.dumps(lock, indent=1) + "\n")
+    print(f"wrote {LOCK}: {len(plan)} entries -> {commit} (data change)")
     return 0
 
 

@@ -41,7 +41,7 @@ blockquote.official{margin:1rem 0;padding:.25rem 1rem;border-left:4px solid var(
 [hidden]{display:none!important}
 .keynums{font-size:1rem}
 details.cgroup{border-bottom:1px solid var(--border);padding:.25rem 0}
-details.cgroup summary{cursor:pointer;padding:.6rem 0;min-height:44px}
+details.cgroup summary,.reason-more summary{cursor:pointer;padding:.6rem 0;min-height:44px}
 .chart img{width:100%;height:auto}
 .chart>div{overflow-x:auto}
 @media (max-width:40rem){.chart img{width:auto;max-width:none;min-width:60rem;height:auto}}
@@ -67,4 +67,5 @@ table.sd-rates caption{display:block}}
 #isd-groups>details.cgroup[open]>summary::before{transform:rotate(45deg)}
 #isd-groups>details.cgroup>summary:focus-visible{outline:3px solid var(--link);outline-offset:2px}
 #isd-groups>details.cgroup>ul.counties{margin:0 0 var(--s1)}
-table.tx-rates td.num{white-space:nowrap}@media (max-width:40rem){table.tx-rates th,table.tx-rates td{padding:.5rem .35rem}}
+table.tx-rates td.num{white-space:nowrap}@media (max-width:40rem){table.tx-rates th,table.tx-rates td,.sd-body,.sd-body~td{padding:.5rem .35rem}}
+#fl-coverage .hub-county{white-space:nowrap}#fl-coverage td a,.sd-body a{overflow-wrap:normal}

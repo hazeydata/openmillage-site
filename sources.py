@@ -15,7 +15,41 @@ NOTE_OVERRIDES = {
     ("Orange", "fl-sfwmd-special_district"): "Shown as one combined rate. Orange County's authority list prints it in three parts: 0.0948 + 0.1026 + 0.0327 = 0.2301.",
     ("Orange", "fl-cftod-special_district"): "Formerly Reedy Creek Improvement District. Independent special district. Printed as one combined operating and debt rate, levied only in mill code 70 (Bay Lake, Lake Buena Vista and unincorporated Reedy Creek).",
 }
+# Copy from the writing pass (Lindsay, OM-FL-COVERAGE-001 fl-hub-copy-r2.md, sha256 0e133591, section 4), wired word for word,
+# OM-FL-COVERAGE-001 by-eye r1 fix 3: display-only plain-words notes for the district_wide water-management-district alt rows.
+# Shown as a numbered note under the rate table ("Note N" in the cell) on the county page and the body page; the row's note in the
+# data and in every JSON output stays the pinned source note (never edited here).
+NOTE_UNDER_TABLE = {
+    ("Calhoun", "fl-nwfwmd-special_district"): (
+        "Resolution No. 957 sets 0.0207 of a mill for all of Calhoun County, which it names in its county list. The "
+        "meeting-packet copy of Resolution 957 isn't signed. Signed Resolution No. 958, in the Northwest Florida Water "
+        "Management District's FY 2025-26 Adopted Budget, confirms it was adopted, and we cite that as a second source. Florida "
+        "DOR's Data Book 2025 also lists Calhoun at 0.0207 county-wide, with no rate for only part of the county."),
+    ("Liberty", "fl-nwfwmd-special_district"): (
+        "Resolution No. 957 sets 0.0207 of a mill for all of Liberty County, which it names in its county list. The "
+        "meeting-packet copy of Resolution 957 isn't signed. Signed Resolution No. 958, in the Northwest Florida Water "
+        "Management District's FY 2025-26 Adopted Budget, confirms it was adopted, and we cite that as a second source. Florida "
+        "DOR's Data Book 2025 also lists Liberty at 0.0207 county-wide, with no rate for only part of the county."),
+    ("Clay", "fl-sjrwmd-special_district"): (
+        "This rate covers all of Clay County. Page 22 of the St. Johns River Water Management District's FY 2025-26 Final Budget "
+        "says: 'This is based on maintaining the current year millage rate of 0.1793'. Page 4 says the district's Governing "
+        "Board adopted the FY 2025-26 millage rate and the final budget on September 15, 2025. Page 6 lists Clay among the "
+        "district's 18 counties without the * that marks a county only partly inside the district. Florida DOR's Data Book 2025 "
+        "also lists Clay at 0.1793 county-wide, with no rate for only part of the county."),
+}
+# Copy from the writing pass (Lindsay, OM-FL-COVERAGE-001 fl-hub-copy-r3.md, sha256 c50d7d1e, "nwfwmd_merged"), wired word for word.
+# NWFWMD body page only: the Calhoun and Liberty rows share this one numbered note instead of their two NOTE_UNDER_TABLE notes,
+# when both rows are on the page and both are district_wide water-management-district alt rows (sources.merged_note_keys); otherwise
+# the page falls back to the separate notes. The Calhoun and Liberty county pages keep their own NOTE_UNDER_TABLE notes.
+NOTE_MERGED = {
+    "fl-nwfwmd-special_district": (("Calhoun", "Liberty"), (
+        "Resolution No. 957 sets 0.0207 of a mill for all of Calhoun County and all of Liberty County, both named in its county "
+        "list. The meeting-packet copy of Resolution 957 isn't signed. Signed Resolution No. 958, in the Northwest Florida Water "
+        "Management District's FY 2025-26 Adopted Budget, confirms it was adopted, and we cite that as a second source. Florida "
+        "DOR's Data Book 2025 also lists both counties at 0.0207 county-wide, with no rate for only part of either county.")),
+}
 HEX = re.compile(r"^[0-9a-f]{64}$")
+PARTIAL = "partial"  # status value in STATUS_FILE: some special-district rows published, others not yet sourced
 
 
 class DataError(Exception):
@@ -93,14 +127,18 @@ def load_rows(lock=None):
 
 
 def coverage(rows, state="FL", year="2025"):
+    """Counts from the data and the pinned status file. A county the status file marks `partial` (some special-district rows
+    published, others not yet sourced) counts as checked and is listed under "partial", not under "not_yet_sourced"."""
     counties = sorted(r["name"].removesuffix(" County") for r in _csv(COUNTIES_FILE))
-    open_ = sorted(r["county"] for r in _csv(STATUS_FILE))
+    status = _csv(STATUS_FILE)
+    open_ = sorted(r["county"] for r in status if r["status"] != PARTIAL)
+    partial = sorted(r["county"] for r in status if r["status"] == PARTIAL)
     with_rows = sorted({r["county"] for r in rows if r["state"] == state and r["year"] == year and r["body_type"] == "special_district"})
     checked = [c for c in counties if c not in open_]
     in_csv = sorted({r["county"] for r in _csv(SD_FILE) if r["state"] == state and r["year"] == year and r["body_type"] == "special_district"})
     return {"in_csv": len(in_csv), "sd_rows_in_csv": sum(1 for r in _csv(SD_FILE) if r["state"] == state and r["year"] == year and r["body_type"] == "special_district"), "counties_in_csv": in_csv, "alt_only": [c for c in with_rows if c not in in_csv],
             "counties": counties, "checked": len(checked), "total": len(counties), "with_rows": len(with_rows),
-            "no_rows": [c for c in checked if c not in with_rows], "not_yet_sourced": open_, "counties_with_rows": with_rows}
+            "no_rows": [c for c in checked if c not in with_rows], "not_yet_sourced": open_, "partial": partial, "counties_with_rows": with_rows}
 
 
 def data_updated(rows):
@@ -123,22 +161,73 @@ def join_names(xs):
     return xs[0] if len(xs) == 1 else ", ".join(xs[:-1]) + " and " + xs[-1]
 
 
+# Alt-source rows (data/special/fl-2025-alt-sources.csv) come from two kinds of document; the kind is read from source_agency.
+ALT_KINDS = (("pa", re.compile(r"County Property Appraiser")), ("wmd", re.compile(r"Water Management District")))
+
+
+def alt_kinds(state="FL", year="2025"):
+    """{county: kind} for every county with special-district rows in the alt-sources CSV. Unknown agency or a county whose
+    alt rows mix kinds raises DataError."""
+    out = {}
+    for r in _csv(ALT_FILE):
+        if r["state"] != state or r["year"] != year or r["body_type"] != "special_district":
+            continue
+        k = next((k for k, pat in ALT_KINDS if pat.search(r["source_agency"])), None)
+        if k is None:
+            raise DataError(f"alt-source agency of unknown kind: {r['source_agency']!r}")
+        if out.setdefault(r["county"], k) != k:
+            raise DataError(f"{r['county']}: alt-source rows mix document kinds")
+    return out
+
+
+def merged_note_keys(rows, body_id):
+    """(set of row keys, text) when a body page shows one merged numbered note (NOTE_MERGED) for several counties' rows, else
+    (set(), None). Every precondition must hold: each listed county has exactly one row of this body on the page, the row has its
+    own NOTE_UNDER_TABLE note, its levy_scope ends in district_wide, and the county's rows come from a water-management-district
+    document in the alt-sources CSV. If any fails, the caller falls back to the separate notes."""
+    if body_id not in NOTE_MERGED:
+        return set(), None
+    counties, text = NOTE_MERGED[body_id]
+    kinds = alt_kinds()
+    out = set()
+    for c in counties:
+        rs = [r for r in rows if r["county"] == c and r["body_id"] == body_id]
+        if not (len(rs) == 1 and (c, body_id) in NOTE_UNDER_TABLE and rs[0]["levy_scope"].split(";")[-1] == "district_wide"
+                and kinds.get(c) == "wmd"):
+            return set(), None
+        out.add(key(rs[0]))
+    return out, text
+
+
 def alt_counts(alt, state="FL", year="2025"):
     """{county: special-district rows} for the alt-only counties, counted from the alt-sources CSV."""
     rows = [r for r in _csv(ALT_FILE) if r["state"] == state and r["year"] == year and r["body_type"] == "special_district"]
     return {c: sum(1 for r in rows if r["county"] == c) for c in alt}
 
 
+def _by_kind(counts):
+    kinds = alt_kinds()
+    out = {}
+    for c, n in counts.items():  # a county with no alt row keeps the original (property appraiser) wording, as before this split
+        out.setdefault(kinds.get(c, "pa"), {})[c] = n
+    return [(k, out[k]) for k, _ in ALT_KINDS if k in out]
+
+
 def alt_sentence(counts):
-    """Body text: counties whose special-district rows come only from county property appraisers (not in the baseline CSV).
-    Wording: FL_SD_COPY (placeholder pending Lindsay); it no longer says the rows are on county pages only (OQ-11)."""
-    names = join_names([c + " (" + plural(n, "row") + ")" for c, n in counts.items()])
-    return FL_SD_COPY["alt_tail_one" if len(counts) == 1 else "alt_tail_many"].format(names=names)
+    """Body text: counties whose special-district rows come only from alt sources (not in the baseline CSV), one sentence per
+    document kind: county property appraisers (FL_SD_COPY, kept wording) and water management district documents (FL_HUB_COPY).
+    Wording: placeholder pending Lindsay; it no longer says the rows are on county pages only (OQ-11)."""
+    out = []
+    for kind, cs in _by_kind(counts):
+        names = join_names([c + " (" + plural(n, "row") + ")" for c, n in cs.items()])
+        copy = FL_SD_COPY if kind == "pa" else FL_HUB_COPY["alt"]
+        out.append(copy["alt_tail_one" if len(cs) == 1 else "alt_tail_many"].format(names=names))
+    return " ".join(out)
 
 
 def alt_meta_sentence(counts):
     """Meta description / JSON-LD wording for the same counties."""
-    return FL_SD_COPY["alt_tail_meta"].format(names=join_names(list(counts)))
+    return " ".join((FL_SD_COPY if kind == "pa" else FL_HUB_COPY["alt"])["alt_tail_meta"].format(names=join_names(list(cs))) for kind, cs in _by_kind(counts))
 
 
 def coverage_sentence(cov, meta=False):
@@ -253,3 +342,137 @@ def fl_bodies(rows, h1_path=H1_FILE, display=lambda s: s):
 def open_counties():
     """[(county, status, reason)] from the pinned TACD status file, file order."""
     return [(r["county"], r["status"], r["reason"]) for r in _csv(STATUS_FILE)]
+
+
+# ---------- Florida hub /fl/ (OM-FL-COVERAGE-001) ----------
+FL_HUB = "fl"
+# Copy from the writing pass (Lindsay, OM-FL-COVERAGE-001 fl-hub-copy.md, sha256 4f26f9bf), wired key for key; by-eye r1 layout fixes
+# from Ann applied (numbered notes, short hub cells). Round 3: absent, not_yet_line and the Monroe plain reason from fl-hub-copy-r2.md
+# (sha256 0e133591), wired word for word. Every reader-facing string of the /fl/ hub, the "partial" county line, the
+# plain reasons, the water-management-district alt-source wording, the big_cypress_basin levy label and the Florida breadcrumb label
+# lives here only. Counts and county names are always computed, never written here.
+FL_HUB_COPY = {
+    "crumb": "Florida",  # breadcrumb label linking /fl/ on every page under /fl/
+    "title": "Florida property tax rates 2025: every county, with sources",
+    "h1": "Florida property tax rates, 2025",
+    "desc": ("Every Florida county's 2025 millage page, plus which independent special districts we've sourced so far and which we haven't. "
+             "Official sources only, no estimates."),
+    "intro": ("Pick a county to see its 2025 millage rates, each linked to the official file it came from. The table also shows how far "
+              "we've got with each county's independent special districts, and why the missing ones are missing."),
+    "absent": "No row means not sourced yet. Absent is not zero.",  # fl-hub-copy-r2.md section 1; carries the spec AC17 line "absent is not zero"
+    "with_rows": ("{n} of {total} Florida counties have at least one sourced special-district row: {csv} from Florida DOR's 2025 rate file "
+                  "for the county (TACD) and {alt} only from other official documents."),
+    "sections_h2": "More Florida pages",
+    "sections": {"special_districts": "Independent special districts, one page each",
+                 "amendment_3": "Amendment 3: the 2025 adopted millage baseline",
+                 "rolled_back": "Rolled-back rate vs adopted millage, 2025"},
+    "table_h2": "Counties",
+    "table_caption": "Florida county pages and special-district coverage, 2025",
+    "th_county": "County",
+    "th_sd": "Special districts sourced",
+    "status_sourced": "Sourced ({bodies})",
+    "status_sourced_alt": "Sourced ({bodies}, from a {kind})",
+    "alt_kind": {"wmd": "water management district document", "pa": "county property appraiser document"},
+    "status_partial": "Partly sourced ({bodies} so far). {reason}",
+    "status_open": "Not sourced yet. {reason}",
+    # kept per fact-check (OM-FL-COVERAGE-001 fact-check REPORT sha 1107f87d): Lindsay's line is false for all 12 counties.
+    "status_none": "No special-district rows published yet",  # hub cell only; capitalised (layout-r2 nit, mechanical display change)
+    "status_multi": "Covers a city in two counties. See each county's page.",  # used only when every city label spans exactly 2 counties
+    "status_multi_more": "Covers a city in more than one county. See each county's page.",  # the writer's fallback otherwise
+    "body": ("district", "districts"),
+    # Plain reason per status-file county. Shown only while sha256 of the county's recorded reason (status file as pinned) still equals
+    # for_sha256; otherwise, or for a county not listed, the verbatim recorded reason is shown (sources.plain_reason).
+    "reason_plain": {
+        "Columbia": {"text": "The county's file doesn't add up: one area's printed total doesn't match the rates printed beside it.",
+                     "for_sha256": "ec657109202660503db22c748599bf8637a5b311faaecabcd2c3f59efcb0fee1"},
+        "Monroe": {"text": "The county's file is a scan we can't read reliably yet: when we read it, one area's rates don't come out to its printed total.",
+                   "for_sha256": "1ced3616e2de8cdbe98f6f2c2194ab95be19edc22b355406e533e03aeed84b89"},
+        "Sumter": {"text": "The county's file prints city totals but not the rates inside them, so there's nothing to check them against.",
+                   "for_sha256": "00fa6d624b8deeb873f036b01b3ec6cc8e525045966c68515e5b76d5125a7777"},
+        "Collier": {"text": ("The South Florida Water Management District is sourced. The county's fire and mosquito control districts "
+                             "aren't yet: its file prints no total to check them against."),
+                    "for_sha256": "436f85e968db5fe0c00417164a538a290ca68647693011b850d2d4fb8255839d"},
+    },
+    # Open (not yet sourced) county pages: this line, then the plain reason, then the reason_more <details> (fl-hub-copy-r2.md section 2).
+    "not_yet_line": "We've checked this county's official file, but we can't use it yet. Here's why:",
+    "reason_more": "Full recorded reason",  # <summary> of the <details class=reason-more> holding the verbatim status-file reason
+    "partial_line": "Partly sourced: some of this county's independent special districts are on this page, and others aren't yet. {reason}",
+    "partial_list": "Partly sourced so far: {names}.",
+    "partial_badge": "special districts partly sourced",
+    "levy_labels": {"big_cypress_basin": "Big Cypress Basin"},  # display label only; the data value stays big_cypress_basin
+    "lead_wmd": "water management districts",  # homepage source-type name for alt rows from WMD documents
+    "home_lead_tail_split": "Another {pa} come from county property appraisers and {wmd} from water management districts, outside the baseline CSV.",
+    "home_link": "Florida: every county page and how far we've got on special districts",
+    "alt": {
+        "alt_tail_one": "{names} has special-district rates from a water management district document, not the baseline CSV.",
+        "alt_tail_many": "{names} have special-district rates from water management district documents, not the baseline CSV.",
+        "alt_tail_meta": "{names} special-district rows come from water management district documents, not the baseline CSV.",
+    },
+    "llms_line": ("- Florida hub: {url} (every Florida county page, and each county's special-district coverage: sourced, partly sourced, "
+                  "or not sourced yet with the reason; absent is not zero).\n"),
+    # These two reuse the rate rows' link pattern (build.src_link: the word "source" and "Source for ..." aria-label); they are not new prose.
+    "tacd_source": "source",
+    "tacd_source_aria": "Source for {county} County's 2025 TACD file",
+}
+
+
+def tacd_source(county):
+    """(url, sha256) of the county's single 2025 TACD file, read from the path in amend3_config.json (tacd_sources_csv).
+    File names map to counties as in amend3.tacd_sources. Zero or several files, a non-https url or a bad sha256 raise DataError."""
+    path = json.load(open("amend3_config.json"))["tacd_sources_csv"]
+    hits = []
+    for r in csv.DictReader(open(path, newline="")):
+        c = re.sub(r" (County City )?TACD\..*$", "", r["file"])[5:]
+        if {"Saint Johns": "St. Johns", "Saint Lucie": "St. Lucie"}.get(c, c) == county: hits.append(r)
+    if len(hits) != 1: raise DataError(f"{county}: expected exactly one 2025 TACD file in {path}, found {len(hits)}")
+    url, sha = hits[0]["url"], hits[0]["sha256"]
+    if not url.startswith("https://"): raise DataError(f"{county}: TACD source url is not https: {url!r}")
+    if not re.fullmatch(r"[0-9a-fA-F]{64}", sha): raise DataError(f"{county}: TACD sha256 is not 64 hex chars: {sha!r}")
+    return url, sha
+
+
+def plain_reason(county, verbatim):
+    """The writer's plain reason for a status-file county, only if it is listed in FL_HUB_COPY["reason_plain"] and was written from this
+    exact recorded reason (sha256 of the verbatim text equals for_sha256); otherwise the verbatim recorded reason, so a status-file change
+    can never leave a stale plain line."""
+    p = FL_HUB_COPY["reason_plain"].get(county)
+    if p and hashlib.sha256(verbatim.encode("utf-8")).hexdigest() == p["for_sha256"]:
+        return p["text"]
+    return verbatim
+
+
+def status_multi(labels):
+    """status_multi when every multi-county city label (parts split on "/") spans exactly 2 counties, else status_multi_more."""
+    return FL_HUB_COPY["status_multi"] if labels and all(len(l.split("/")) == 2 for l in labels) else FL_HUB_COPY["status_multi_more"]
+
+
+def multi_labels(cov, state="FL", year="2025"):
+    """County labels in the base file that are not census counties (two-county city rows such as Flagler/St. Johns)."""
+    return sorted({r["county"] for r in _csv(BASE_FILE) if r["state"] == state and r["year"] == year} - set(cov["counties"]))
+
+
+def display_label(label):
+    """Display only: a multi-county city label is shown with a space around the slash ("Flagler / St. Johns")."""
+    return " / ".join(p.strip() for p in label.split("/"))
+
+
+def fl_hub_status(label, cov, rows, state="FL", year="2025", reason=None):
+    """(kind, text) for one county label's special-district coverage, computed from the rows and the status file.
+    kind: sourced | sourced_alt | partial | open | none | multi. {reason} is filled with `reason` when given (the hub passes a marker it
+    turns into a "Note N" link), else with the plain reason (plain_reason)."""
+    C = FL_HUB_COPY
+    reasons = {c: why for c, st, why in open_counties()}
+    rs = lambda c: plain_reason(c, reasons[c]) if reason is None else reason
+    bodies = sorted({r["body_id"] for r in rows if r["state"] == state and r["year"] == year and r["county"] == label and r["body_type"] == "special_district"})
+    nb = plural(len(bodies), *C["body"])
+    if label not in cov["counties"]:
+        return "multi", status_multi(multi_labels(cov, state, year))
+    if label in cov["not_yet_sourced"]:
+        return "open", C["status_open"].format(reason=rs(label))
+    if label in cov["partial"]:
+        return "partial", C["status_partial"].format(bodies=nb, reason=rs(label))
+    if not bodies:
+        return "none", C["status_none"]
+    if label in cov["alt_only"]:
+        return "sourced_alt", C["status_sourced_alt"].format(bodies=nb, kind=C["alt_kind"][alt_kinds()[label]])
+    return "sourced", C["status_sourced"].format(bodies=nb)

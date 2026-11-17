@@ -16,9 +16,12 @@ PRIMARY = {
     "Florida Office of Economic & Demographic Research (Municipal Ad Valorem Tax Profile; data source FL DOR)": "EDR",
     "DeSoto County Property Appraiser (2025 DeSoto County Final Millage)": "county property appraisers",
     "Orange County Property Appraiser (2025 Final Millage Rates, taxing authorities by mill code)": "county property appraisers",
+    # OM-FL-COVERAGE-001 (openmillage@9d125472): alt rows for Calhoun, Liberty (NWFWMD) and Clay (SJRWMD)
+    "Northwest Florida Water Management District (Resolution No. 957, Final Public Hearing on the FY 2025-2026 Budget, Sept 24, 2025)": "water management districts",
+    "St. Johns River Water Management District (FY 2025-26 Final Budget)": "water management districts",
 }
 ADDITIONAL = {"Pasco County Board of County Commissioners (Resolution No. 25-348)": "Pasco County BOCC resolution"}
-ORDER = ["Florida DOR", "EDR", "county property appraisers"]
+ORDER = ["Florida DOR", "EDR", "county property appraisers", "water management districts"]
 
 def rd(p): return list(csv.DictReader(open(p, encoding="utf-8")))
 alt = rd(ALT)

@@ -9,10 +9,16 @@ def ok(cond, msg): print(("PASS " if cond else "FAIL ") + msg); cond or FAIL.app
 API = "docs/api/v1/fl/2025"
 def js(c): return json.load(open(f"{API}/{c}.json"))
 def pg(c): return open(f"docs/fl/2025/{c}-county/index.html", encoding="utf-8").read()
-SENT = "57 of 67 Florida counties checked against official sources; 43 have special-district rows in the Amendment 3 baseline CSV. DeSoto (1 row) and Orange (3 rows) have special-district rates from their county property appraisers, not the baseline CSV."  # OM-SITE-SPECIAL-ISD-001: alt tail reworded (OQ-11)
+SENT = ("64 of 67 Florida counties checked against official sources; 47 have special-district rows in the Amendment 3 baseline CSV. "
+        "DeSoto (1 row) and Orange (3 rows) have special-district rates from their county property appraisers, not the baseline CSV. "
+        "Calhoun (1 row), Clay (1 row) and Liberty (1 row) have special-district rates from water management district documents, not the baseline CSV.")  # OM-FL-COVERAGE-001 (openmillage@9d125472): 7 counties gained rows, Collier is partial; WMD-document alt sentence added
 NO_ROWS = "No special-district rows published yet for this county."
 NO_ROWS_COUNTIES = ["Bradford", "Citrus", "Franklin", "Glades", "Hardee", "Highlands", "Nassau", "Okeechobee", "Pasco", "Polk", "Wakulla", "Walton"]
-OPEN = ["Calhoun", "Clay", "Columbia", "Monroe", "Collier", "Sumter", "Gadsden", "Levy", "Taylor", "Liberty"]
+# OM-FL-COVERAGE-001 AC23: the open (not yet sourced) counties are read from the pinned status file, not hard-coded;
+# a `partial` county (some rows published) is listed separately.
+_STATUS = list(csv.DictReader(open(sources.STATUS_FILE, newline="", encoding="utf-8")))
+OPEN = [r["county"] for r in _STATUS if r["status"] != "partial"]
+PARTIAL = [r["county"] for r in _STATUS if r["status"] == "partial"]
 CFTOD_SHA = "1f4e3b57663e35703d71d5338c0add294164c90813ef78275af7d978a9486a68"
 
 def build_copy(mutate=None):
@@ -59,7 +65,7 @@ ok("python3 tests/test_special.py" in wf, "CI runs tests/test_special.py")
 n_base = len(list(csv.DictReader(open(sources.BASE_FILE)))); n_sd = len(list(csv.DictReader(open(sources.SD_FILE))))
 n_alt = sum(r["body_type"] == "special_district" for r in csv.DictReader(open(sources.ALT_FILE)))
 api_rows = [r for f in sorted(glob.glob(f"{API}/*.json")) if not os.path.basename(f).startswith("amendment-3") for r in json.load(open(f))]
-ok((n_base, n_sd, n_alt) == (601, 161, 4) and n_base + n_sd + n_alt == len(rows) == len(api_rows) == 766,
+ok((n_base, n_sd, n_alt) == (601, 167, 7) and n_base + n_sd + n_alt == len(rows) == len(api_rows) == 775,  # OM-FL-COVERAGE-001: +6 TACD, +3 alt rows (openmillage@9d125472)
    f"AC2 {n_base} + {n_sd} + {n_alt} = {n_base + n_sd + n_alt}; loaded {len(rows)}; JSON API {len(api_rows)}")
 
 pas = [r for r in js("pasco") if r["body_type"] == "county" and r["levy_component"] == "operating" and r["rate_kind"] == "adopted"]
@@ -87,7 +93,8 @@ ok(r.returncode != 0 and "duplicate key" in r.stderr, "AC4 a duplicated row fail
 shutil.rmtree(tmp)
 
 sd = [r for r in api_rows if r["body_type"] == "special_district"]
-ok(len(sd) == 165 and all(re.match(r"^https?://\S+$", r["source_url"]) and re.fullmatch(r"[0-9a-f]{64}", r["sha256"]) for r in sd),
+ok(len(sd) == 174 and all(  # OM-FL-COVERAGE-001: 165 + 9
+   re.match(r"^https?://\S+$", r["source_url"]) and re.fullmatch(r"[0-9a-f]{64}", r["sha256"]) for r in sd),
    f"AC5 all {len(sd)} special_district rows have an http(s) source_url and 64-hex sha256")
 def no_sha(t):
     p = os.path.join(t, sources.SD_FILE); s = open(p).read().replace("6f6d8dfbc4466961fa1c45531cb734ae1f0863873188cf6810622827ec700861", "", 1)
@@ -107,7 +114,8 @@ for c in with_rows:
     h = pg(re.sub(r"[^a-z0-9]+", "-", c.lower()).strip("-")); sec = h.split("Special districts</h2>", 1)[-1]
     srows = [r for r in rows if r["county"] == c and r["body_type"] == "special_district"]
     if not ("Special districts</h2>" in h and all(html.escape(r["taxing_body"]) in sec and f"title='{r['sha256']}'>{r['sha256'][:8]}</code>" in sec and html.escape(r["source_url"]) in sec
-            and (r["levy_component"] == "all_components_combined" or html.escape(site_chrome.label(r["levy_component"])) in sec) and f"<td class=num>{float(r['rate']):.4f} {r['unit']}</td>" in sec for r in srows)):
+            and (r["levy_component"] == "all_components_combined" or html.escape(site_chrome.label(r["levy_component"])) in sec) and r["unit"] == "mills" and f"<td class=num>{float(r['rate']):.4f}</td>" in sec for r in srows)
+            and "<th scope=col class=num>Rate (mills)</th>" in sec):  # by-eye r2 R1: unit in the header, bare rate in the cell
         FAIL.append(f"AC7 {c}")
 ok(not [f for f in FAIL if f.startswith("AC7")], f"AC7 {len(with_rows)} county pages carry a Special districts section with name, levy, rate, source link and sha256")
 
@@ -120,23 +128,31 @@ oh = pg("orange")
 ok(len(cf) == 1 and cf[0]["taxing_body"] == "Central Florida Tourism Oversight District" and "display_rate" not in cf[0] and cf[0]["levy_component"] == "all_components_combined"
    and cf[0]["rate"] == "12.4236" and cf[0]["sha256"] == CFTOD_SHA and "Formerly Reedy Creek" in cf[0]["note"] and "contentFileID=416847" in cf[0]["source_url"],
    "AC9 CFTOD JSON row golden")
-ok(any("<td><a href='/fl/special-districts/cftod/'>Central Florida Tourism Oversight District</a><br>" in tr and re.findall(r"<td>([^<]*)</td>", tr)[0] == "(operating + debt, combined)"
-   and "<td class=num>12.4236 mills</td>" in tr for tr in oh.split("<tr>")) and "Formerly Reedy Creek" in oh
+ok(any("<td class=sd-body><a href='/fl/special-districts/cftod/'>Central Florida Tourism Oversight District</a><br>" in tr and re.findall(r"<td>([^<]*)</td>", tr)[0] == "(operating + debt, combined)"
+   and "<td class=num>12.4236</td>" in tr for tr in oh.split("<tr>")) and "<th scope=col class=num>Rate (mills)</th>" in oh.split("Independent special districts in Orange County</caption>")[1].split("</thead>")[0] and "Formerly Reedy Creek" in oh
    and "contentFileID=416847" in oh and f"title='{CFTOD_SHA}'" in oh, "AC9 CFTOD on the Orange page")
 ch = [r for r in js("alachua") if r["taxing_body"] == "Children's Trust of Alachua County"]
 ok(len(ch) == 1 and ch[0]["rate"] == "0.4500" and ch[0]["sha256"].startswith("6f6d8dfb") and ch[0]["sha256"].endswith("0861")
-   and "Children&#x27;s Trust of Alachua County" in pg("alachua") and "0.4500 mills" in pg("alachua"), "AC10 Children's Trust of Alachua County golden")
+   and "Children&#x27;s Trust of Alachua County" in pg("alachua") and any("Children&#x27;s Trust of Alachua County</a>" in tr and "<td class=num>0.4500</td>" in tr for tr in pg("alachua").split("<tr>"))
+   and "<th scope=col class=num>Rate (mills)</th>" in pg("alachua").split("Independent special districts in Alachua County</caption>")[1].split("</thead>")[0], "AC10 Children's Trust of Alachua County golden (rate in the 'Rate (mills)' column)")
 ok(len(now_or) == 20 and len(main_or) == 17 and any(r["body_type"] == "special_district" for r in now_or), f"AC11 orange.json has {len(now_or)} rows")
 
 sentence = sources.coverage_sentence(cov)
 pages = glob.glob("docs/fl/2025/*-county/index.html")
-ok(all(html.escape(sentence) in open(p).read() for p in pages + ["docs/index.html"]), f"AC12 computed coverage sentence on index and all {len(pages)} county pages")
-ok(sentence == SENT and (cov["checked"], cov["total"], cov["with_rows"]) == (57, 67, 45) and cov["with_rows"] + len(cov["no_rows"]) == cov["checked"], f"AC12 computed sentence equals the ruled string: {sentence}")
+# OM-FL-COVERAGE-001 by-eye r1 fix 5: county pages link /fl/ (where the statewide sentence now lives) instead of repeating it
+_fl_link = f"<p class=muted><a href='/fl/'>{html.escape(sources.FL_HUB_COPY['home_link'])}</a></p>"
+ok(html.escape(sentence) in open("docs/index.html").read() and html.escape(sentence) in open("docs/fl/index.html").read()
+   and all(html.escape(sentence) not in open(p).read() and _fl_link in open(p).read() for p in pages),
+   f"AC12 computed coverage sentence on index and /fl/; all {len(pages)} county pages link /fl/ instead")
+ok(sentence == SENT and (cov["checked"], cov["total"], cov["with_rows"]) == (64, 67, 52) and cov["with_rows"] + len(cov["no_rows"]) == cov["checked"], f"AC12 computed sentence equals the ruled string: {sentence}")
 ok(cov["no_rows"] == NO_ROWS_COUNTIES, f"AC13 no-rows counties are the ruled 12: {cov['no_rows']}")
 ok(all(NO_ROWS in pg(c.lower()) and "0.0000" not in pg(c.lower()).split("Special districts</h2>")[1].split("<p>Source:")[0] for c in cov["no_rows"]),
    f"AC13 the {len(cov['no_rows'])} computed no-rows counties show the fixed string: {cov['no_rows']}")
 ok(sorted(cov["not_yet_sourced"]) == sorted(OPEN) and all("not yet sourced" in pg(c.lower()) and NO_ROWS not in pg(c.lower()) and "<th>Taxing body</th><th>Levy</th><th>Rate</th>" not in pg(c.lower()) for c in OPEN)
-   and all(c in open("docs/index.html").read().split("<p>Independent special districts not yet sourced")[1].split("</p>")[0] for c in OPEN), "AC14 the 10 open counties are listed as not yet sourced on the index and their pages")
+   and all(c in open("docs/index.html").read().split("<p>Independent special districts not yet sourced")[1].split("</p>")[0] for c in OPEN), f"AC14 the {len(OPEN)} open counties (status file) are listed as not yet sourced on the index and their pages")
+ok(sorted(cov["partial"]) == sorted(PARTIAL) and not set(PARTIAL) & set(OPEN) and all("not yet sourced" not in pg(c.lower()).split("Special districts</h2>")[1].split("<p>Source:")[0].split("<details class=reason-more>")[0]
+   and "<p class=partial>" in pg(c.lower()) and "<th scope=col>Taxing body</th><th scope=col>Levy</th>" in pg(c.lower()) for c in PARTIAL),
+   f"AC14 the {len(PARTIAL)} partial counties (status file: {PARTIAL}) show their rows and the partial line, not the not-yet-sourced block")
 import site_chrome as _sc
 _t = html.escape(_sc.RATE_KIND_COPY['aggregate_effective']['note'])
 ok("<p id=agg-note>" in oh and _t in oh.split("<p id=agg-note>")[1].split("</p>")[0] and "<p id=agg-note>" not in oh.split("Special districts</h2>")[1], "AC15 aggregate_effective note still renders (copy from site_chrome.RATE_KIND_COPY)")
@@ -159,8 +175,8 @@ def snap(d):
 tmp, r = build_copy(); t2, r2 = build_copy()
 ok(r.returncode == 0 and r2.returncode == 0 and snap(tmp) == snap(t2), f"AC19 two builds produce byte-identical docs/ ({len(snap(tmp))} files) apart from lastmod")
 shutil.rmtree(tmp); shutil.rmtree(t2)
-po = pg("polk"); i = [po.find(s) for s in ("Special districts</h2>", html.escape(sentence), NO_ROWS)]
-ok(-1 not in i and i == sorted(i), "visual: Polk order is heading, coverage, empty-state line")
+po = pg("polk"); i = [po.find(s) for s in ("Special districts</h2>", _fl_link, NO_ROWS)]
+ok(-1 not in i and i == sorted(i), "visual: Polk order is heading, coverage (link to /fl/), empty-state line")
 BANNED = re.compile(r"\b(CEO|rulings?|R6)\b", re.I)
 hits = ["CEO ruling 2026-10-20", "CEO rulings", "Fred ruling", "(ruling 5)", "ceo", "Ruling", "rulings", "r6", "per R6."]
 misses = ["Osceola", "OSCEOLA County", "overruling", "AR6X", "R60", "ceos", "rulingx"]
@@ -218,6 +234,6 @@ texts = [html.escape(v) for v in NOTES.values()] + list(NOTES.values())
 bad_json = [sources.key(r) for r in other if r["note"] != raw_notes[(r["county"], r["body_id"], r["levy_component"])]]
 bad_pages = sorted({r["county"] for r in other if any(x in pg(re.sub(r"[^a-z0-9]+", "-", r["county"].lower()).strip("-")) for x in texts)})
 bad_api = [r["county"] for r in other if any(x in (r["note"] or "") for x in NOTES.values())]
-ok(len(other) == 162 and not bad_json and not bad_pages and not bad_api,
+ok(len(other) == 171 and not bad_json and not bad_pages and not bad_api,  # OM-FL-COVERAGE-001: 162 + 9
    f"Orange note overrides stay in Orange: {len(other)} other-county rows keep their source notes; mismatches {bad_json[:3]}, pages with Orange text {bad_pages[:5]}")
 print("FAILURES", len(FAIL)); sys.exit(1 if FAIL else 0)

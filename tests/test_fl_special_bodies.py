@@ -81,6 +81,9 @@ dirs = sorted(os.path.basename(os.path.dirname(p)) for p in glob.glob("docs/fl/s
 ok(len(dirs) == N and set(dirs) == set(SLUG.values()) and len(set(SLUG.values())) == N, f"AC1 {len(dirs)} body pages == {N} distinct body_ids (computed), slugs unique")
 ok(all(os.path.isfile(f"docs/fl/special-districts/{s}/index.json") for s in SLUG.values()), "AC1 index.json beside every body page")
 
+def body_note(r):  # the note shown for this row on its body page: the shared NWFWMD note (sources.NOTE_MERGED) or its own NOTE_UNDER_TABLE note
+    m = sources.NOTE_MERGED.get(r["body_id"])
+    return m[1] if m and r["county"] in m[0] else sources.NOTE_UNDER_TABLE[(r["county"], r["body_id"])]
 # ---------------- AC2: one table row per CSV row ----------------
 P = {b: parse(body_path(b)) for b in BODIES}
 bad2, nrows = [], 0
@@ -91,6 +94,9 @@ for b, rs in BODIES.items():
     for row, r in zip(t, rs):
         c, lv, rt, src = row
         want_note = LOADED[(r["county"], r["body_id"], r["levy_component"], r["rate_kind"])]["note"]
+        if (r["county"], r["body_id"]) in sources.NOTE_UNDER_TABLE:  # by-eye r1 fix 3: the cell carries "Note N"; the note sits under the table
+            m = re.search(r"#note-(\d+)", " ".join(h for h, _ in c["links"]))
+            want_note = f"Note {m.group(1)}" if m and f"<p class=footnote id=note-{m.group(1)}>Note {m.group(1)}: {html.escape(body_note(r))}</p>" in rd(body_path(b)) else "(numbered note missing)"
         if not (c["text"].startswith(r["county"]) and c["links"][0][0] == f"{PATH}/fl/2025/{slug(r['county'])}-county/" and lv["text"] == levy(r)
                 and rt["text"] == f"{float(r['rate']):.4f} {r['unit']}" and src["links"][0][0] == r["source_url"] and src["codes"] == [r["sha256"]]
                 and (want_note or "") == c["text"][len(r["county"]):].strip()):
@@ -105,23 +111,28 @@ cf = parse("docs/fl/special-districts/cftod/index.html"); t = data_rows(cf.table
 ok(cf.h1 == "Central Florida Tourism Oversight District" and len(t) == 1 and t[0][0]["text"].startswith("Orange") and t[0][1]["text"] == "(operating + debt, combined)"
    and t[0][2]["text"] == "12.4236 mills" and "contentFileID=416847" in t[0][3]["links"][0][0] and t[0][3]["codes"] == [CFTOD_SHA] and "formerly reedy creek" in t[0][0]["text"].lower(),
    "AC3 golden CFTOD: H1, one Orange row, (operating + debt, combined), 12.4236 mills, OCPA contentFileID=416847, sha256, note 'formerly Reedy Creek'")
-SJR = ["Alachua", "Baker", "Brevard", "Duval", "Flagler", "Indian River", "Lake", "Marion", "Orange", "Osceola", "Putnam", "Seminole", "St. Johns", "Volusia"]
+SJR = ["Alachua", "Baker", "Brevard", "Clay", "Duval",  # Clay: OM-FL-COVERAGE-001 (SJRWMD FY 2025-26 Final Budget, alt row)
+       "Flagler", "Indian River", "Lake", "Marion", "Orange", "Osceola", "Putnam", "Seminole", "St. Johns", "Volusia"]
 sj = [row[0]["links"][0][0] for row in data_rows(parse("docs/fl/special-districts/sjrwmd/index.html").tables[0])]
-ok(sj == [f"{PATH}/fl/2025/{slug(c)}-county/" for c in SJR], f"AC4 golden SJRWMD lists exactly the 14 counties: {len(sj)} rows")
+ok(sj == [f"{PATH}/fl/2025/{slug(c)}-county/" for c in SJR], f"AC4 golden SJRWMD lists exactly the {len(SJR)} counties: {len(sj)} rows")
 ok("fl-childrens-trust-alachua-special_district" in BODIES and SLUG["fl-childrens-trust-alachua-special_district"] == "childrens-trust-alachua", "AC5 slug childrens-trust-alachua exists in the data")
 ct = data_rows(parse("docs/fl/special-districts/childrens-trust-alachua/index.html").tables[0])
 ok(len(ct) == 1 and ct[0][0]["text"] == "Alachua" and ct[0][2]["text"] == "0.4500 mills" and ct[0][3]["codes"] == ["6f6d8dfbc4466961fa1c45531cb734ae1f0863873188cf6810622827ec700861"],
    "AC5 golden Children's Trust of Alachua County: Alachua, 0.4500 mills, sha256")
 sf_h = rd("docs/fl/special-districts/sfwmd/index.html"); sf = data_rows(parse("docs/fl/special-districts/sfwmd/index.html").tables[0])
 cty = lambda row: row[0]["links"][0][0].split("/")[-2][:-len("-county")]
-bro = [r for r in sf if cty(r) == "broward"]; ora = [r for r in sf if cty(r) == "orange"]
+bro = [r for r in sf if cty(r) == "broward"]; ora = [r for r in sf if cty(r) == "orange"]; col = [r for r in sf if cty(r) == "collier"]
 parts = {}
 for r in sf:
-    if cty(r) not in ("broward", "orange"): parts.setdefault(cty(r), []).append((r[1]["text"], r[2]["text"]))
+    if cty(r) not in ("broward", "orange", "collier"): parts.setdefault(cty(r), []).append((r[1]["text"], r[2]["text"]))
 P3 = sorted([("Operating", "0.0948 mills"), ("Okeechobee Basin", "0.1026 mills"), ("Everglades Construction", "0.0327 mills")])
-ok(len(sf) == 26 == len(BODIES["fl-sfwmd-special_district"]) and len(bro) == 1 and bro[0][1]["text"] == "(operating + debt, combined)" and bro[0][2]["text"] == "0.2301 mills"
+# Collier (OM-FL-COVERAGE-001): operating 0.0948 then big_cypress_basin 0.0978 (label from FL_HUB_COPY; data value unchanged), never summed
+ok([(r[1]["text"], r[2]["text"]) for r in col] == [("Operating", "0.0948 mills"), (sources.FL_HUB_COPY["levy_labels"]["big_cypress_basin"], "0.0978 mills")]
+   and [r["levy_component"] for r in BODIES["fl-sfwmd-special_district"] if r["county"] == "Collier"] == ["operating", "big_cypress_basin"] and "0.1926" not in sf_h,
+   "AC6/OM-FL-COVERAGE-001 AC15 SFWMD Collier: Operating 0.0948 and Big Cypress Basin 0.0978, in that order, no sum")
+ok(len(sf) == 28 == len(BODIES["fl-sfwmd-special_district"]) and len(bro) == 1 and bro[0][1]["text"] == "(operating + debt, combined)" and bro[0][2]["text"] == "0.2301 mills"
    and len(ora) == 1 and ora[0][1]["text"] == "Operating" and ora[0][2]["text"] == "0.2301 mills" and "0.0948 + 0.1026 + 0.0327 = 0.2301" in ora[0][0]["text"]
-   and len(parts) == 8 and all(sorted(v) == P3 for v in parts.values()), "AC6 SFWMD 26 rows as published: Broward combined 0.2301, Orange operating 0.2301 with its note, 8 counties x 3 parts")
+   and len(parts) == 8 and all(sorted(v) == P3 for v in parts.values()), "AC6 SFWMD 28 rows as published (26 + Collier 2): Broward combined 0.2301, Orange operating 0.2301 with its note, 8 counties x 3 parts")
 fn3 = re.search(r'^3\. .*?\nWording: "(.*)"\s*$', rd("data/ref/fl_special_district_footnotes.md"), re.M | re.S)
 ok(fn3 and html.escape(fn3.group(1)) in sf_h and "Note 3:" in sf_h, "AC6 footnote 3 from data/ref/fl_special_district_footnotes.md shown on the SFWMD page")
 ok(not re.search(r"(?i)<t[dh][^>]*>\s*(total|sum)\b", sf_h), "AC6 no total/sum row added by the site")
@@ -135,7 +146,7 @@ ok(len(parts) == 8 and all([lv for lv, _ in v] == ["Operating", "Okeechobee Basi
    and {"lee", "miami-dade"} <= set(parts), "L1 every 3-part SFWMD county (incl. Lee and Miami-Dade, whose file order differs) reads Operating, Okeechobee Basin, Everglades Construction")
 _hh = [row[1]["text"] for row in data_rows(P["fl-hendry-hospital-special_district"].tables[0])]
 ok(len(_hh) == 2 and _hh[0] == "Operating" and _hh == [levy(r) for r in BODIES["fl-hendry-hospital-special_district"]], f"L1 other components follow the fixed parts in file order (Hendry hospital: {_hh})")
-ok(len(sf) == 26 and not re.search(r"(?i)<t[dh][^>]*>\s*(total|sum)\b", sf_h), "L1 AC6 unchanged: 26 SFWMD rows, no sum row")
+ok(len(sf) == 28 and not re.search(r"(?i)<t[dh][^>]*>\s*(total|sum)\b", sf_h), "L1 AC6 unchanged: 28 SFWMD rows (26 + Collier 2, OM-FL-COVERAGE-001), no sum row")
 
 # ---------------- LAYOUT caption: stacked-table caption is block-level at <=40rem ----------------
 _css = rd("docs/style.css"); _i = _css.find("table.sd-rates thead"); _s = _css.rfind("@media", 0, _i); _d = 0; _blk = ""
@@ -223,7 +234,8 @@ ok(not ONLY.search(sent) and not ONLY.search(meta) and not ONLY.search(sources.a
 ok(sent.startswith(f"{cov['checked']} of {cov['total']} Florida counties checked against official sources; {cov['in_csv']} have special-district rows in the Amendment 3 baseline CSV."),
    "AC8 computed head unchanged")
 ok(all(meta in parse(p).desc and all(meta in json.loads(x)["description"] for x in parse(p).ld) for p in newp), "AC8 meta variant in meta description and JSON-LD description")
-OPEN = csvrows(sources.STATUS_FILE)
+OPEN = [o for o in csvrows(sources.STATUS_FILE) if o["status"] != sources.PARTIAL]  # OM-FL-COVERAGE-001: `partial` counties have rows; listed separately
+PARTIAL = [o["county"] for o in csvrows(sources.STATUS_FILE) if o["status"] == sources.PARTIAL]
 bad8 = []
 for p in newp:
     h = rd(p); m = re.search(r"<ul class=nys>(.*?)</ul>", h)
@@ -231,8 +243,12 @@ for p in newp:
     want = sorted(f"{o['county']}: " + ("no 2025 TACD file" if o["status"] == "no_file" else sources.FL_SD_COPY["nys_reason"][o["status"]]) for o in OPEN)
     cells = [c["text"] for t in parse(p).tables for row in data_rows(t) for c in row[:1]]
     if sorted(lis) != want or any(c.startswith(o["county"]) for c in cells for o in OPEN): bad8.append(p)
-ok(len(OPEN) == len(cov["not_yet_sourced"]) and not bad8 and "Liberty: no 2025 TACD file" in rd(HUB),
-   f"AC8 the {len(OPEN)} open counties listed as not yet sourced (Liberty: no 2025 TACD file) with no rate cell, on hub and body pages: {bad8[:3]}")
+# OM-FL-COVERAGE-001 (openmillage@9d125472): Liberty now has a sourced row, so it is no longer listed; every no_file county still reads "no 2025 TACD file"
+_nys_hub = re.search(r"<ul class=nys>(.*?)</ul>", rd(HUB)).group(1)
+ok(len(OPEN) == len(cov["not_yet_sourced"]) and not bad8 and all(f"{o['county']}: no 2025 TACD file" in _nys_hub for o in OPEN if o["status"] == "no_file") and "Liberty" not in _nys_hub,
+   f"AC8 the {len(OPEN)} open counties listed as not yet sourced (each no_file county: no 2025 TACD file; Liberty not listed) with no rate cell, on hub and body pages: {bad8[:3]}")
+_pl = html.escape(sources.FL_HUB_COPY["partial_list"].format(names=sources.join_names(PARTIAL)))
+ok(PARTIAL == cov["partial"] and all(_pl in rd(p) for p in newp), f"AC8 the partial counties {PARTIAL} are named once as partial on hub and body pages, not as not yet sourced")
 def drop_open(county):
     def m(tmp):
         p = os.path.join(tmp, sources.STATUS_FILE); ls = open(p, encoding="utf-8").read().splitlines(keepends=True)

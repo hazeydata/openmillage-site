@@ -21,9 +21,13 @@ for needle in ("overflow-wrap:anywhere", ".tablewrap{overflow-x:auto", ":focus-v
 # the allowed nowraps: FL body-page Rate and Source cells (OM-SITE-SPECIAL-ISD-001 LAYOUT (b)1, pick L2) and TX rate-table numeric
 # cells (OM-SITE-SPECIAL-ISD-001 round 2, Lucille 2: no rate wraps mid-number at 390); nowhere else. The size cap was raised from
 # 4500 to 5800 bytes (round 3: the TX hub details rules) for the TX ISD chart style (CHART-SPEC section 9: STYLE lives in style.css once), the TX hub and those rules.
+# OM-FL-COVERAGE-001 by-eye r1 (Ann, fixes 1 and 4) adds one more allowed nowrap rule (FL hub county cells, FL county-page Rate cells)
+# and its overflow-wrap override; the cap is raised from 5800 to 5900 bytes for those 121 bytes only. By-eye r2 R1 narrows that rule to the
+# hub county cells (county-page rate cells hold a bare number now) and stays under the same 5900-byte cap.
 SD_NOWRAP = "table.sd-rates td.num,table.sd-rates td.src{white-space:nowrap}"
 TX_NOWRAP = "table.tx-rates td.num{white-space:nowrap}"
-ok("nowrap" not in css.replace(SD_NOWRAP, "", 1).replace(TX_NOWRAP, "", 1) and len(css.encode()) < 5800, f"style.css has no nowrap outside the FL body-page rate/source cells and TX rate-table numeric cells, and stays small ({len(css.encode())} bytes)")
+FL_NOWRAP = "#fl-coverage .hub-county{white-space:nowrap}"
+ok("nowrap" not in css.replace(SD_NOWRAP, "", 1).replace(TX_NOWRAP, "", 1).replace(FL_NOWRAP, "", 1) and len(css.encode()) < 5900, f"style.css has no nowrap outside the FL body-page rate/source cells, TX rate-table numeric cells and the FL hub county cells, and stays small ({len(css.encode())} bytes)")
 
 RAW = ("'>operating_total", ">school_district<", ">dependent_special_district", ">less_than_countywide")
 def check_page(p):
@@ -97,7 +101,7 @@ ok(rd("docs/robots.txt") == f"User-agent: *\nAllow: /\n# Optional feedback from 
 
 # count consistency: one number everywhere
 ok(n > 0,f"computed count of counties with special-district rows: {n}")
-ok(f"{n} have special-district rows in the Amendment 3 baseline CSV" in html.unescape(idx) and f"{n} have special-district rows in the Amendment 3 baseline CSV" in llms and all(f"{n} have special-district rows in the Amendment 3 baseline CSV" in html.unescape(rd(p)) for p in county_pages), "count sentence on home, llms.txt and every county page")
+ok(f"{n} have special-district rows in the Amendment 3 baseline CSV" in html.unescape(idx) and f"{n} have special-district rows in the Amendment 3 baseline CSV" in llms and all(f"{n} have special-district rows in the Amendment 3 baseline CSV" in html.unescape(rd(p)) for p in ["docs/fl/index.html"]) and not any(f"{n} have special-district rows in the Amendment 3 baseline CSV" in html.unescape(rd(p)) for p in county_pages), "count sentence on home, llms.txt and /fl/ (county pages link /fl/ instead, OM-FL-COVERAGE-001 by-eye r1 fix 5)")
 ok(f"Special districts: {n} of 67 Florida counties have special-district rows in this baseline" in ah, "amendment page states the same count")
 # Amendment 3 sub-counts, computed from data/ independently of sources.py and amend3.py
 import csv
@@ -130,7 +134,11 @@ _pub_c = {r["county"] for r in _pub}
 ok(len(_pub_c) == n and f"Special districts: {len(_pub_c)} of 67 Florida counties have special-district rows in this baseline ({len(_pub)} rows)" in ah_txt,
    f"amendment page matches published baseline CSV: {len(_pub)} special-district rows in {len(_pub_c)} counties")
 _api_sd = sum(r["body_type"] == "special_district" for r in rows)
-ok(f"{len(_pub)} baseline rows are independent special districts. {_api_sd - len(_pub)} more come from county property appraisers, not the baseline CSV." in html.unescape(idx), f"home lead states {len(_pub)} baseline special-district rows and {_api_sd - len(_pub)} more")
+# OM-FL-COVERAGE-001: rows outside the baseline CSV are split by alt-source document kind (property appraiser vs water management district), computed
+_kinds = sources.alt_kinds(); _alt_rows = [r for r in rows if r["body_type"] == "special_district" and r["county"] not in _pub_c]
+_npa = sum(_kinds[r["county"]] == "pa" for r in _alt_rows); _nwmd = sum(_kinds[r["county"]] == "wmd" for r in _alt_rows)
+ok(_npa + _nwmd == _api_sd - len(_pub) and f"{len(_pub)} baseline rows are independent special districts. " + (sources.FL_HUB_COPY["home_lead_tail_split"].format(pa=_npa, wmd=_nwmd) if _nwmd else f"{_npa} more come from county property appraisers, not the baseline CSV.") in html.unescape(idx),
+   f"home lead states {len(_pub)} baseline special-district rows and {_api_sd - len(_pub)} more ({_npa} property appraiser, {_nwmd} water management district)")
 _corr = "Correction, Oct 23, 2026: we earlier said 165 special districts across 45 counties. The numbers above match the baseline CSV."
 _h = idx.index("<h2>How to read this</h2>"); _c = idx.index("<h2 id=counties>")
 ok(f"<p id=correction>{html.escape(_corr)}</p>" in idx[_h:_c], "correction line sits under 'How to read this' on the home page")
@@ -211,9 +219,9 @@ api_href = f"{PATH}/{sc.api_page(SLUG)}"; meth_href = f"{PATH}/{sc.METHOD_PAGE}"
 ok(os.path.exists("docs/" + sc.api_page(SLUG)) and os.path.exists("docs/" + sc.METHOD_PAGE), f"Method ({sc.METHOD_PAGE}) and API ({sc.api_page(SLUG)}) targets exist in docs/")
 navbad = [p for p in pages if not re.search(r"<nav aria-label=Site>.*?>Counties</a>.*?>Amendment 3</a> <a href='" + re.escape(meth_href) + r"'>Method</a> <a href='" + re.escape(api_href) + r"'>API</a></nav>", rd(p))]
 ok(not navbad, f"every page's nav reads Counties · Amendment 3 · Method · API with working targets; failing {navbad[:3]}")
-crbad = [p for p in county_pages if not re.search(r"</header><nav aria-label=Breadcrumb class=crumbs><a href='" + re.escape(PATH) + r"/'>OpenMillage</a> &rsaquo; <a href='" + re.escape(PATH) + r"/#counties'>Counties</a> &rsaquo; <span aria-current=page>[^<]+ County, FL</span></nav><main", rd(p))]
-ok(not crbad, f"every county page has OpenMillage > Counties > <county> breadcrumbs; failing {crbad[:3]}")
-ok(re.search(r"</header><nav aria-label=Breadcrumb class=crumbs><a href='" + re.escape(PATH) + r"/'>OpenMillage</a> &rsaquo; <span aria-current=page>[^<]+</span></nav><main", ah) is not None, "Amendment 3 page has breadcrumbs")
+crbad = [p for p in county_pages if not re.search(r"</header><nav aria-label=Breadcrumb class=crumbs><a href='" + re.escape(PATH) + r"/'>OpenMillage</a> &rsaquo; <a href='" + re.escape(PATH) + r"/fl/'>" + re.escape(sources.FL_HUB_COPY["crumb"]) + r"</a> &rsaquo; <span aria-current=page>[^<]+ County, FL</span></nav><main", rd(p))]
+ok(not crbad, f"every county page has OpenMillage > Florida (/fl/, OM-FL-COVERAGE-001 AC19) > <county> breadcrumbs; failing {crbad[:3]}")
+ok(re.search(r"</header><nav aria-label=Breadcrumb class=crumbs><a href='" + re.escape(PATH) + r"/'>OpenMillage</a> &rsaquo; <a href='" + re.escape(PATH) + r"/fl/'>" + re.escape(sources.FL_HUB_COPY["crumb"]) + r"</a> &rsaquo; <span aria-current=page>[^<]+</span></nav><main", ah) is not None, "Amendment 3 page has breadcrumbs (OpenMillage > Florida > page)")
 ok("aria-label=Breadcrumb" not in idx, "home has no breadcrumbs (it is the root)")
 from zoneinfo import ZoneInfo
 _lat = max(r["retrieved_at"] for r in rows); _d = datetime.datetime.fromisoformat(_lat).astimezone(ZoneInfo("America/New_York")).date()
@@ -240,7 +248,10 @@ try:
     _lines = open(_csvp, encoding="utf-8").read().splitlines(keepends=True)
     _hdr = next(csv.reader([_lines[0]])); _ri = _hdr.index("retrieved_at"); _si = _hdr.index("source_url")
     _row = next(csv.reader([_lines[1]]))
-    _new = "2026-11-05T03:30:00+00:00"   # 23:30 ET on November 4: also checks the ET conversion
+    # 03:30 UTC two days after the latest retrieved_at in the data = 23:30 ET the day before: also checks the ET conversion.
+    # (OM-FL-COVERAGE-001: computed from the data, since new rows moved the latest retrieval past the old fixed 2026-11-05.)
+    _d0 = datetime.date.fromisoformat(max(r["retrieved_at"] for r in rows)[:10]) + datetime.timedelta(days=2)
+    _new = f"{_d0.isoformat()}T03:30:00+00:00"; _et = _d0 - datetime.timedelta(days=1)
     _old = _row[_ri]; assert _old in _lines[1] and _old < _new
     _lines[1] = _lines[1].replace(_old, _new, 1); open(_csvp, "w", encoding="utf-8").write("".join(_lines))
     _lk = json.load(open(os.path.join(_r, "data/SOURCES.lock")))
@@ -251,7 +262,7 @@ try:
     _b = _sp.run([sys.executable, "build.py"], cwd=_r, env=_env, capture_output=True, text=True)
     _a = _sp.run([sys.executable, "amend3.py"], cwd=_r, env=_env, capture_output=True, text=True)
     ok(_b.returncode == 0 and _a.returncode == 0, f"perturbed build ok: {(_b.stderr + _a.stderr)[-300:]}")
-    _want = f"Site data updated <time datetime=2026-11-04>November 4, 2026</time> (latest source retrieval across all pages, <a href='{html.escape(_row[_si])}'>source</a>)"
+    _want = f"Site data updated <time datetime={_et.isoformat()}>{_et.strftime('%B')} {_et.day}, {_et.year}</time> (latest source retrieval across all pages, <a href='{html.escape(_row[_si])}'>source</a>)"
     _pp = [os.path.join(_r, "docs", x) for x in ("index.html", "fl/2025/palm-beach-county/index.html", "fl/2025/orange-county/index.html", f"{SLUG}/index.html")]
     _miss = [x for x in _pp if not os.path.exists(x) or _want not in rd(x)]
     ok(not _miss, f"footer follows a moved retrieved_at on perturbed data (home, Palm Beach, Orange, Amendment 3): failing {[os.path.relpath(x, _r) for x in _miss]}")

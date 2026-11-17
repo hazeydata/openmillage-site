@@ -206,5 +206,31 @@
   "note": null,
   "also_cited": null,
   "additional_sources": null
+ },
+ {
+  "state": "FL",
+  "year": "2025",
+  "county": "Gadsden",
+  "taxing_body": "Northwest Florida Water Management District",
+  "body_type": "special_district",
+  "body_id": "fl-nwfwmd-special_district",
+  "nces_leaid": "",
+  "fips": "",
+  "levy_component": "operating",
+  "levy_scope": "county:Gadsden;district_wide",
+  "rate_kind": "adopted",
+  "rate": "0.0207",
+  "unit": "mills",
+  "source_agency": "Florida Department of Revenue, Property Tax Oversight (2025 TACD, as filed by the county property appraiser)",
+  "source_url": "https://floridarevenue.com/property/dataportal/Documents/PTO%20Data%20Portal/TACD%20History/2025%20Taxing%20Authority%20Code%20Descriptions/2025%20Gadsden%20TACD.xlsx",
+  "sha256": "b08a19cef1f12ce9f170169bd01825f6459f4f3d0c7bcfe500c0bf4653de9df0",
+  "retrieved_at": "2026-10-19T19:13:16+00:00",
+  "source_page": "Sheet",
+  "extraction": "xlsx",
+  "printed_label": "NW - NW FLORIDA WATER MGMT",
+  "independence": null,
+  "note": null,
+  "also_cited": null,
+  "additional_sources": null
  }
 ]
