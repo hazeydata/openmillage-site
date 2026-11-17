@@ -37,6 +37,17 @@ NOTE_UNDER_TABLE = {
         "district's 18 counties without the * that marks a county only partly inside the district. Florida DOR's Data Book 2025 "
         "also lists Clay at 0.1793 county-wide, with no rate for only part of the county."),
 }
+# Copy from the writing pass (Lindsay, OM-FL-COVERAGE-001 fl-hub-copy-r3.md, sha256 c50d7d1e, "nwfwmd_merged"), wired word for word.
+# NWFWMD body page only: the Calhoun and Liberty rows share this one numbered note instead of their two NOTE_UNDER_TABLE notes,
+# when both rows are on the page and both are district_wide water-management-district alt rows (sources.merged_note_keys); otherwise
+# the page falls back to the separate notes. The Calhoun and Liberty county pages keep their own NOTE_UNDER_TABLE notes.
+NOTE_MERGED = {
+    "fl-nwfwmd-special_district": (("Calhoun", "Liberty"), (
+        "Resolution No. 957 sets 0.0207 of a mill for all of Calhoun County and all of Liberty County, both named in its county "
+        "list. The meeting-packet copy of Resolution 957 isn't signed. Signed Resolution No. 958, in the Northwest Florida Water "
+        "Management District's FY 2025-26 Adopted Budget, confirms it was adopted, and we cite that as a second source. Florida "
+        "DOR's Data Book 2025 also lists both counties at 0.0207 county-wide, with no rate for only part of either county.")),
+}
 HEX = re.compile(r"^[0-9a-f]{64}$")
 PARTIAL = "partial"  # status value in STATUS_FILE: some special-district rows published, others not yet sourced
 
@@ -167,6 +178,25 @@ def alt_kinds(state="FL", year="2025"):
         if out.setdefault(r["county"], k) != k:
             raise DataError(f"{r['county']}: alt-source rows mix document kinds")
     return out
+
+
+def merged_note_keys(rows, body_id):
+    """(set of row keys, text) when a body page shows one merged numbered note (NOTE_MERGED) for several counties' rows, else
+    (set(), None). Every precondition must hold: each listed county has exactly one row of this body on the page, the row has its
+    own NOTE_UNDER_TABLE note, its levy_scope ends in district_wide, and the county's rows come from a water-management-district
+    document in the alt-sources CSV. If any fails, the caller falls back to the separate notes."""
+    if body_id not in NOTE_MERGED:
+        return set(), None
+    counties, text = NOTE_MERGED[body_id]
+    kinds = alt_kinds()
+    out = set()
+    for c in counties:
+        rs = [r for r in rows if r["county"] == c and r["body_id"] == body_id]
+        if not (len(rs) == 1 and (c, body_id) in NOTE_UNDER_TABLE and rs[0]["levy_scope"].split(";")[-1] == "district_wide"
+                and kinds.get(c) == "wmd"):
+            return set(), None
+        out.add(key(rs[0]))
+    return out, text
 
 
 def alt_counts(alt, state="FL", year="2025"):

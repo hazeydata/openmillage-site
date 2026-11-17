@@ -66,18 +66,23 @@ def src_link(r):
 def sd_levy(r): return f"({COMBINED[r['levy_component']]})" if r['levy_component'] in COMBINED else sc.label(r['levy_component'])
 NOTE_LABEL = "Note {n}"  # numbered-note label, the pattern of the Amendment 3 footnotes (SFWMD "Note 3")
 def note_ref(n): return f"<a href='#note-{n}'>{NOTE_LABEL.format(n=n)}</a>"
-def numbered_notes(rs, taken=()):
+def numbered_notes(rs, taken=(), body_id=None):
     """{key(r): (n, text)} for rows whose note is shown as a numbered note under the table (sources.NOTE_UNDER_TABLE), in row order,
-    numbered from 1 skipping numbers already used on the page (`taken`). Display only: r['note'] (the data note) is not changed."""
-    out, n = {}, 0
+    numbered from 1 skipping numbers already used on the page (`taken`). Display only: r['note'] (the data note) is not changed.
+    On a body page (`body_id` given) the rows of sources.merged_note_keys share one numbered note (sources.NOTE_MERGED)."""
+    merged, mt = sources.merged_note_keys(rs, body_id) if body_id else (set(), None)
+    out, n, shared = {}, 0, None
     for r in rs:
-        t = sources.NOTE_UNDER_TABLE.get((r["county"], r["body_id"]))
-        if t and sources.key(r) not in out:
+        k = sources.key(r)
+        t = mt if k in merged else sources.NOTE_UNDER_TABLE.get((r["county"], r["body_id"]))
+        if t and k not in out:
+            if k in merged and shared: out[k] = shared; continue
             n += 1
             while n in taken: n += 1
-            out[sources.key(r)] = (n, t)
+            out[k] = (n, t)
+            if k in merged: shared = out[k]
     return out
-def notes_block(nn): return "".join(f"<p class=footnote id=note-{n}>{NOTE_LABEL.format(n=n)}: {html.escape(t)}</p>" for n, t in sorted(nn.values()))
+def notes_block(nn): return "".join(f"<p class=footnote id=note-{n}>{NOTE_LABEL.format(n=n)}: {html.escape(t)}</p>" for n, t in sorted(set(nn.values())))
 def cell_note(r, nn):
     if sources.key(r) in nn: return f"<br><small class=muted>{note_ref(nn[sources.key(r)][0])}</small>"
     return f"<br><small class=muted>{html.escape(r['note'])}</small>" if r['note'] else ""
@@ -248,7 +253,7 @@ for bid, b in sorted(SD_BODIES.items(), key=lambda kv: hub_key(kv[1])):
     json.dump(brs, open(f"{d}/index.json", "w"), indent=1)
     ctys = sorted({r["county"] for r in brs}); cty_txt = sc.name_list(ctys) + (" County" if len(ctys) == 1 else " counties")
     also = [n for n in b["names"] if n != name]
-    nn = numbered_notes(brs, taken={CFG["footnote_citations"][SD_FOOTNOTES[bid]]["n"]} if bid in SD_FOOTNOTES else ())
+    nn = numbered_notes(brs, taken={CFG["footnote_citations"][SD_FOOTNOTES[bid]]["n"]} if bid in SD_FOOTNOTES else (), body_id=bid)
     inner = (f"<p class=lead>{html.escape(FL_SD_COPY['body_intro'].format(name=name))}</p>"
              + (f"<p>{html.escape(FL_SD_COPY['also_printed'])}: " + "; ".join(f"<q>{html.escape(n)}</q>" for n in also) + "</p>" if also else "")
              + f"<h2 id=rates>2025 rates</h2><p class=muted>{html.escape(FL_SD_COPY['rows_note'])}</p>"

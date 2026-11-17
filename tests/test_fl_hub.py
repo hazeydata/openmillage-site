@@ -308,12 +308,28 @@ for (c, bid), v in NU.items():
     api = [r for r in json.load(open(f"docs/api/v1/fl/2025/{slug(c)}.json")) if r["body_id"] == bid]
     for p in (f"docs/fl/2025/{slug(c)}-county/index.html", f"docs/fl/special-districts/{sources.sd_slug(bid)}/index.html"):
         h = rd(p); sec = h.split("<h2 id=special-districts>", 1)[-1].split("<h2 id=rates>", 1)[-1]  # county page: special-district section; body page: rates
-        m = re.search(rf"<p class=footnote id=note-(\d+)>Note \1: {re.escape(html.escape(v))}</p>", sec)
+        mg = sources.NOTE_MERGED.get(bid); vv = mg[1] if mg and c in mg[0] and "special-districts" in p else v  # body page of NWFWMD: the shared note
+        m = re.search(rf"<p class=footnote id=note-(\d+)>Note \1: {re.escape(html.escape(vv))}</p>", sec)
         tb = sec.split("<table", 1)[1].split("</table>", 1)[0]
         if not (m and f"<small class=muted><a href='#note-{m.group(1)}'>Note {m.group(1)}</a></small>" in tb and html.escape(raw["note"]) not in h
                 and sec.index("</table>") < m.start()): bad3.append(p)
     if not (api and all(r["note"] == raw["note"] for r in api)): bad3.append(f"api {c}")
 ok(len(NU) == 3 and not bad3, f"B3 Calhoun/Liberty (NWFWMD) and Clay (SJRWMD): the cell carries only a 'Note N' link to a numbered note under the table, on the county page and the body page; JSON keeps the data note: {bad3}")
+# nwfwmd_merged (Lindsay, fl-hub-copy-r3.md sha256 c50d7d1e): ONE note on the NWFWMD body page, Calhoun and Liberty both point at it;
+# the Calhoun and Liberty county pages keep their own r2 notes.
+NWFWMD_MERGED = ("Resolution No. 957 sets 0.0207 of a mill for all of Calhoun County and all of Liberty County, both named in its county "
+                 "list. The meeting-packet copy of Resolution 957 isn't signed. Signed Resolution No. 958, in the Northwest Florida Water "
+                 "Management District's FY 2025-26 Adopted Budget, confirms it was adopted, and we cite that as a second source. Florida "
+                 "DOR's Data Book 2025 also lists both counties at 0.0207 county-wide, with no rate for only part of either county.")
+_nb = rd("docs/fl/special-districts/nwfwmd/index.html")
+_notes = re.findall(r"<p class=footnote id=note-(\d+)>Note \1: (.*?)</p>", _nb)
+_cells = re.findall(r"<small class=muted><a href='#note-(\d+)'>Note \1</a></small>", _nb)
+_cty = {c: re.findall(rf"<p class=footnote id=note-\d+>Note \d+: (.*?)</p>", rd(f"docs/fl/2025/{slug(c)}-county/index.html")) for c in ("Calhoun", "Liberty")}
+ok(len(_notes) == 1 and _notes[0][1] == html.escape(NWFWMD_MERGED) and len(_cells) == 2 and set(_cells) == {_notes[0][0]}
+   and sources.NOTE_MERGED["fl-nwfwmd-special_district"][1] == NWFWMD_MERGED,
+   f"B3b NWFWMD body page: exactly one note with the exact nwfwmd_merged text; the Calhoun and Liberty cells both point to it: {len(_notes)} notes, cells {_cells}")
+ok(all(len(v) == 1 and v[0] == html.escape(NU[(c, "fl-nwfwmd-special_district")]) and v[0] != html.escape(NWFWMD_MERGED) for c, v in _cty.items()),
+   "B3b the Calhoun and Liberty county pages still carry their own exact r2 notes (unmerged)")
 # Raw tokens: none in the visible text of docs/fl/**/*.html and docs/index.html, outside <details class=reason-more> (the verbatim audit
 # text, by design) and script / JSON-LD
 def visible(h):

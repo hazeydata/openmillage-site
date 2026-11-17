@@ -81,6 +81,9 @@ dirs = sorted(os.path.basename(os.path.dirname(p)) for p in glob.glob("docs/fl/s
 ok(len(dirs) == N and set(dirs) == set(SLUG.values()) and len(set(SLUG.values())) == N, f"AC1 {len(dirs)} body pages == {N} distinct body_ids (computed), slugs unique")
 ok(all(os.path.isfile(f"docs/fl/special-districts/{s}/index.json") for s in SLUG.values()), "AC1 index.json beside every body page")
 
+def body_note(r):  # the note shown for this row on its body page: the shared NWFWMD note (sources.NOTE_MERGED) or its own NOTE_UNDER_TABLE note
+    m = sources.NOTE_MERGED.get(r["body_id"])
+    return m[1] if m and r["county"] in m[0] else sources.NOTE_UNDER_TABLE[(r["county"], r["body_id"])]
 # ---------------- AC2: one table row per CSV row ----------------
 P = {b: parse(body_path(b)) for b in BODIES}
 bad2, nrows = [], 0
@@ -93,7 +96,7 @@ for b, rs in BODIES.items():
         want_note = LOADED[(r["county"], r["body_id"], r["levy_component"], r["rate_kind"])]["note"]
         if (r["county"], r["body_id"]) in sources.NOTE_UNDER_TABLE:  # by-eye r1 fix 3: the cell carries "Note N"; the note sits under the table
             m = re.search(r"#note-(\d+)", " ".join(h for h, _ in c["links"]))
-            want_note = f"Note {m.group(1)}" if m and f"<p class=footnote id=note-{m.group(1)}>Note {m.group(1)}: {html.escape(sources.NOTE_UNDER_TABLE[(r['county'], r['body_id'])])}</p>" in rd(body_path(b)) else "(numbered note missing)"
+            want_note = f"Note {m.group(1)}" if m and f"<p class=footnote id=note-{m.group(1)}>Note {m.group(1)}: {html.escape(body_note(r))}</p>" in rd(body_path(b)) else "(numbered note missing)"
         if not (c["text"].startswith(r["county"]) and c["links"][0][0] == f"{PATH}/fl/2025/{slug(r['county'])}-county/" and lv["text"] == levy(r)
                 and rt["text"] == f"{float(r['rate']):.4f} {r['unit']}" and src["links"][0][0] == r["source_url"] and src["codes"] == [r["sha256"]]
                 and (want_note or "") == c["text"][len(r["county"]):].strip()):
