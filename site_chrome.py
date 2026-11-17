@@ -2,6 +2,7 @@
 import html, re
 from decimal import Decimal
 import redo
+import sources
 
 def rate_text(s):
     if not s or len(Decimal(s).as_tuple().digits) <= 15: return s
@@ -101,6 +102,7 @@ LABELS = {
     "adopted": "Adopted",
     "okeechobee_basin": "Okeechobee Basin", "everglades_construction": "Everglades Construction",
 }
+LABELS.update(sources.FL_HUB_COPY["levy_labels"])  # big_cypress_basin: placeholder label (OM-FL-COVERAGE-001); the data value is never renamed
 # ONE place for every human-facing display of rate_kind (data, CSV, JSON and llms.txt keep the raw enum).
 # Copy slot: Lindsay's final strings go here (Weatherman HOLD on #14 @28ef0a99).
 RATE_KIND_COPY = {  # Lindsay final, om-aggregate-label.md writing draft (2026-10-23)

@@ -10,23 +10,23 @@
   {
    "path": "data/special/fl-2025-special-districts.csv",
    "repo": "hazeydata/openmillage",
-   "commit": "cbac2ebf65166b2a38fe1291c3cf00c90a05c502",
+   "commit": "9d1254726131ae7ccb22dff7d7890081b4f72773",
    "source_path": "data/fl-2025-special-districts.csv",
-   "sha256": "8dc92afc8cdeedcbcc97e8149eabb5607f603564a792bb9cac80d461564cc99c"
+   "sha256": "f993adfaa3cf79eeb09a32425a43b019329ae44eb23542c3601e4e77195649d0"
   },
   {
    "path": "data/special/fl-2025-alt-sources.csv",
    "repo": "hazeydata/openmillage",
-   "commit": "cbac2ebf65166b2a38fe1291c3cf00c90a05c502",
+   "commit": "9d1254726131ae7ccb22dff7d7890081b4f72773",
    "source_path": "data/fl-2025-alt-sources.csv",
-   "sha256": "a022fcd1608f1cc465e9849c79c408d6d958f83d3e396264ad5de1f8f85bac40"
+   "sha256": "fd9c23d67cf318246592b8cafffb53acff296940a668486daa769d926df3a378"
   },
   {
    "path": "data/special/tacd_county_status_open.csv",
    "repo": "hazeydata/openmillage",
-   "commit": "cbac2ebf65166b2a38fe1291c3cf00c90a05c502",
+   "commit": "9d1254726131ae7ccb22dff7d7890081b4f72773",
    "source_path": "reference/tacd_county_status_open.csv",
-   "sha256": "77c3f9499bbad2fab26baa882edbb665694cdfc04b797828ca2ce98ed9267e7e"
+   "sha256": "46939bdf741172286da0bc20ca2a111065831b25f692eda8c388a73af7f8f3f9"
   },
   {
    "path": "data/history/fl_millage_history.csv",

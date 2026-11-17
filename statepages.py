@@ -699,7 +699,7 @@ def fl_page(alts):
              + (f"<p>{len(skipped)} rows are in our file but can't be compared because a rate is missing or the rolled-back rate is zero:</p><ul>{skl}</ul>" if skipped else ""))
     return [doc(f"{FL_SLUG}/index.html", "Florida rolled-back rate vs adopted millage, 2025",
                 "Where each Florida taxing authority's 2025 adopted millage sits against its rolled-back rate, from Florida DOR, levy by levy.",
-                inner, [("Florida rolled-back rate", None)], updated_of(rs))], (len(rs), len(ok), up, eq, dn, len(skipped))
+                inner, [(sources.FL_HUB_COPY["crumb"], f"{PATH}/{sources.FL_HUB}/"), ("Florida rolled-back rate", None)], updated_of(rs))], (len(rs), len(ok), up, eq, dn, len(skipped))
 
 def main():
     need = [f"data/nc/nc-{y}{s}.csv" for y in YEARS for s in ("", ".provenance")] + ["data/rollback/fl-2025-rollback.csv", "data/rollback/fl-2025-rollback-exclusions.csv", f"{CHARTS}/alt-text.md",

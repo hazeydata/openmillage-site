@@ -34,9 +34,15 @@ def check(h, label, counts):
 
 alt_only = sources.coverage(sources.load_rows())["alt_only"]
 counts = csv_counts(ALT)
-want = {c: counts[c] for c in alt_only}
-ok(sorted(want) == ["DeSoto", "Orange"], f"alt-only counties are DeSoto and Orange: {sorted(want)}")
-ok(sources.alt_counts(alt_only) == want, "sources.alt_counts equals counts computed directly from the CSV")
+# OM-FL-COVERAGE-001: alt-only counties now also include counties sourced from water management district (WMD) documents; this file
+# checks the appraiser-only ones (kind "pa", read from source_agency), and that every other alt-only county is a WMD-document county.
+kinds = sources.alt_kinds()
+want = {c: counts[c] for c in alt_only if kinds[c] == "pa"}
+wmd = {c: counts[c] for c in alt_only if kinds[c] == "wmd"}
+ok(sorted(want) == ["DeSoto", "Orange"], f"appraiser alt-only counties are DeSoto and Orange: {sorted(want)}")
+ok(set(alt_only) == set(want) | set(wmd) and all("Water Management District" in r["source_agency"] for r in csv.DictReader(open(ALT, newline="", encoding="utf-8")) if r["county"] in wmd and r["body_type"] == "special_district"),
+   f"every other alt-only county is sourced from a water management district document: {sorted(wmd)}")
+ok(sources.alt_counts(alt_only) == {**want, **wmd}, "sources.alt_counts equals counts computed directly from the CSV")
 check(render(), "amend3 render", want)
 
 # Perturbation: an extra Orange row in a temp alt-sources CSV changes the rendered count to 4 (nothing hard-coded)

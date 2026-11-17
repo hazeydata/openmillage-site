@@ -16,6 +16,7 @@ NOTE_OVERRIDES = {
     ("Orange", "fl-cftod-special_district"): "Formerly Reedy Creek Improvement District. Independent special district. Printed as one combined operating and debt rate, levied only in mill code 70 (Bay Lake, Lake Buena Vista and unincorporated Reedy Creek).",
 }
 HEX = re.compile(r"^[0-9a-f]{64}$")
+PARTIAL = "partial"  # status value in STATUS_FILE: some special-district rows published, others not yet sourced
 
 
 class DataError(Exception):
@@ -93,14 +94,18 @@ def load_rows(lock=None):
 
 
 def coverage(rows, state="FL", year="2025"):
+    """Counts from the data and the pinned status file. A county the status file marks `partial` (some special-district rows
+    published, others not yet sourced) counts as checked and is listed under "partial", not under "not_yet_sourced"."""
     counties = sorted(r["name"].removesuffix(" County") for r in _csv(COUNTIES_FILE))
-    open_ = sorted(r["county"] for r in _csv(STATUS_FILE))
+    status = _csv(STATUS_FILE)
+    open_ = sorted(r["county"] for r in status if r["status"] != PARTIAL)
+    partial = sorted(r["county"] for r in status if r["status"] == PARTIAL)
     with_rows = sorted({r["county"] for r in rows if r["state"] == state and r["year"] == year and r["body_type"] == "special_district"})
     checked = [c for c in counties if c not in open_]
     in_csv = sorted({r["county"] for r in _csv(SD_FILE) if r["state"] == state and r["year"] == year and r["body_type"] == "special_district"})
     return {"in_csv": len(in_csv), "sd_rows_in_csv": sum(1 for r in _csv(SD_FILE) if r["state"] == state and r["year"] == year and r["body_type"] == "special_district"), "counties_in_csv": in_csv, "alt_only": [c for c in with_rows if c not in in_csv],
             "counties": counties, "checked": len(checked), "total": len(counties), "with_rows": len(with_rows),
-            "no_rows": [c for c in checked if c not in with_rows], "not_yet_sourced": open_, "counties_with_rows": with_rows}
+            "no_rows": [c for c in checked if c not in with_rows], "not_yet_sourced": open_, "partial": partial, "counties_with_rows": with_rows}
 
 
 def data_updated(rows):
@@ -123,22 +128,54 @@ def join_names(xs):
     return xs[0] if len(xs) == 1 else ", ".join(xs[:-1]) + " and " + xs[-1]
 
 
+# Alt-source rows (data/special/fl-2025-alt-sources.csv) come from two kinds of document; the kind is read from source_agency.
+ALT_KINDS = (("pa", re.compile(r"County Property Appraiser")), ("wmd", re.compile(r"Water Management District")))
+
+
+def alt_kinds(state="FL", year="2025"):
+    """{county: kind} for every county with special-district rows in the alt-sources CSV. Unknown agency or a county whose
+    alt rows mix kinds raises DataError."""
+    out = {}
+    for r in _csv(ALT_FILE):
+        if r["state"] != state or r["year"] != year or r["body_type"] != "special_district":
+            continue
+        k = next((k for k, pat in ALT_KINDS if pat.search(r["source_agency"])), None)
+        if k is None:
+            raise DataError(f"alt-source agency of unknown kind: {r['source_agency']!r}")
+        if out.setdefault(r["county"], k) != k:
+            raise DataError(f"{r['county']}: alt-source rows mix document kinds")
+    return out
+
+
 def alt_counts(alt, state="FL", year="2025"):
     """{county: special-district rows} for the alt-only counties, counted from the alt-sources CSV."""
     rows = [r for r in _csv(ALT_FILE) if r["state"] == state and r["year"] == year and r["body_type"] == "special_district"]
     return {c: sum(1 for r in rows if r["county"] == c) for c in alt}
 
 
+def _by_kind(counts):
+    kinds = alt_kinds()
+    out = {}
+    for c, n in counts.items():  # a county with no alt row keeps the original (property appraiser) wording, as before this split
+        out.setdefault(kinds.get(c, "pa"), {})[c] = n
+    return [(k, out[k]) for k, _ in ALT_KINDS if k in out]
+
+
 def alt_sentence(counts):
-    """Body text: counties whose special-district rows come only from county property appraisers (not in the baseline CSV).
-    Wording: FL_SD_COPY (placeholder pending Lindsay); it no longer says the rows are on county pages only (OQ-11)."""
-    names = join_names([c + " (" + plural(n, "row") + ")" for c, n in counts.items()])
-    return FL_SD_COPY["alt_tail_one" if len(counts) == 1 else "alt_tail_many"].format(names=names)
+    """Body text: counties whose special-district rows come only from alt sources (not in the baseline CSV), one sentence per
+    document kind: county property appraisers (FL_SD_COPY, kept wording) and water management district documents (FL_HUB_COPY).
+    Wording: placeholder pending Lindsay; it no longer says the rows are on county pages only (OQ-11)."""
+    out = []
+    for kind, cs in _by_kind(counts):
+        names = join_names([c + " (" + plural(n, "row") + ")" for c, n in cs.items()])
+        copy = FL_SD_COPY if kind == "pa" else FL_HUB_COPY["alt"]
+        out.append(copy["alt_tail_one" if len(cs) == 1 else "alt_tail_many"].format(names=names))
+    return " ".join(out)
 
 
 def alt_meta_sentence(counts):
     """Meta description / JSON-LD wording for the same counties."""
-    return FL_SD_COPY["alt_tail_meta"].format(names=join_names(list(counts)))
+    return " ".join((FL_SD_COPY if kind == "pa" else FL_HUB_COPY["alt"])["alt_tail_meta"].format(names=join_names(list(cs))) for kind, cs in _by_kind(counts))
 
 
 def coverage_sentence(cov, meta=False):
@@ -253,3 +290,72 @@ def fl_bodies(rows, h1_path=H1_FILE, display=lambda s: s):
 def open_counties():
     """[(county, status, reason)] from the pinned TACD status file, file order."""
     return [(r["county"], r["status"], r["reason"]) for r in _csv(STATUS_FILE)]
+
+
+# ---------- Florida hub /fl/ (OM-FL-COVERAGE-001) ----------
+FL_HUB = "fl"
+# PLACEHOLDER COPY pending the writing pass (Lindsay) and the by-eye pass (Ann), OM-FL-COVERAGE-001: every new reader-facing
+# string of the /fl/ hub, the "partial" county line, the water-management-district alt-source wording, the big_cypress_basin
+# levy label and the Florida breadcrumb label lives here only. Counts and county names are always computed, never written here.
+FL_HUB_COPY = {
+    "crumb": "Florida",  # breadcrumb label linking /fl/ on every page under /fl/
+    "title": "Florida property tax rates by county: sources and coverage, 2025",
+    "h1": "Florida property tax rates, 2025",
+    "desc": ("Every Florida county page, with what we have sourced for each county's independent special districts "
+             "and what is not yet sourced. No estimates."),
+    "intro": ("Each county page lists the 2025 millage rates we have from official sources, each linked to its source. "
+              "The table below also shows how far we have got with each county's independent special districts."),
+    "absent": "A county or district with no row has not been sourced yet: absent is not zero.",
+    "with_rows": ("{n} of {total} Florida counties have at least one sourced special-district row: {csv} from the county's "
+                  "2025 TACD file and {alt} only from other official documents."),
+    "sections_h2": "Florida pages",
+    "sections": {"special_districts": "Independent special districts, one page each",
+                 "amendment_3": "Amendment 3: the 2025 adopted millage baseline",
+                 "rolled_back": "Rolled-back rate vs adopted millage, 2025"},
+    "table_h2": "Counties",
+    "table_caption": "Florida county pages and special-district coverage, 2025",
+    "th_county": "County page",
+    "th_sd": "Independent special districts",
+    "status_sourced": "sourced ({bodies})",
+    "status_sourced_alt": "sourced ({bodies}, {kind})",
+    "alt_kind": {"wmd": "water management district document", "pa": "county property appraiser document"},
+    "status_partial": "partial ({bodies} sourced). Recorded reason: {reason}",
+    "status_open": "not yet sourced: {reason}",
+    "status_none": "no special-district rows published yet",
+    "status_multi": "city spanning more than one county; see each county's page",
+    "body": ("body", "bodies"),
+    "partial_line": "Partial coverage: some independent special districts in this county are sourced and others are not yet. Recorded reason: {reason}",
+    "partial_list": "Partial coverage (some districts sourced, others not yet): {names}.",
+    "partial_badge": "special districts partly sourced",
+    "levy_labels": {"big_cypress_basin": "Big Cypress Basin"},  # display label only; the data value stays big_cypress_basin
+    "lead_wmd": "water management districts",  # homepage source-type name for alt rows from WMD documents
+    "home_lead_tail_split": "{pa} more come from county property appraisers and {wmd} from water management district documents, not the baseline CSV.",
+    "home_link": "Florida: every county page and special-district coverage",
+    "alt": {
+        "alt_tail_one": "{names} has special-district rates from a water management district document, not the baseline CSV.",
+        "alt_tail_many": "{names} have special-district rates from water management district documents, not the baseline CSV.",
+        "alt_tail_meta": "{names} special-district rows come from water management district documents, not the baseline CSV.",
+    },
+    "llms_line": ("- Florida hub: {url} (every Florida county page and each county's special-district coverage: sourced, partial "
+                  "or not yet sourced with the recorded reason; absent is not zero).\n"),
+}
+
+
+def fl_hub_status(label, cov, rows, state="FL", year="2025"):
+    """(kind, text) for one county label's special-district coverage, computed from the rows and the status file.
+    kind: sourced | sourced_alt | partial | open | none | multi."""
+    C = FL_HUB_COPY
+    reasons = {c: (st, why) for c, st, why in open_counties()}
+    bodies = sorted({r["body_id"] for r in rows if r["state"] == state and r["year"] == year and r["county"] == label and r["body_type"] == "special_district"})
+    nb = plural(len(bodies), *C["body"])
+    if label not in cov["counties"]:
+        return "multi", C["status_multi"]
+    if label in cov["not_yet_sourced"]:
+        return "open", C["status_open"].format(reason=reasons[label][1])
+    if label in cov["partial"]:
+        return "partial", C["status_partial"].format(bodies=nb, reason=reasons[label][1])
+    if not bodies:
+        return "none", C["status_none"]
+    if label in cov["alt_only"]:
+        return "sourced_alt", C["status_sourced_alt"].format(bodies=nb, kind=C["alt_kind"][alt_kinds()[label]])
+    return "sourced", C["status_sourced"].format(bodies=nb)

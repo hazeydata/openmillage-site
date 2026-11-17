@@ -5,7 +5,7 @@ import sources
 from analytics import GOATCOUNTER_TAG
 import site_chrome as sc
 import redo
-from sources import plural, COMBINED, load_rows, data_updated, coverage, coverage_sentence, EXTRA_KEYS, FL_SD_COPY, SD_HUB
+from sources import plural, COMBINED, load_rows, data_updated, coverage, coverage_sentence, EXTRA_KEYS, FL_SD_COPY, SD_HUB, FL_HUB_COPY, FL_HUB
 BASE = os.environ.get("SITE_BASE", "https://openmillage.com").rstrip("/")
 PATH = "/" + BASE.split("/", 3)[3] if BASE.count("/") > 2 else ""
 OUT = "docs"
@@ -19,7 +19,7 @@ UPDATED = data_updated(rows)
 def source_type(agency):
     """Map a row's source_agency to the short type named in the homepage lead. Unknown agencies fail the build."""
     for pat, name in ((r"^Florida Department of Revenue", "Florida DOR"), (r"^Florida Office of Economic & Demographic Research", "EDR"),
-                      (r"County Property Appraiser", "county property appraisers")):
+                      (r"County Property Appraiser", "county property appraisers"), (r"Water Management District", FL_HUB_COPY["lead_wmd"])):
         if re.search(pat, agency): return name
     raise SystemExit(f"build.py: unmapped source_agency for homepage lead: {agency!r}")
 def extra_name(agency):
@@ -28,7 +28,7 @@ def extra_name(agency):
     raise SystemExit(f"build.py: unmapped additional source_agency for homepage lead: {agency!r}")
 name_list = sc.name_list
 def source_lead(rows):
-    order = ["Florida DOR", "EDR", "county property appraisers"]
+    order = ["Florida DOR", "EDR", "county property appraisers", FL_HUB_COPY["lead_wmd"]]
     prim = sorted({source_type(r["source_agency"]) for r in rows}, key=lambda t: (order.index(t) if t in order else len(order), t))
     extra = sorted({extra_name(a["source_agency"]) for r in rows for a in r.get("additional_sources") or []})
     return "from " + name_list(prim) + (f" (additional source{'s' if len(extra) > 1 else ''}: {name_list(extra)})" if extra else "")
@@ -42,14 +42,15 @@ os.makedirs(OUT, exist_ok=True)
 cov = coverage(rows); COV = html.escape(coverage_sentence(cov))
 NO_ROWS = "No special-district rows published yet for this county."
 NYS = "not yet sourced"
+FL_CRUMB = (FL_HUB_COPY["crumb"], f"{PATH}/{FL_HUB}/")  # every page under /fl/ starts its breadcrumb with the Florida hub (OM-FL-COVERAGE-001 AC19)
 # Dated correction of earlier published copy (historical numbers, intentionally literal; exempt from the no-literal-count test).
 CORRECTION = "Correction, Oct 23, 2026: we earlier said 165 special districts across 45 counties. The numbers above match the baseline CSV."
 by = {}
 for r in rows: by.setdefault((r["state"], r["year"], r["county"]), []).append(r)
 urls = [BASE + "/"]
-def page(path, title, body, jsonld=None, desc="", current=None, lead="", trail=None, h1=None):
+def page(path, title, body, jsonld=None, desc="", current=None, lead="", trail=None, h1=None, extra_ld=()):
     os.makedirs(os.path.dirname(os.path.join(OUT, path)) or OUT, exist_ok=True)
-    ld = f'<script type="application/ld+json">{json.dumps(jsonld)}</script>' if jsonld else ""
+    ld = "".join(f'<script type="application/ld+json">{json.dumps(j)}</script>' for j in ([jsonld] if jsonld else []) + list(extra_ld))
     open(os.path.join(OUT, path), "w").write(f"<!doctype html><html lang=en><head><meta charset=utf-8><title>{html.escape(title)}</title>"
       f"<meta name=description content='{html.escape(desc, quote=True)}'><link rel=canonical href='{BASE}/{path[:-10] if path.endswith('index.html') else path}'>"
       f"{sc.head_extra(PATH)}{ld}{GOATCOUNTER_TAG}</head>{sc.body(PATH, html.escape(h1 or title), body, current, AMEND, lead, UPDATED, trail)}</html>")
@@ -101,6 +102,10 @@ for (st, yr, co), rs in sorted(by.items()):
         sdh = f"<p>Independent special districts: {NYS}. The official source for this county has not been checked yet; absent is not zero.</p>"
     elif co not in cov['counties']:
         sdh = ""
+    elif co in cov['partial']:
+        sdh = (f"<p class=partial>{html.escape(FL_HUB_COPY['partial_line'].format(reason=dict((c, w) for c, _, w in sources.open_counties())[co]))}</p>"
+               + table(f"Independent special districts in {co} County", [("Taxing body", 0), ("Levy", 0), ("Rate", 1), ("Source", 0)], "".join(sd_tr(r) for r in sds))
+               + f"<p><a href='{PATH}/{SD_HUB}/'>{html.escape(FL_SD_COPY['county_link'])}</a></p>")
     elif not sds:
         sdh = f"<p>{NO_ROWS}</p>"
     else:
@@ -139,9 +144,10 @@ for (st, yr, co), rs in sorted(by.items()):
     page(p, f"{co} County, {st} property tax rates ({yr})",
          top + note + "<details class=all><summary>See all rates</summary>" + "".join(groups) + "</details>"
          + f"{sdh}{meta}<p>JSON: <a href='{PATH}/{api}'>{api}</a></p>" + redo.getdata(f"<a href='{PATH}/{api}'>JSON</a> · <a href='{PATH}/api/v1/fl/2025/{AMEND.split('/')[-1]}-baseline.csv'>CSV (all counties)</a>"), ds,
-         f"Official {yr} property tax millage rates for {plural(len(rs), 'levy', 'levies')} in {co} County, {st}, each linked to its government source. Retrieved {ret}.", lead=HEAD_LEAD, trail=[("Counties", f"{PATH}/#counties"), (f"{co} County, {st}", None)])
+         f"Official {yr} property tax millage rates for {plural(len(rs), 'levy', 'levies')} in {co} County, {st}, each linked to its government source. Retrieved {ret}.", lead=HEAD_LEAD, trail=[FL_CRUMB, (f"{co} County, {st}", None)])
     links.append(f"<li><a href='{PATH}/{p[:-10]}'>{html.escape(co)} County, {st}</a> <span class=muted>({plural(len(rs), 'rate')})</span>"
-                 + (" <span class=badge>special districts not yet sourced</span>" if co in cov['not_yet_sourced'] else "") + "</li>")
+                 + (" <span class=badge>special districts not yet sourced</span>" if co in cov['not_yet_sourced'] else "")
+                 + (f" <span class=badge>{html.escape(FL_HUB_COPY['partial_badge'])}</span>" if co in cov['partial'] else "") + "</li>")
 def locator_label(loc):
     loc = loc or ""
     m = re.fullmatch(r"sheet=(\d{4})!([A-Z]{1,3}\d{1,6})", loc)
@@ -171,15 +177,16 @@ for (co, lv), hrs in sorted(HIST.items()):
          + "".join(f"<p>Also: <a href='{h}'>{HIST_LEVELS[l]} history</a> · <a href='{PATH}/fl/2025/{slug(co)}-county/'>{html.escape(co)} County 2025 rates</a></p>" for l, h in other)
          + redo.getdata(f"<a href='{PATH}/{hp[:-10]}index.csv'>CSV</a> · <a href='{PATH}/{hp[:-10]}index.json'>JSON</a> (openmillage@{HIST_PIN[:7]})"),
          None, f"{HIST_LEVELS[lv]} millage in {co} County, Florida, by year since {yrs[0]}, each value linked to its official source file.",
-         lead=HEAD_LEAD, trail=[("Counties", f"{PATH}/#counties"), (f"{co} County, FL", f"{PATH}/fl/2025/{slug(co)}-county/"), (f"History: {HIST_LEVELS[lv]}", None)])
+         lead=HEAD_LEAD, trail=[FL_CRUMB, (f"{co} County, FL", f"{PATH}/fl/2025/{slug(co)}-county/"), (f"History: {HIST_LEVELS[lv]}", None)])
 # --- FL independent special-district body pages + hub (OM-SITE-SPECIAL-ISD-001): /fl/special-districts/<slug>/ with index.json beside each.
 # Rows: every special_district row of the merged FL set (sources.fl_bodies); rates via the county-page renderer; nothing summed, ranked or estimated.
 import amend3 as _a3  # footnote wording + its source citations, shared with the Amendment 3 page (data/ref/fl_special_district_footnotes.md)
 SD_FOOTNOTES = {"fl-sfwmd-special_district": "Broward"}  # body_id -> amend3_config footnote_citations key whose footnote applies to that body
-NYS_LIST = sources.open_counties()
+NYS_LIST = [x for x in sources.open_counties() if x[1] != sources.PARTIAL]  # status file rows; `partial` counties have rows and are listed separately
 def nys_block():
     return (f"<p>{html.escape(FL_SD_COPY['nys_lead'])}</p><ul class=nys>"
-            + "".join(f"<li>{html.escape(c)}: {html.escape(FL_SD_COPY['nys_reason'][st])}</li>" for c, st, _ in sorted(NYS_LIST)) + "</ul>")
+            + "".join(f"<li>{html.escape(c)}: {html.escape(FL_SD_COPY['nys_reason'][st])}</li>" for c, st, _ in sorted(NYS_LIST)) + "</ul>"
+            + (f"<p>{html.escape(FL_HUB_COPY['partial_list'].format(names=sources.join_names(cov['partial'])))}</p>" if cov['partial'] else ""))
 def cov_block():
     return f"<h2 id=coverage>{html.escape(FL_SD_COPY['coverage_h2'])}</h2><p class=muted>{COV}</p>" + nys_block()
 def county_href(co): return f"{PATH}/fl/2025/{slug(co)}-county/"
@@ -227,7 +234,7 @@ for bid, b in sorted(SD_BODIES.items(), key=lambda kv: hub_key(kv[1])):
           "distribution": [{"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": f"{BASE}/{sp[:-10]}index.json"}]}
     page(sp, FL_SD_COPY["body_title"].format(name=name), inner, ds,
          FL_SD_COPY["body_desc"].format(name=name, rates="rate" if len(brs) == 1 else "rates", counties=cty_txt) + " " + coverage_sentence(cov, meta=True),
-         lead=HEAD_LEAD, trail=[(FL_SD_COPY["hub_h1"], f"{PATH}/{SD_HUB}/"), (name, None)], h1=name)
+         lead=HEAD_LEAD, trail=[FL_CRUMB, (FL_SD_COPY["hub_h1"], f"{PATH}/{SD_HUB}/"), (name, None)], h1=name)
     hub_trs.append(f"<tr><td><a href='{PATH}/{sp[:-10]}'>{html.escape(name)}</a></td><td>{html.escape(', '.join(ctys))}</td></tr>")
 SD_FILTER_JS = ("<script>(function(){var w=document.getElementById('sd-filter-wrap'),i=document.getElementById('sd-filter'),"
   "o=document.getElementById('sd-filter-count'),tr=document.querySelectorAll('#sd-bodies tbody tr');if(!w||!i)return;w.hidden=false;"
@@ -249,15 +256,46 @@ page(f"{SD_HUB}/index.html", FL_SD_COPY["hub_title"],
      {"@context": "https://schema.org", "@type": "Dataset", "name": FL_SD_COPY["hub_h1"], "description": FL_SD_COPY["hub_desc"] + " " + coverage_sentence(cov, meta=True) + " Absent is not zero.",
       "license": "https://creativecommons.org/licenses/by/4.0/", "temporalCoverage": "2025", "url": f"{BASE}/{SD_HUB}/", "creator": {"@type": "Organization", "name": "Hazey Data"},
       "isBasedOn": sorted({r['source_url'] for b in SD_BODIES.values() for r in b["rows"]})},
-     FL_SD_COPY["hub_desc"] + " " + coverage_sentence(cov, meta=True), lead=HEAD_LEAD, trail=[(FL_SD_COPY["hub_h1"], None)], h1=FL_SD_COPY["hub_h1"])
+     FL_SD_COPY["hub_desc"] + " " + coverage_sentence(cov, meta=True), lead=HEAD_LEAD, trail=[FL_CRUMB, (FL_SD_COPY["hub_h1"], None)], h1=FL_SD_COPY["hub_h1"])
 urls.append(f"{BASE}/{SD_HUB}/")
+def home_tail():
+    """Home lead: special-district rows outside the baseline CSV, split by alt-source document kind (computed)."""
+    alt = [r for r in rows if r["body_type"] == "special_district" and r["county"] in cov["alt_only"]]
+    if len(alt) != sum(r['body_type'] == 'special_district' for r in rows) - cov['sd_rows_in_csv']:
+        raise SystemExit("build.py: special-district rows outside the baseline CSV are not all alt-only rows")
+    kinds = sources.alt_kinds(); n = collections.Counter(kinds[r["county"]] for r in alt)
+    if not n["wmd"]: return f"{n['pa']} {FL_SD_COPY['home_lead_tail']}"
+    return FL_HUB_COPY["home_lead_tail_split"].format(pa=n["pa"], wmd=n["wmd"])
+# --- Florida hub /fl/ (OM-FL-COVERAGE-001): every FL county page + computed special-district coverage per county label. No rates, totals or ranks.
+def fl_hub():
+    C = FL_HUB_COPY
+    labels = sorted(co for (st, yr, co) in by if st == "FL" and yr == "2025")
+    trs = "".join(f"<tr data-status={k}><td><a href='{county_href(co)}'>{html.escape(co)} County, FL</a></td><td>{html.escape(t)}</td></tr>"
+                  for co in labels for k, t in [sources.fl_hub_status(co, cov, rows)])
+    tbl = sc.tablewrap(C["table_caption"], f"<table id=fl-coverage><caption>{html.escape(C['table_caption'])}</caption><thead><tr><th scope=col>{html.escape(C['th_county'])}</th>"
+                       f"<th scope=col>{html.escape(C['th_sd'])}</th></tr></thead><tbody>{trs}</tbody></table>")
+    S = C["sections"]
+    secs = (f"<h2 id=sections>{html.escape(C['sections_h2'])}</h2><ul>"
+            + "".join(f"<li><a href='{PATH}/{u}/'>{html.escape(S[k])}</a></li>" for k, u in (("special_districts", SD_HUB), ("amendment_3", AMEND), ("rolled_back", "fl/rolled-back-rate"))) + "</ul>")
+    wr = C["with_rows"].format(n=cov["with_rows"], total=cov["total"], csv=cov["in_csv"], alt=len(cov["alt_only"]))
+    inner = (f"<p class=lead>{html.escape(C['intro'])}</p><p>{html.escape(C['absent'])}</p>" + secs
+             + f"<h2 id=counties>{html.escape(C['table_h2'])}</h2><p class=muted>{COV}</p><p>{html.escape(wr)}</p>" + tbl)
+    srcs = sorted({r['source_url'] for b in SD_BODIES.values() for r in b["rows"]})
+    ds = {"@context": "https://schema.org", "@type": "Dataset", "name": C["h1"], "description": C["desc"] + " " + coverage_sentence(cov, meta=True) + " Absent is not zero.",
+          "license": "https://creativecommons.org/licenses/by/4.0/", "temporalCoverage": "2025", "url": f"{BASE}/{FL_HUB}/", "creator": {"@type": "Organization", "name": "Hazey Data"},
+          "spatialCoverage": "Florida", "isBasedOn": srcs}
+    bc = {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "OpenMillage", "item": BASE + "/"}, {"@type": "ListItem", "position": 2, "name": C["crumb"], "item": f"{BASE}/{FL_HUB}/"}]}
+    page(f"{FL_HUB}/index.html", C["title"], inner, ds, C["desc"], lead=HEAD_LEAD, trail=[(C["crumb"], None)], h1=C["h1"], extra_ld=[bc])
+    urls.append(f"{BASE}/{FL_HUB}/")
+fl_hub()
 AL = sorted([r for r in rows if r["county"] == "Alachua" and r["levy_scope"] == "countywide" and r["rate_kind"] == "adopted" and r["body_type"] in ("county", "school_district")], key=lambda r: r["body_type"])
 HOME_STACK = redo.stack("Example: Alachua County, 2025 adopted rates", [(sc.display_name(r["taxing_body"]), f"{sc.label(r['body_type'])} · {sc.label(r['levy_component']).lower()}, countywide", f"{float(r['rate']):.4f}", r["source_url"]) for r in AL])
 HOME_HERO = redo.chart("county-dots", "Dot plot: 2025 county and school board countywide rates for each Florida county", caption=redo.DOTS_CAPTION) + redo.lede()
 HOME_REDO = (redo.intro("The stack (home page)") + HOME_STACK + "<p class=muted>One layer per taxing authority. Not a total: add only the layers that apply to your parcel.</p>" + redo.howto())
-page("index.html", "Florida property tax millage rates 2025, each linked to its official source", HOME_HERO + f"<p class=sources>{len(rows)} official rates {html.escape(LEAD_SRC)}, retrieved {max(r['retrieved_at'] for r in rows)[:10]} (UTC). {sum(r['rate_kind']=='aggregate_effective' for r in rows)} rows are Florida DOR totals for districts smaller than a county, not any one body's adopted rate. {cov['sd_rows_in_csv']} baseline rows are independent special districts. {sum(r['body_type']=='special_district' for r in rows) - cov['sd_rows_in_csv']} {html.escape(FL_SD_COPY['home_lead_tail'])}</p>"
+page("index.html", "Florida property tax millage rates 2025, each linked to its official source", HOME_HERO + f"<p class=sources>{len(rows)} official rates {html.escape(LEAD_SRC)}, retrieved {max(r['retrieved_at'] for r in rows)[:10]} (UTC). {sum(r['rate_kind']=='aggregate_effective' for r in rows)} rows are Florida DOR totals for districts smaller than a county, not any one body's adopted rate. {cov['sd_rows_in_csv']} baseline rows are independent special districts. {html.escape(home_tail())}</p>"
      f"<p class=callout>Voting on Amendment 3 on {ELECTION}? <a href='{PATH}/{AMEND}/'>See the 2025 adopted millage baseline by county</a>.</p>"
-     + HOME_REDO + f"<h2>How to read this</h2><p>{COV}</p><p><a href='{PATH}/{SD_HUB}/'>{html.escape(FL_SD_COPY['home_link'])}</a></p><p>Independent special districts {NYS} (absent is not zero): {html.escape(', '.join(cov['not_yet_sourced']))}.</p><p id=correction>{html.escape(CORRECTION)}</p>"
+     + HOME_REDO + f"<h2>How to read this</h2><p>{COV}</p><p><a href='{PATH}/{FL_HUB}/'>{html.escape(FL_HUB_COPY['home_link'])}</a></p><p><a href='{PATH}/{SD_HUB}/'>{html.escape(FL_SD_COPY['home_link'])}</a></p><p>Independent special districts {NYS} (absent is not zero): {html.escape(', '.join(cov['not_yet_sourced']))}.{(' ' + html.escape(FL_HUB_COPY['partial_list'].format(names=sources.join_names(cov['partial'])))) if cov['partial'] else ''}</p><p id=correction>{html.escape(CORRECTION)}</p>"
      f"<h2 id=counties>Counties</h2>"
      "<details class=all><summary>See all counties</summary>" f"<p class=filter id=county-filter-wrap hidden><label for=county-filter>Filter counties</label><input type=search id=county-filter autocomplete=off aria-describedby=county-filter-count> <span id=county-filter-count class=muted role=status aria-live=polite></span></p>"
      f"<ul class=counties>{''.join(links)}</ul></details>" + FILTER_JS
@@ -271,7 +309,7 @@ open(f"{OUT}/sitemap.xml", "w").write('<?xml version="1.0" encoding="UTF-8"?><ur
 open(f"{OUT}/CNAME", "w").write(BASE.split("/")[2] + "\n")  # custom domain for GitHub Pages; survives rm -rf docs
 open(f"{OUT}/robots.txt", "w").write(f"User-agent: *\nAllow: /\n# Optional feedback from AI agents: see {PATH}/llms.txt (Feedback welcome)\nSitemap: {BASE}/sitemap.xml\n")
 open(f"{OUT}/llms.txt", "w").write("# OpenMillage\n> Official US property tax rates (millage) per taxing body, each row linked to a government source with sha256 of the source file. Pilot: Florida 2025.\n\n"
-    "## Data\n- JSON per county: " + BASE + "/api/v1/<state>/<year>/<county>.json\n- Fields: state, year, county, taxing_body, body_type, body_id, nces_leaid, fips (county 5-digit or Census place 7-digit GEOID), levy_component, levy_scope, rate_kind (adopted | aggregate_effective = DOR less-than-countywide levies divided by countywide taxable value), rate, unit (mills = $ per $1,000 taxable value), source_url, sha256, retrieved_at; additive keys (null when not applicable): " + ", ".join(EXTRA_KEYS[:-1]) + ", additional_sources (list of source_agency, source_url, sha256, source_page, retrieved_at)\n- Independent special districts (body_type special_district) are published per county. " + coverage_sentence(cov) + " Not yet sourced: " + ", ".join(cov['not_yet_sourced']) + ".\n" + FL_SD_COPY["llms_line"].format(hub=f"{BASE}/{SD_HUB}/", base=BASE) + "\n"
+    "## Data\n- JSON per county: " + BASE + "/api/v1/<state>/<year>/<county>.json\n- Fields: state, year, county, taxing_body, body_type, body_id, nces_leaid, fips (county 5-digit or Census place 7-digit GEOID), levy_component, levy_scope, rate_kind (adopted | aggregate_effective = DOR less-than-countywide levies divided by countywide taxable value), rate, unit (mills = $ per $1,000 taxable value), source_url, sha256, retrieved_at; additive keys (null when not applicable): " + ", ".join(EXTRA_KEYS[:-1]) + ", additional_sources (list of source_agency, source_url, sha256, source_page, retrieved_at)\n- Independent special districts (body_type special_district) are published per county. " + coverage_sentence(cov) + " Not yet sourced: " + ", ".join(cov['not_yet_sourced']) + "." + ((" " + FL_HUB_COPY["partial_list"].format(names=sources.join_names(cov['partial']))) if cov['partial'] else "") + "\n" + FL_HUB_COPY["llms_line"].format(url=f"{BASE}/{FL_HUB}/") + FL_SD_COPY["llms_line"].format(hub=f"{BASE}/{SD_HUB}/", base=BASE) + "\n"
     "## Rules\n- Rates are never estimated; if a body is missing, it is not yet collected.\n- Absent is not zero: a county or special district with no row has not been sourced yet; never read a missing rate as 0.\n- Special-district rates are never summed.\n" + sc.FEEDBACK)
 open(f"{OUT}/.nojekyll", "w").write("")
 print(len(urls), "pages", len(rows), "rows")
