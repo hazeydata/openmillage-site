@@ -91,6 +91,9 @@ for b, rs in BODIES.items():
     for row, r in zip(t, rs):
         c, lv, rt, src = row
         want_note = LOADED[(r["county"], r["body_id"], r["levy_component"], r["rate_kind"])]["note"]
+        if (r["county"], r["body_id"]) in sources.NOTE_UNDER_TABLE:  # by-eye r1 fix 3: the cell carries "Note N"; the note sits under the table
+            m = re.search(r"#note-(\d+)", " ".join(h for h, _ in c["links"]))
+            want_note = f"Note {m.group(1)}" if m and f"<p class=footnote id=note-{m.group(1)}>Note {m.group(1)}: {html.escape(sources.NOTE_UNDER_TABLE[(r['county'], r['body_id'])])}</p>" in rd(body_path(b)) else "(numbered note missing)"
         if not (c["text"].startswith(r["county"]) and c["links"][0][0] == f"{PATH}/fl/2025/{slug(r['county'])}-county/" and lv["text"] == levy(r)
                 and rt["text"] == f"{float(r['rate']):.4f} {r['unit']}" and src["links"][0][0] == r["source_url"] and src["codes"] == [r["sha256"]]
                 and (want_note or "") == c["text"][len(r["county"]):].strip()):

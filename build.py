@@ -64,9 +64,30 @@ def table(caption, cols, trs):
 def src_link(r):
     return f"<a href='{html.escape(r['source_url'])}' aria-label='Source for {html.escape(sc.display_name(r['taxing_body']))}'>source</a>"
 def sd_levy(r): return f"({COMBINED[r['levy_component']]})" if r['levy_component'] in COMBINED else sc.label(r['levy_component'])
-def sd_tr(r):
-    note = f"<br><small class=muted>{html.escape(r['note'])}</small>" if r['note'] else ""
-    return (f"<tr><td><a href='{sd_href(r['body_id'])}'>{html.escape(sc.display_name(r['taxing_body']))}</a>{note}</td><td>{html.escape(sd_levy(r))}</td><td class=num>{float(r['rate']):.4f} {r['unit']}</td>"
+NOTE_LABEL = "Note {n}"  # numbered-note label, the pattern of the Amendment 3 footnotes (SFWMD "Note 3")
+def note_ref(n): return f"<a href='#note-{n}'>{NOTE_LABEL.format(n=n)}</a>"
+def numbered_notes(rs, taken=()):
+    """{key(r): (n, text)} for rows whose note is shown as a numbered note under the table (sources.NOTE_UNDER_TABLE), in row order,
+    numbered from 1 skipping numbers already used on the page (`taken`). Display only: r['note'] (the data note) is not changed."""
+    out, n = {}, 0
+    for r in rs:
+        t = sources.NOTE_UNDER_TABLE.get((r["county"], r["body_id"]))
+        if t and sources.key(r) not in out:
+            n += 1
+            while n in taken: n += 1
+            out[sources.key(r)] = (n, t)
+    return out
+def notes_block(nn): return "".join(f"<p class=footnote id=note-{n}>{NOTE_LABEL.format(n=n)}: {html.escape(t)}</p>" for n, t in sorted(nn.values()))
+def cell_note(r, nn):
+    if sources.key(r) in nn: return f"<br><small class=muted>{note_ref(nn[sources.key(r)][0])}</small>"
+    return f"<br><small class=muted>{html.escape(r['note'])}</small>" if r['note'] else ""
+def reason_more(verbatim):
+    """Plain reason's audit trail: the status file's recorded reason, verbatim, one click away."""
+    return f"<details class=reason-more><summary>{html.escape(FL_HUB_COPY['reason_more'])}</summary><p>{html.escape(verbatim)}</p></details>"
+REASONS = {c: w for c, _, w in sources.open_counties()}
+def sd_tr(r, nn={}):
+    note = cell_note(r, nn)
+    return (f"<tr><td class=sd-body><a href='{sd_href(r['body_id'])}'>{html.escape(sc.display_name(r['taxing_body']))}</a>{note}</td><td>{html.escape(sd_levy(r))}</td><td class=num>{float(r['rate']):.4f} {r['unit']}</td>"
             f"<td>{src_link(r)} <code title='{r['sha256']}'>{r['sha256'][:8]}</code></td></tr>")
 def base_tr(r):
     agg = r['rate_kind'] == 'aggregate_effective'
@@ -98,20 +119,23 @@ for (st, yr, co), rs in sorted(by.items()):
     for gname, cap, bts in GROUPS:
         g = [r for r in base if r['body_type'] in bts]
         if g: groups.append(f"<h2 id={slug(gname)}>{gname}</h2>" + table(f"{cap} rates in {co} County", COLS, "".join(base_tr(r) for r in g)))
+    SDCOLS = [("Taxing body", 0), ("Levy", 0), ("Rate", 1), ("Source", 0)]
+    nn = numbered_notes(sds)
+    sdt = lambda: (table(f"Independent special districts in {co} County", SDCOLS, "".join(sd_tr(r, nn) for r in sds))
+                   + notes_block(nn) + f"<p><a href='{PATH}/{SD_HUB}/'>{html.escape(FL_SD_COPY['county_link'])}</a></p>")
     if co in cov['not_yet_sourced']:
-        sdh = f"<p>Independent special districts: {NYS}. The official source for this county has not been checked yet; absent is not zero.</p>"
+        sdh = (f"<p>Independent special districts: {NYS}. The official source for this county has not been checked yet; absent is not zero.</p>"
+               + f"<p>{html.escape(sources.plain_reason(co, REASONS[co]))}</p>" + reason_more(REASONS[co]))
     elif co not in cov['counties']:
         sdh = ""
     elif co in cov['partial']:
-        sdh = (f"<p class=partial>{html.escape(FL_HUB_COPY['partial_line'].format(reason=dict((c, w) for c, _, w in sources.open_counties())[co]))}</p>"
-               + table(f"Independent special districts in {co} County", [("Taxing body", 0), ("Levy", 0), ("Rate", 1), ("Source", 0)], "".join(sd_tr(r) for r in sds))
-               + f"<p><a href='{PATH}/{SD_HUB}/'>{html.escape(FL_SD_COPY['county_link'])}</a></p>")
+        sdh = (f"<p class=partial>{html.escape(FL_HUB_COPY['partial_line'].format(reason=sources.plain_reason(co, REASONS[co])))}</p>" + reason_more(REASONS[co]) + sdt())
     elif not sds:
         sdh = f"<p>{NO_ROWS}</p>"
     else:
-        sdh = (table(f"Independent special districts in {co} County", [("Taxing body", 0), ("Levy", 0), ("Rate", 1), ("Source", 0)], "".join(sd_tr(r) for r in sds))
-               + f"<p><a href='{PATH}/{SD_HUB}/'>{html.escape(FL_SD_COPY['county_link'])}</a></p>")
-    sdh = f"<h2 id=special-districts>Special districts</h2><p class=muted>{COV}</p>{sdh}" if sdh else f"<p class=muted>{COV}</p>"
+        sdh = sdt()
+    fl_link = f"<p class=muted><a href='{PATH}/{FL_HUB}/'>{html.escape(FL_HUB_COPY['home_link'])}</a></p>"  # statewide count lives on /fl/ (by-eye r1 fix 5)
+    sdh = f"<h2 id=special-districts>Special districts</h2>{fl_link}{sdh}" if sdh else fl_link
     api = f"api/v1/{st.lower()}/{yr}/{slug(co)}.json"
     os.makedirs(os.path.dirname(f"{OUT}/{api}"), exist_ok=True); json.dump(rs, open(f"{OUT}/{api}", "w"), indent=1)
     ds = {"@context": "https://schema.org", "@type": "Dataset", "name": f"{co} County, {st} property tax millage rates {yr}",
@@ -190,12 +214,12 @@ def nys_block():
 def cov_block():
     return f"<h2 id=coverage>{html.escape(FL_SD_COPY['coverage_h2'])}</h2><p class=muted>{COV}</p>" + nys_block()
 def county_href(co): return f"{PATH}/fl/2025/{slug(co)}-county/"
-def body_table(caption, brs):
+def body_table(caption, brs, nn={}):
     """LAYOUT (b): one <tbody> per county (rows already in sources.sd_row_order), county as <th scope=rowgroup rowspan=n> on the
     group's first row; explicit ARIA roles so the table keeps its semantics when stacked at <= 40rem (CSS table.sd-rates)."""
     groups = {}
     for r in brs: groups.setdefault(r["county"], []).append(r)
-    note = lambda r: f"<br><small class=muted>{html.escape(r['note'])}</small>" if r['note'] else ""
+    note = lambda r: cell_note(r, nn)
     tbodies = []
     for co, g in groups.items():
         trs = []
@@ -208,7 +232,7 @@ def body_table(caption, brs):
     return sc.tablewrap(caption, f"<table class=sd-rates role=table><caption>{html.escape(caption)}</caption><thead role=rowgroup><tr role=row>{th}</tr></thead>{''.join(tbodies)}</table>")
 def footnote(key):
     fc = CFG["footnote_citations"][key]
-    return (f"<p class=footnote>Note {fc['n']}: &ldquo;{html.escape(_a3.FOOT[fc['n']])}&rdquo; Source: "
+    return (f"<p class=footnote>{NOTE_LABEL.format(n=fc['n'])}: &ldquo;{html.escape(_a3.FOOT[fc['n']])}&rdquo; Source: "
             + "; ".join(f"<a href='{html.escape(_a3.SRC[f]['url'])}'>{html.escape('DOR 2025 TACD (' + _a3.SRC[f]['county'] + ')')}</a>, {html.escape(w)}" for f, w in fc["cites"]) + ".</p>")
 hub_trs = []
 def hub_key(b):  # hub caption says "by name": the displayed name, case-insensitive, a leading "The " ignored; slug breaks ties
@@ -219,10 +243,11 @@ for bid, b in sorted(SD_BODIES.items(), key=lambda kv: hub_key(kv[1])):
     json.dump(brs, open(f"{d}/index.json", "w"), indent=1)
     ctys = sorted({r["county"] for r in brs}); cty_txt = sc.name_list(ctys) + (" County" if len(ctys) == 1 else " counties")
     also = [n for n in b["names"] if n != name]
+    nn = numbered_notes(brs, taken={CFG["footnote_citations"][SD_FOOTNOTES[bid]]["n"]} if bid in SD_FOOTNOTES else ())
     inner = (f"<p class=lead>{html.escape(FL_SD_COPY['body_intro'].format(name=name))}</p>"
              + (f"<p>{html.escape(FL_SD_COPY['also_printed'])}: " + "; ".join(f"<q>{html.escape(n)}</q>" for n in also) + "</p>" if also else "")
              + f"<h2 id=rates>2025 rates</h2><p class=muted>{html.escape(FL_SD_COPY['rows_note'])}</p>"
-             + body_table(f"{name}, 2025 rates by county", brs)
+             + body_table(f"{name}, 2025 rates by county", brs, nn) + notes_block(nn)
              + (footnote(SD_FOOTNOTES[bid]) if bid in SD_FOOTNOTES else "")
              + f"<p>{html.escape(FL_SD_COPY['absent_note'])}</p>" + cov_block()
              + f"<p>JSON: <a href='{PATH}/{sp[:-10]}index.json'>index.json</a> · <a href='{PATH}/{SD_HUB}/'>{html.escape(FL_SD_COPY['county_link'])}</a></p>")
@@ -270,10 +295,16 @@ def home_tail():
 def fl_hub():
     C = FL_HUB_COPY
     labels = sorted(co for (st, yr, co) in by if st == "FL" and yr == "2025")
-    trs = "".join(f"<tr data-status={k}><td><a href='{county_href(co)}'>{html.escape(co)} County, FL</a></td><td>{html.escape(t)}</td></tr>"
-                  for co in labels for k, t in [sources.fl_hub_status(co, cov, rows)])
+    # Short status cells: {reason} becomes a "Note N" link to a numbered note under the table (plain reason + the recorded reason verbatim).
+    mark = "\x00reason\x00"
+    st = [(co, *sources.fl_hub_status(co, cov, rows, reason=mark)) for co in labels]
+    noted = [co for co, k, t in st if mark in t]
+    num = {co: i + 1 for i, co in enumerate(noted)}
+    cell = lambda co, t: html.escape(t).replace(mark, note_ref(num[co])) if co in num else html.escape(t)
+    trs = "".join(f"<tr data-status={k}><td{'' if k == 'multi' else ' class=hub-county'}><a href='{county_href(co)}'>{html.escape(sources.display_label(co))}</a></td><td>{cell(co, t)}</td></tr>" for co, k, t in st)
     tbl = sc.tablewrap(C["table_caption"], f"<table id=fl-coverage><caption>{html.escape(C['table_caption'])}</caption><thead><tr><th scope=col>{html.escape(C['th_county'])}</th>"
                        f"<th scope=col>{html.escape(C['th_sd'])}</th></tr></thead><tbody>{trs}</tbody></table>")
+    tbl += "".join(f"<div class=footnote id=note-{num[co]}><p>{NOTE_LABEL.format(n=num[co])} ({html.escape(co)}): {html.escape(sources.plain_reason(co, REASONS[co]))}</p>{reason_more(REASONS[co])}</div>" for co in noted)
     S = C["sections"]
     secs = (f"<h2 id=sections>{html.escape(C['sections_h2'])}</h2><ul>"
             + "".join(f"<li><a href='{PATH}/{u}/'>{html.escape(S[k])}</a></li>" for k, u in (("special_districts", SD_HUB), ("amendment_3", AMEND), ("rolled_back", "fl/rolled-back-rate"))) + "</ul>")

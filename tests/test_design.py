@@ -21,9 +21,12 @@ for needle in ("overflow-wrap:anywhere", ".tablewrap{overflow-x:auto", ":focus-v
 # the allowed nowraps: FL body-page Rate and Source cells (OM-SITE-SPECIAL-ISD-001 LAYOUT (b)1, pick L2) and TX rate-table numeric
 # cells (OM-SITE-SPECIAL-ISD-001 round 2, Lucille 2: no rate wraps mid-number at 390); nowhere else. The size cap was raised from
 # 4500 to 5800 bytes (round 3: the TX hub details rules) for the TX ISD chart style (CHART-SPEC section 9: STYLE lives in style.css once), the TX hub and those rules.
+# OM-FL-COVERAGE-001 by-eye r1 (Ann, fixes 1 and 4) adds one more allowed nowrap rule (FL hub county cells, FL county-page Rate cells)
+# and its overflow-wrap override; the cap is raised from 5800 to 5900 bytes for those 121 bytes only.
 SD_NOWRAP = "table.sd-rates td.num,table.sd-rates td.src{white-space:nowrap}"
 TX_NOWRAP = "table.tx-rates td.num{white-space:nowrap}"
-ok("nowrap" not in css.replace(SD_NOWRAP, "", 1).replace(TX_NOWRAP, "", 1) and len(css.encode()) < 5800, f"style.css has no nowrap outside the FL body-page rate/source cells and TX rate-table numeric cells, and stays small ({len(css.encode())} bytes)")
+FL_NOWRAP = "#fl-coverage .hub-county,.sd-body~.num{white-space:nowrap}"
+ok("nowrap" not in css.replace(SD_NOWRAP, "", 1).replace(TX_NOWRAP, "", 1).replace(FL_NOWRAP, "", 1) and len(css.encode()) < 5900, f"style.css has no nowrap outside the FL body-page rate/source cells, TX rate-table numeric cells and the FL hub county / county-page rate cells, and stays small ({len(css.encode())} bytes)")
 
 RAW = ("'>operating_total", ">school_district<", ">dependent_special_district", ">less_than_countywide")
 def check_page(p):
@@ -97,7 +100,7 @@ ok(rd("docs/robots.txt") == f"User-agent: *\nAllow: /\n# Optional feedback from 
 
 # count consistency: one number everywhere
 ok(n > 0,f"computed count of counties with special-district rows: {n}")
-ok(f"{n} have special-district rows in the Amendment 3 baseline CSV" in html.unescape(idx) and f"{n} have special-district rows in the Amendment 3 baseline CSV" in llms and all(f"{n} have special-district rows in the Amendment 3 baseline CSV" in html.unescape(rd(p)) for p in county_pages), "count sentence on home, llms.txt and every county page")
+ok(f"{n} have special-district rows in the Amendment 3 baseline CSV" in html.unescape(idx) and f"{n} have special-district rows in the Amendment 3 baseline CSV" in llms and all(f"{n} have special-district rows in the Amendment 3 baseline CSV" in html.unescape(rd(p)) for p in ["docs/fl/index.html"]) and not any(f"{n} have special-district rows in the Amendment 3 baseline CSV" in html.unescape(rd(p)) for p in county_pages), "count sentence on home, llms.txt and /fl/ (county pages link /fl/ instead, OM-FL-COVERAGE-001 by-eye r1 fix 5)")
 ok(f"Special districts: {n} of 67 Florida counties have special-district rows in this baseline" in ah, "amendment page states the same count")
 # Amendment 3 sub-counts, computed from data/ independently of sources.py and amend3.py
 import csv

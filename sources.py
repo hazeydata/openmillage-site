@@ -15,6 +15,26 @@ NOTE_OVERRIDES = {
     ("Orange", "fl-sfwmd-special_district"): "Shown as one combined rate. Orange County's authority list prints it in three parts: 0.0948 + 0.1026 + 0.0327 = 0.2301.",
     ("Orange", "fl-cftod-special_district"): "Formerly Reedy Creek Improvement District. Independent special district. Printed as one combined operating and debt rate, levied only in mill code 70 (Bay Lake, Lake Buena Vista and unincorporated Reedy Creek).",
 }
+# PLACEHOLDER COPY pending the writing pass (Lindsay), OM-FL-COVERAGE-001 by-eye r1 fix 3: display-only plain-words notes for the
+# district_wide water-management-district alt rows. Shown as a numbered note under the rate table ("Note N" in the cell) on the county
+# page and the body page; the row's note in the data and in every JSON output stays the pinned source note (never edited here).
+NOTE_UNDER_TABLE = {
+    ("Calhoun", "fl-nwfwmd-special_district"): (
+        "Resolution No. 957 sets 0.0207 of a mill for the whole of Calhoun County, which it names in its county list. The meeting-packet "
+        "copy of Resolution 957 is unsigned. Its adoption is confirmed by signed Resolution No. 958 in the Northwest Florida Water "
+        "Management District's FY 2025-26 Adopted Budget, which our data cites as a second source. Florida DOR's Data Book 2025 lists "
+        "Calhoun at 0.0207 county-wide, with no rate for only part of the county."),
+    ("Liberty", "fl-nwfwmd-special_district"): (
+        "Resolution No. 957 sets 0.0207 of a mill for the whole of Liberty County, which it names in its county list. The meeting-packet "
+        "copy of Resolution 957 is unsigned. Its adoption is confirmed by signed Resolution No. 958 in the Northwest Florida Water "
+        "Management District's FY 2025-26 Adopted Budget, which our data cites as a second source. Florida DOR's Data Book 2025 lists "
+        "Liberty at 0.0207 county-wide, with no rate for only part of the county."),
+    ("Clay", "fl-sjrwmd-special_district"): (
+        "The rate applies to the whole of Clay County. Page 22 of the St. Johns River Water Management District's FY 2025-26 Final Budget says: 'This is based on maintaining the current year millage "
+        "rate of 0.1793'. Page 4 says the district's Governing Board adopted the FY 2025-26 millage rate and the final budget on September 15, 2025. "
+        "Page 6 lists Clay among the district's 18 counties without the * that marks counties only partly in the district. Florida DOR's "
+        "Data Book 2025 lists Clay at 0.1793 county-wide, with no rate for only part of the county."),
+}
 HEX = re.compile(r"^[0-9a-f]{64}$")
 PARTIAL = "partial"  # status value in STATUS_FILE: some special-district rows published, others not yet sourced
 
@@ -294,66 +314,112 @@ def open_counties():
 
 # ---------- Florida hub /fl/ (OM-FL-COVERAGE-001) ----------
 FL_HUB = "fl"
-# PLACEHOLDER COPY pending the writing pass (Lindsay) and the by-eye pass (Ann), OM-FL-COVERAGE-001: every new reader-facing
-# string of the /fl/ hub, the "partial" county line, the water-management-district alt-source wording, the big_cypress_basin
-# levy label and the Florida breadcrumb label lives here only. Counts and county names are always computed, never written here.
+# Copy from the writing pass (Lindsay, OM-FL-COVERAGE-001 fl-hub-copy.md, sha256 4f26f9bf), wired key for key; by-eye r1 layout fixes
+# from Ann applied (numbered notes, short hub cells). Every reader-facing string of the /fl/ hub, the "partial" county line, the
+# plain reasons, the water-management-district alt-source wording, the big_cypress_basin levy label and the Florida breadcrumb label
+# lives here only. Counts and county names are always computed, never written here.
 FL_HUB_COPY = {
     "crumb": "Florida",  # breadcrumb label linking /fl/ on every page under /fl/
-    "title": "Florida property tax rates by county: sources and coverage, 2025",
+    "title": "Florida property tax rates 2025: every county, with sources",
     "h1": "Florida property tax rates, 2025",
-    "desc": ("Every Florida county page, with what we have sourced for each county's independent special districts "
-             "and what is not yet sourced. No estimates."),
-    "intro": ("Each county page lists the 2025 millage rates we have from official sources, each linked to its source. "
-              "The table below also shows how far we have got with each county's independent special districts."),
+    "desc": ("Every Florida county's 2025 millage page, plus which independent special districts we've sourced so far and which we haven't. "
+             "Official sources only, no estimates."),
+    "intro": ("Pick a county to see its 2025 millage rates, each linked to the official file it came from. The table also shows how far "
+              "we've got with each county's independent special districts, and why the missing ones are missing."),
+    # STOPPED (not wired): the writer's "No row means not sourced yet, not zero." drops the line "absent is not zero" that spec AC17
+    # requires on the hub; the previous string is kept until the desk rules.
     "absent": "A county or district with no row has not been sourced yet: absent is not zero.",
-    "with_rows": ("{n} of {total} Florida counties have at least one sourced special-district row: {csv} from the county's "
-                  "2025 TACD file and {alt} only from other official documents."),
-    "sections_h2": "Florida pages",
+    "with_rows": ("{n} of {total} Florida counties have at least one sourced special-district row: {csv} from Florida DOR's 2025 rate file "
+                  "for the county (TACD) and {alt} only from other official documents."),
+    "sections_h2": "More Florida pages",
     "sections": {"special_districts": "Independent special districts, one page each",
                  "amendment_3": "Amendment 3: the 2025 adopted millage baseline",
                  "rolled_back": "Rolled-back rate vs adopted millage, 2025"},
     "table_h2": "Counties",
     "table_caption": "Florida county pages and special-district coverage, 2025",
-    "th_county": "County page",
-    "th_sd": "Independent special districts",
-    "status_sourced": "sourced ({bodies})",
-    "status_sourced_alt": "sourced ({bodies}, {kind})",
+    "th_county": "County",
+    "th_sd": "Special districts sourced",
+    "status_sourced": "Sourced ({bodies})",
+    "status_sourced_alt": "Sourced ({bodies}, from a {kind})",
     "alt_kind": {"wmd": "water management district document", "pa": "county property appraiser document"},
-    "status_partial": "partial ({bodies} sourced). Recorded reason: {reason}",
-    "status_open": "not yet sourced: {reason}",
+    "status_partial": "Partly sourced ({bodies} so far). {reason}",
+    "status_open": "Not sourced yet. {reason}",
+    # kept per fact-check (OM-FL-COVERAGE-001 fact-check REPORT sha 1107f87d): Lindsay's line is false for all 12 counties.
     "status_none": "no special-district rows published yet",
-    "status_multi": "city spanning more than one county; see each county's page",
-    "body": ("body", "bodies"),
-    "partial_line": "Partial coverage: some independent special districts in this county are sourced and others are not yet. Recorded reason: {reason}",
-    "partial_list": "Partial coverage (some districts sourced, others not yet): {names}.",
+    "status_multi": "Covers a city in two counties. See each county's page.",  # used only when every city label spans exactly 2 counties
+    "status_multi_more": "Covers a city in more than one county. See each county's page.",  # the writer's fallback otherwise
+    "body": ("district", "districts"),
+    # Plain reason per status-file county. Shown only while sha256 of the county's recorded reason (status file as pinned) still equals
+    # for_sha256; otherwise, or for a county not listed, the verbatim recorded reason is shown (sources.plain_reason).
+    "reason_plain": {
+        "Columbia": {"text": "The county's file doesn't add up: one area's printed total doesn't match the rates printed beside it.",
+                     "for_sha256": "ec657109202660503db22c748599bf8637a5b311faaecabcd2c3f59efcb0fee1"},
+        "Monroe": {"text": "The county's file is a scan we can't read reliably yet: after scanning, one area's rates don't add up to its printed total.",
+                   "for_sha256": "1ced3616e2de8cdbe98f6f2c2194ab95be19edc22b355406e533e03aeed84b89"},
+        "Sumter": {"text": "The county's file prints city totals but not the rates inside them, so there's nothing to check them against.",
+                   "for_sha256": "00fa6d624b8deeb873f036b01b3ec6cc8e525045966c68515e5b76d5125a7777"},
+        "Collier": {"text": ("The South Florida Water Management District is sourced. The county's fire and mosquito control districts "
+                             "aren't yet: its file prints no total to check them against."),
+                    "for_sha256": "436f85e968db5fe0c00417164a538a290ca68647693011b850d2d4fb8255839d"},
+    },
+    "reason_more": "Full recorded reason",  # <summary> of the <details class=reason-more> holding the verbatim status-file reason
+    "partial_line": "Partly sourced: some of this county's independent special districts are on this page, and others aren't yet. {reason}",
+    "partial_list": "Partly sourced so far: {names}.",
     "partial_badge": "special districts partly sourced",
     "levy_labels": {"big_cypress_basin": "Big Cypress Basin"},  # display label only; the data value stays big_cypress_basin
     "lead_wmd": "water management districts",  # homepage source-type name for alt rows from WMD documents
-    "home_lead_tail_split": "{pa} more come from county property appraisers and {wmd} from water management district documents, not the baseline CSV.",
-    "home_link": "Florida: every county page and special-district coverage",
+    "home_lead_tail_split": "Another {pa} come from county property appraisers and {wmd} from water management districts, outside the baseline CSV.",
+    "home_link": "Florida: every county page and how far we've got on special districts",
     "alt": {
         "alt_tail_one": "{names} has special-district rates from a water management district document, not the baseline CSV.",
         "alt_tail_many": "{names} have special-district rates from water management district documents, not the baseline CSV.",
         "alt_tail_meta": "{names} special-district rows come from water management district documents, not the baseline CSV.",
     },
-    "llms_line": ("- Florida hub: {url} (every Florida county page and each county's special-district coverage: sourced, partial "
-                  "or not yet sourced with the recorded reason; absent is not zero).\n"),
+    "llms_line": ("- Florida hub: {url} (every Florida county page, and each county's special-district coverage: sourced, partly sourced, "
+                  "or not sourced yet with the reason; absent is not zero).\n"),
 }
 
 
-def fl_hub_status(label, cov, rows, state="FL", year="2025"):
+def plain_reason(county, verbatim):
+    """The writer's plain reason for a status-file county, only if it is listed in FL_HUB_COPY["reason_plain"] and was written from this
+    exact recorded reason (sha256 of the verbatim text equals for_sha256); otherwise the verbatim recorded reason, so a status-file change
+    can never leave a stale plain line."""
+    p = FL_HUB_COPY["reason_plain"].get(county)
+    if p and hashlib.sha256(verbatim.encode("utf-8")).hexdigest() == p["for_sha256"]:
+        return p["text"]
+    return verbatim
+
+
+def status_multi(labels):
+    """status_multi when every multi-county city label (parts split on "/") spans exactly 2 counties, else status_multi_more."""
+    return FL_HUB_COPY["status_multi"] if labels and all(len(l.split("/")) == 2 for l in labels) else FL_HUB_COPY["status_multi_more"]
+
+
+def multi_labels(cov, state="FL", year="2025"):
+    """County labels in the base file that are not census counties (two-county city rows such as Flagler/St. Johns)."""
+    return sorted({r["county"] for r in _csv(BASE_FILE) if r["state"] == state and r["year"] == year} - set(cov["counties"]))
+
+
+def display_label(label):
+    """Display only: a multi-county city label is shown with a space around the slash ("Flagler / St. Johns")."""
+    return " / ".join(p.strip() for p in label.split("/"))
+
+
+def fl_hub_status(label, cov, rows, state="FL", year="2025", reason=None):
     """(kind, text) for one county label's special-district coverage, computed from the rows and the status file.
-    kind: sourced | sourced_alt | partial | open | none | multi."""
+    kind: sourced | sourced_alt | partial | open | none | multi. {reason} is filled with `reason` when given (the hub passes a marker it
+    turns into a "Note N" link), else with the plain reason (plain_reason)."""
     C = FL_HUB_COPY
-    reasons = {c: (st, why) for c, st, why in open_counties()}
+    reasons = {c: why for c, st, why in open_counties()}
+    rs = lambda c: plain_reason(c, reasons[c]) if reason is None else reason
     bodies = sorted({r["body_id"] for r in rows if r["state"] == state and r["year"] == year and r["county"] == label and r["body_type"] == "special_district"})
     nb = plural(len(bodies), *C["body"])
     if label not in cov["counties"]:
-        return "multi", C["status_multi"]
+        return "multi", status_multi(multi_labels(cov, state, year))
     if label in cov["not_yet_sourced"]:
-        return "open", C["status_open"].format(reason=reasons[label][1])
+        return "open", C["status_open"].format(reason=rs(label))
     if label in cov["partial"]:
-        return "partial", C["status_partial"].format(bodies=nb, reason=reasons[label][1])
+        return "partial", C["status_partial"].format(bodies=nb, reason=rs(label))
     if not bodies:
         return "none", C["status_none"]
     if label in cov["alt_only"]:

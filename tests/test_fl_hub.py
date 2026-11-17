@@ -80,7 +80,9 @@ for r in NEW:
         bad14.append((r["county"], r["body_id"], r["levy_component"]))
 ok(NEW and not bad14, f"AC14 the {len(NEW_C)} counties' pages render all {len(NEW)} new rows with rate, source link, sha256 and body-page link: missing {bad14}")
 reasons = {r["county"]: r["reason"] for r in STATUS}
-ok(PARTIAL and all(html.escape(C["partial_line"].format(reason=reasons[r["county"]])) in county_page(r["county"]) and "<p>Independent special districts: not yet sourced" not in county_page(r["county"]) for r in PARTIAL),
+def more(v): return f"<details class=reason-more><summary>{html.escape(C['reason_more'])}</summary><p>{html.escape(v)}</p></details>"
+ok(PARTIAL and all(html.escape(C["partial_line"].format(reason=sources.plain_reason(r["county"], reasons[r["county"]]))) + "</p>" + more(reasons[r["county"]]) in county_page(r["county"])
+                   and "<p>Independent special districts: not yet sourced" not in county_page(r["county"]) for r in PARTIAL),
    f"AC14 partial counties {[r['county'] for r in PARTIAL]} show the partial-coverage line (FL_HUB_COPY) and their rows, not the not-yet-sourced block")
 ok(sorted(cov["not_yet_sourced"]) == sorted(r["county"] for r in OPEN) and all("<p>Independent special districts: not yet sourced." in county_page(r["county"]) for r in OPEN)
    and not any(r["county"] in NEW_C for r in OPEN),
@@ -126,25 +128,34 @@ ok(not re.search(r"href='/fl/(2025|history)/'", hub) and not os.path.exists("doc
 labels = sorted({r["county"] for r in csvrows(sources.BASE_FILE)})
 census = {r["name"].removesuffix(" County") for r in csvrows(sources.COUNTIES_FILE)}
 tacd_c = {r["county"] for r in SD_RAW}
+multi = sorted(set(labels) - census)
 def want_status(c):
     n = len({r["body_id"] for r in SD_RAW + ALT_RAW if r["county"] == c})
     nb = sources.plural(n, *C["body"])
-    if c not in census: return "multi", C["status_multi"]
+    if c not in census: return "multi", C["status_multi"] if all(len(l.split("/")) == 2 for l in multi) else C["status_multi_more"]
     st = next((r for r in STATUS if r["county"] == c), None)
-    if st and st["status"] != sources.PARTIAL: return "open", C["status_open"].format(reason=st["reason"])
-    if st: return "partial", C["status_partial"].format(bodies=nb, reason=st["reason"])
+    if st and st["status"] != sources.PARTIAL: return "open", C["status_open"].format(reason=f"Note {NOTE_N[c]}")
+    if st: return "partial", C["status_partial"].format(bodies=nb, reason=f"Note {NOTE_N[c]}")
     if not n: return "none", C["status_none"]
     if c not in tacd_c:
         ag = {r["source_agency"] for r in ALT_RAW if r["county"] == c}
         kind = "wmd" if all("Water Management District" in a for a in ag) else "pa" if all("County Property Appraiser" in a for a in ag) else None
         return "sourced_alt", C["status_sourced_alt"].format(bodies=nb, kind=C["alt_kind"][kind])
     return "sourced", C["status_sourced"].format(bodies=nb)
-trs = re.findall(r"<tr data-status=(\w+)><td><a href='/fl/2025/([^']+)/'>([^<]+) County, FL</a></td><td>([^<]*)</td></tr>", hm)
-got = [(html.unescape(name), k, html.unescape(t)) for k, _, name, t in trs]
+NOTE_N = {c: i + 1 for i, c in enumerate(c for c in labels if c in {r["county"] for r in STATUS})}  # numbered in table order
+trs = re.findall(r"<tr data-status=(\w+)><td(?: class=hub-county)?><a href='/fl/2025/([^']+)/'>([^<]+)</a></td><td>((?:[^<]|<a href='#note-\d+'>Note \d+</a>)*)</td></tr>", hm)
+show = lambda c: " / ".join(c.split("/"))  # display only: space around the slash of a two-county city label
+undisplay = {show(c): c for c in labels}
+got = [(undisplay.get(html.unescape(name), html.unescape(name)), k, text(t)) for k, _, name, t in trs]
 ok([g[0] for g in got] == labels and all((k, t) == want_status(c) for c, k, t in got), f"AC17 one row per county label ({len(labels)}), each status recomputed from the CSVs + status file: mismatches {[(c, k) for c, k, t in got if (k, t) != want_status(c)][:3]}")
 kinds = {k for _, k, _ in got}
-ok({"sourced", "sourced_alt", "partial", "open"} <= kinds and all(f"not yet sourced: {r['reason']}" in [t for _, _, t in got] for r in OPEN),
-   f"AC17 statuses present: sourced, sourced_alt (alt-source only, marked), partial, open with the recorded reason ({sorted(kinds)})")
+def hub_note(c):
+    m = re.search(rf"<div class=footnote id=note-{NOTE_N[c]}><p>(.*?)</p>(<details class=reason-more>.*?</details>)</div>", hm)
+    return m and (html.unescape(m.group(1)), m.group(2))
+ok({"sourced", "sourced_alt", "partial", "open"} <= kinds and all(C["status_open"].format(reason=f"Note {NOTE_N[r['county']]}") in [t for _, _, t in got] for r in OPEN)
+   and all(f"<a href='#note-{NOTE_N[r['county']]}'>Note {NOTE_N[r['county']]}</a>" in hm for r in STATUS)
+   and all(hub_note(r["county"]) == (f"Note {NOTE_N[r['county']]} ({r['county']}): {sources.plain_reason(r['county'], r['reason'])}", more(r["reason"])) for r in STATUS),
+   f"AC17 statuses present: sourced, sourced_alt (alt-source only, marked), partial, open; every status-file county's cell links its numbered note (plain reason + recorded reason verbatim) ({sorted(kinds)})")
 alt_wmd = [c for c, k, t in got if k == "sourced_alt" and C["alt_kind"]["wmd"] in t]
 ok(sorted(alt_wmd) == sorted(c for c in cov["alt_only"] if sources.alt_kinds()[c] == "wmd"), f"AC17 water-management-district-document counties are marked distinctly: {alt_wmd}")
 # The recorded reasons from the status file are quoted verbatim (spec AC17) and may cite printed figures from the source file; they are
@@ -194,12 +205,15 @@ ok(len(linking) == sum(counts.values()) + 1 and len(linking) >= 293, f"AC19 page
 
 # ---------------- AC20: copy block ----------------
 src = rd("sources.py")
-ok("PLACEHOLDER COPY pending the writing pass (Lindsay) and the by-eye pass (Ann), OM-FL-COVERAGE-001" in src, "AC20 FL_HUB_COPY is marked as placeholder copy pending Lindsay and Ann")
+ok("# Copy from the writing pass (Lindsay, OM-FL-COVERAGE-001 fl-hub-copy.md, sha256 4f26f9bf), wired key for key; by-eye r1 layout fixes\n# from Ann applied" in src
+   and "# PLACEHOLDER COPY pending the writing pass (Lindsay), OM-FL-COVERAGE-001 by-eye r1 fix 3" in src.split("NOTE_UNDER_TABLE = {")[0],
+   "AC20 FL_HUB_COPY is marked as the writing-pass copy with Ann's r1 fixes; the display-only NOTE_UNDER_TABLE notes are marked placeholder pending Lindsay")
 # Hub visible text: remove every FL_HUB_COPY string (formatted with computed values), the computed coverage sentence and the county
 # names; what remains is punctuation only, so no reader-facing hub string lives outside the copy block.
 rest = text(hm)
 pieces = [C["h1"], C["intro"], C["absent"], C["sections_h2"], *C["sections"].values(), C["table_h2"], C["table_caption"], C["th_county"], C["th_sd"], wr,
-          sources.coverage_sentence(cov)] + [t for _, _, t in got] + [f"{c} County, FL" for c in labels]
+          sources.coverage_sentence(cov)] + [t for _, _, t in got] + [show(c) for c in labels] + [C["reason_more"]] + [r["reason"] for r in STATUS] \
+         + [f"Note {NOTE_N[r['county']]} ({r['county']}): {sources.plain_reason(r['county'], r['reason'])}" for r in STATUS]
 for p in sorted(pieces, key=len, reverse=True): rest = rest.replace(text(html.escape(p)), " ")
 ok(not re.sub(r"[\s.,:;()]", "", rest), f"AC20 every hub string in <main> comes from FL_HUB_COPY or is computed: leftover {rest[:120]!r}")
 bm = rd("build.py").split("def fl_hub():", 1)[1].split("fl_hub()", 1)[0]
@@ -212,6 +226,67 @@ for p in glob.glob("docs/**/*.html", recursive=True):
     m = re.search(r"<link rel=canonical href='([^']+)'>", rd(p)); url = BASE + "/" + p[len("docs/"):-len("index.html")]
     if m and m.group(1) == url: canon.add(url)
 ok(len(locs) == len(set(locs)) == len(canon) and set(locs) == canon, f"AC21 sitemap <loc> count {len(locs)} == built (self-canonical) page count {len(canon)}, same set")
+
+# ---------------- Round 2: writing pass (A) and by-eye r1 fixes (B) ----------------
+# A3 status_multi is chosen by the data: "two counties" only when every city label spans exactly 2 counties
+ok(sources.status_multi(["A/B", "C/D"]) == C["status_multi"] and sources.status_multi(["A/B", "C/D/E"]) == C["status_multi_more"] and sources.status_multi([]) == C["status_multi_more"]
+   and C["status_multi_more"] == "Covers a city in more than one county. See each county's page.",
+   "A3 status_multi when every label spans 2 counties, else the writer's fallback status_multi_more (synthetic labels)")
+ok(multi and sources.multi_labels(cov) == multi and all(k == "multi" and t == sources.status_multi(multi) for c, k, t in got if c in multi)
+   and (C["status_multi"] if all(len(l.split("/")) == 2 for l in multi) else C["status_multi_more"]) in [t for _, _, t in got],
+   f"A3 the hub's city rows ({', '.join(multi)}) use the status_multi string the data selects")
+# A4 reason_plain: shown only for a listed county whose recorded reason is unchanged; else the verbatim reason
+RP = C["reason_plain"]
+ok(sorted(RP) == sorted(r["county"] for r in STATUS) and all(sources.plain_reason(r["county"], r["reason"]) == RP[r["county"]]["text"]
+   and RP[r["county"]]["for_sha256"] == hashlib.sha256(r["reason"].encode("utf-8")).hexdigest() for r in STATUS),
+   "A4 reason_plain covers the status-file counties, each written for the pinned recorded reason (sha256 matches)")
+ok(sources.plain_reason("Nowhere", "some recorded reason") == "some recorded reason", "A4 fallback: a county not in reason_plain shows its verbatim reason")
+ok(all(sources.plain_reason(r["county"], r["reason"] + " (changed)") == r["reason"] + " (changed)" for r in STATUS),
+   "A4 fallback: a changed recorded reason (sha256 no longer matches) shows the new verbatim reason, never the stale plain line")
+# A5/B2 the reason_more <details> (verbatim recorded reason) on the hub and on each status-file county's page
+ok(all(hm.count(more(r["reason"])) == 1 and more(r["reason"]) in county_page(r["county"]) for r in STATUS),
+   f"A5/B2 <details class=reason-more> with the verbatim recorded reason on the hub and on the county pages of {[r['county'] for r in STATUS]}")
+ok(all(html.escape(sources.plain_reason(r["county"], r["reason"])) in county_page(r["county"]).split(more(r["reason"]))[0].rsplit("<p", 1)[-1] for r in STATUS)
+   and all(county_page(r["county"]).index("<p>Independent special districts: not yet sourced.") < county_page(r["county"]).index(more(r["reason"])) for r in OPEN),
+   "B2 county pages: the plain reason sits right before its reason_more <details>; open counties keep the not-yet-sourced line before it")
+# B1 hub county column
+cells = re.findall(r"<tr data-status=\w+><td[^>]*>(.*?)</td>", hm)
+ok(len(cells) == len(labels) and not any(" County, FL" in c for c in cells) and all(f">{html.escape(show(c))}</a>" in hm for c in multi) and all(" / " in show(c) for c in multi),
+   "B1 hub county cells carry no ' County, FL'; two-county city rows read 'A / B' (display only)")
+css = rd("docs/style.css")
+ok(sc.FL_NOWRAP in css and "#fl-coverage td:first-child a,.sd-body a{overflow-wrap:normal}" in css
+   and len(re.findall(r"<td class=hub-county>", hm)) == len(labels) - len(multi),
+   "B1/B4 CSS: hub county cells nowrap (not the city rows), county links and county-page body links never break mid-word, county-page Rate cells nowrap")
+# B3 display-only numbered notes for the district_wide water-management-district rows
+NU = sources.NOTE_UNDER_TABLE
+TOK = ("district_wide", "(R1)", "also_cited", "less-than-county-wide blank")
+ok(not any(t in v for v in NU.values() for t in TOK), "B3 the NOTE_UNDER_TABLE strings hold none of the raw tokens")
+bad3 = []
+for (c, bid), v in NU.items():
+    raw = next(r for r in ALT_RAW if r["county"] == c and r["body_id"] == bid)
+    api = [r for r in json.load(open(f"docs/api/v1/fl/2025/{slug(c)}.json")) if r["body_id"] == bid]
+    for p in (f"docs/fl/2025/{slug(c)}-county/index.html", f"docs/fl/special-districts/{sources.sd_slug(bid)}/index.html"):
+        h = rd(p); sec = h.split("<h2 id=special-districts>", 1)[-1].split("<h2 id=rates>", 1)[-1]  # county page: special-district section; body page: rates
+        m = re.search(rf"<p class=footnote id=note-(\d+)>Note \1: {re.escape(html.escape(v))}</p>", sec)
+        tb = sec.split("<table", 1)[1].split("</table>", 1)[0]
+        if not (m and f"<small class=muted><a href='#note-{m.group(1)}'>Note {m.group(1)}</a></small>" in tb and html.escape(raw["note"]) not in h
+                and sec.index("</table>") < m.start()): bad3.append(p)
+    if not (api and all(r["note"] == raw["note"] for r in api)): bad3.append(f"api {c}")
+ok(len(NU) == 3 and not bad3, f"B3 Calhoun/Liberty (NWFWMD) and Clay (SJRWMD): the cell carries only a 'Note N' link to a numbered note under the table, on the county page and the body page; JSON keeps the data note: {bad3}")
+# Raw tokens: none in the visible text of docs/fl/**/*.html and docs/index.html, outside <details class=reason-more> (the verbatim audit
+# text, by design) and script / JSON-LD
+def visible(h):
+    h = re.sub(r"<details class=reason-more>.*?</details>", " ", h, flags=re.S)
+    h = re.sub(r"<script\b.*?</script>", " ", h, flags=re.S); h = re.sub(r"<style\b.*?</style>", " ", h, flags=re.S)
+    return html.unescape(re.sub(r"<[^>]+>", " ", h))
+vis_pages = sorted(glob.glob("docs/fl/**/*.html", recursive=True)) + ["docs/index.html"]
+leak = [(p, t) for p in vis_pages for t in TOK if t in visible(rd(p))]
+ok(HUB in vis_pages and len(vis_pages) == len(under) + 2 and not leak, f"B3 no raw token {TOK} in the visible text of {len(vis_pages)} pages (docs/fl/**, home): {leak[:5]}")
+# B5 county pages link /fl/ instead of repeating the statewide coverage paragraph; /fl/ and home keep it
+cps = sorted(glob.glob("docs/fl/2025/*/index.html")); sent = html.escape(sources.coverage_sentence(cov))
+link = f"<p class=muted><a href='/fl/'>{html.escape(C['home_link'])}</a></p>"
+ok(cps and all(link in rd(p) and sent not in rd(p) for p in cps) and sent in hm and sent in main_of(home),
+   f"B5 all {len(cps)} county pages link /fl/ with home_link and drop the statewide paragraph; /fl/ and home keep it")
 
 # ---------------- AC22: two builds byte-identical, no network ----------------
 def build(tmp):

@@ -127,7 +127,7 @@ oh = pg("orange")
 ok(len(cf) == 1 and cf[0]["taxing_body"] == "Central Florida Tourism Oversight District" and "display_rate" not in cf[0] and cf[0]["levy_component"] == "all_components_combined"
    and cf[0]["rate"] == "12.4236" and cf[0]["sha256"] == CFTOD_SHA and "Formerly Reedy Creek" in cf[0]["note"] and "contentFileID=416847" in cf[0]["source_url"],
    "AC9 CFTOD JSON row golden")
-ok(any("<td><a href='/fl/special-districts/cftod/'>Central Florida Tourism Oversight District</a><br>" in tr and re.findall(r"<td>([^<]*)</td>", tr)[0] == "(operating + debt, combined)"
+ok(any("<td class=sd-body><a href='/fl/special-districts/cftod/'>Central Florida Tourism Oversight District</a><br>" in tr and re.findall(r"<td>([^<]*)</td>", tr)[0] == "(operating + debt, combined)"
    and "<td class=num>12.4236 mills</td>" in tr for tr in oh.split("<tr>")) and "Formerly Reedy Creek" in oh
    and "contentFileID=416847" in oh and f"title='{CFTOD_SHA}'" in oh, "AC9 CFTOD on the Orange page")
 ch = [r for r in js("alachua") if r["taxing_body"] == "Children's Trust of Alachua County"]
@@ -137,14 +137,18 @@ ok(len(now_or) == 20 and len(main_or) == 17 and any(r["body_type"] == "special_d
 
 sentence = sources.coverage_sentence(cov)
 pages = glob.glob("docs/fl/2025/*-county/index.html")
-ok(all(html.escape(sentence) in open(p).read() for p in pages + ["docs/index.html"]), f"AC12 computed coverage sentence on index and all {len(pages)} county pages")
+# OM-FL-COVERAGE-001 by-eye r1 fix 5: county pages link /fl/ (where the statewide sentence now lives) instead of repeating it
+_fl_link = f"<p class=muted><a href='/fl/'>{html.escape(sources.FL_HUB_COPY['home_link'])}</a></p>"
+ok(html.escape(sentence) in open("docs/index.html").read() and html.escape(sentence) in open("docs/fl/index.html").read()
+   and all(html.escape(sentence) not in open(p).read() and _fl_link in open(p).read() for p in pages),
+   f"AC12 computed coverage sentence on index and /fl/; all {len(pages)} county pages link /fl/ instead")
 ok(sentence == SENT and (cov["checked"], cov["total"], cov["with_rows"]) == (64, 67, 52) and cov["with_rows"] + len(cov["no_rows"]) == cov["checked"], f"AC12 computed sentence equals the ruled string: {sentence}")
 ok(cov["no_rows"] == NO_ROWS_COUNTIES, f"AC13 no-rows counties are the ruled 12: {cov['no_rows']}")
 ok(all(NO_ROWS in pg(c.lower()) and "0.0000" not in pg(c.lower()).split("Special districts</h2>")[1].split("<p>Source:")[0] for c in cov["no_rows"]),
    f"AC13 the {len(cov['no_rows'])} computed no-rows counties show the fixed string: {cov['no_rows']}")
 ok(sorted(cov["not_yet_sourced"]) == sorted(OPEN) and all("not yet sourced" in pg(c.lower()) and NO_ROWS not in pg(c.lower()) and "<th>Taxing body</th><th>Levy</th><th>Rate</th>" not in pg(c.lower()) for c in OPEN)
    and all(c in open("docs/index.html").read().split("<p>Independent special districts not yet sourced")[1].split("</p>")[0] for c in OPEN), f"AC14 the {len(OPEN)} open counties (status file) are listed as not yet sourced on the index and their pages")
-ok(sorted(cov["partial"]) == sorted(PARTIAL) and not set(PARTIAL) & set(OPEN) and all("not yet sourced" not in pg(c.lower()).split("Special districts</h2>")[1].split("<p>Source:")[0].split("Recorded reason:")[0]
+ok(sorted(cov["partial"]) == sorted(PARTIAL) and not set(PARTIAL) & set(OPEN) and all("not yet sourced" not in pg(c.lower()).split("Special districts</h2>")[1].split("<p>Source:")[0].split("<details class=reason-more>")[0]
    and "<p class=partial>" in pg(c.lower()) and "<th scope=col>Taxing body</th><th scope=col>Levy</th>" in pg(c.lower()) for c in PARTIAL),
    f"AC14 the {len(PARTIAL)} partial counties (status file: {PARTIAL}) show their rows and the partial line, not the not-yet-sourced block")
 import site_chrome as _sc
@@ -169,8 +173,8 @@ def snap(d):
 tmp, r = build_copy(); t2, r2 = build_copy()
 ok(r.returncode == 0 and r2.returncode == 0 and snap(tmp) == snap(t2), f"AC19 two builds produce byte-identical docs/ ({len(snap(tmp))} files) apart from lastmod")
 shutil.rmtree(tmp); shutil.rmtree(t2)
-po = pg("polk"); i = [po.find(s) for s in ("Special districts</h2>", html.escape(sentence), NO_ROWS)]
-ok(-1 not in i and i == sorted(i), "visual: Polk order is heading, coverage, empty-state line")
+po = pg("polk"); i = [po.find(s) for s in ("Special districts</h2>", _fl_link, NO_ROWS)]
+ok(-1 not in i and i == sorted(i), "visual: Polk order is heading, coverage (link to /fl/), empty-state line")
 BANNED = re.compile(r"\b(CEO|rulings?|R6)\b", re.I)
 hits = ["CEO ruling 2026-10-20", "CEO rulings", "Fred ruling", "(ruling 5)", "ceo", "Ruling", "rulings", "r6", "per R6."]
 misses = ["Osceola", "OSCEOLA County", "overruling", "AR6X", "R60", "ceos", "rulingx"]

@@ -93,6 +93,10 @@ TX_HUB_CSS = "\n".join([
 TX_RATES_NOWRAP = "table.tx-rates td.num{white-space:nowrap}"
 TX_RATES_CSS = TX_RATES_NOWRAP + "@media (max-width:40rem){table.tx-rates th,table.tx-rates td{padding:.5rem .35rem}}"
 CSS += ISD_STYLE + ISD_DISPLAY + "\n" + TX_HUB_CSS + "\n" + TX_RATES_CSS + "\n"
+# FL hub county cells and FL county-page special-district tables (OM-FL-COVERAGE-001 by-eye r1 fixes 1 and 4): county names (not the
+# two-county city rows) and rates never wrap; county and body names never break mid-word (overrides the global a{overflow-wrap:anywhere}).
+FL_NOWRAP = "#fl-coverage .hub-county,.sd-body~.num{white-space:nowrap}"
+CSS += FL_NOWRAP + "#fl-coverage td:first-child a,.sd-body a{overflow-wrap:normal}\n"
 
 LABELS = {
     "county": "County", "school_district": "School district", "municipality": "Municipality", "special_district": "Special district",
