@@ -63,6 +63,10 @@ def table(caption, cols, trs):
     return sc.tablewrap(caption, f"<table><caption>{html.escape(caption)}</caption><thead><tr>{th}</tr></thead><tbody>{trs}</tbody></table>")
 def src_link(r):
     return f"<a href='{html.escape(r['source_url'])}' aria-label='Source for {html.escape(sc.display_name(r['taxing_body']))}'>source</a>"
+def tacd_src(co):
+    url, sha = sources.tacd_source(co)
+    E = html.escape
+    return f" <a href='{E(url)}' aria-label='{E(FL_HUB_COPY['tacd_source_aria'].format(county=co))}'>{E(FL_HUB_COPY['tacd_source'])}</a> <code title='{E(sha)}'>{E(sha[:8])}</code>"
 def sd_levy(r): return f"({COMBINED[r['levy_component']]})" if r['levy_component'] in COMBINED else sc.label(r['levy_component'])
 NOTE_LABEL = "Note {n}"  # numbered-note label, the pattern of the Amendment 3 footnotes (SFWMD "Note 3")
 def note_ref(n): return f"<a href='#note-{n}'>{NOTE_LABEL.format(n=n)}</a>"
@@ -135,11 +139,11 @@ for (st, yr, co), rs in sorted(by.items()):
         # Open county: the status line (kept: AC14/B2 tests and the home badge read "not yet sourced"), then FL_HUB_COPY not_yet_line,
         # the plain reason and the reason_more <details> with the verbatim recorded reason (fl-hub-copy-r2.md section 2).
         sdh = (f"<p>Independent special districts: {NYS}.</p><p>{html.escape(FL_HUB_COPY['not_yet_line'])}</p>"
-               + f"<p>{html.escape(sources.plain_reason(co, REASONS[co]))}</p>" + reason_more(REASONS[co]))
+               + f"<p>{html.escape(sources.plain_reason(co, REASONS[co]))}{tacd_src(co)}</p>" + reason_more(REASONS[co]))
     elif co not in cov['counties']:
         sdh = ""
     elif co in cov['partial']:
-        sdh = (f"<p class=partial>{html.escape(FL_HUB_COPY['partial_line'].format(reason=sources.plain_reason(co, REASONS[co])))}</p>" + reason_more(REASONS[co]) + sdt())
+        sdh = (f"<p class=partial>{html.escape(FL_HUB_COPY['partial_line'].format(reason=sources.plain_reason(co, REASONS[co])))}{tacd_src(co)}</p>" + reason_more(REASONS[co]) + sdt())
     elif not sds:
         sdh = f"<p>{NO_ROWS}</p>"
     else:
@@ -314,7 +318,7 @@ def fl_hub():
     trs = "".join(f"<tr data-status={k}><td{'' if k == 'multi' else ' class=hub-county'}><a href='{county_href(co)}'>{html.escape(sources.display_label(co))}</a></td><td>{cell(co, t)}</td></tr>" for co, k, t in st)
     tbl = sc.tablewrap(C["table_caption"], f"<table id=fl-coverage><caption>{html.escape(C['table_caption'])}</caption><thead><tr><th scope=col>{html.escape(C['th_county'])}</th>"
                        f"<th scope=col>{html.escape(C['th_sd'])}</th></tr></thead><tbody>{trs}</tbody></table>")
-    tbl += "".join(f"<div class=footnote id=note-{num[co]}><p>{NOTE_LABEL.format(n=num[co])} ({html.escape(co)}): {html.escape(sources.plain_reason(co, REASONS[co]))}</p>{reason_more(REASONS[co])}</div>" for co in noted)
+    tbl += "".join(f"<div class=footnote id=note-{num[co]}><p>{NOTE_LABEL.format(n=num[co])} ({html.escape(co)}): {html.escape(sources.plain_reason(co, REASONS[co]))}{tacd_src(co)}</p>{reason_more(REASONS[co])}</div>" for co in noted)
     S = C["sections"]
     secs = (f"<h2 id=sections>{html.escape(C['sections_h2'])}</h2><ul>"
             + "".join(f"<li><a href='{PATH}/{u}/'>{html.escape(S[k])}</a></li>" for k, u in (("special_districts", SD_HUB), ("amendment_3", AMEND), ("rolled_back", "fl/rolled-back-rate"))) + "</ul>")

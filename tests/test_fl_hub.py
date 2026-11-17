@@ -12,6 +12,15 @@ def ok(cond, msg): print(("PASS " if cond else "FAIL ") + msg); cond or FAIL.app
 def rd(p): return open(p, encoding="utf-8").read()
 def csvrows(p): return list(csv.DictReader(open(p, newline="", encoding="utf-8")))
 BASE = "https://openmillage.com"
+# TACD source links, read independently of sources.tacd_source: straight from the CSV, matching "2025 <County> TACD.<ext>" by file name
+def _tacd(co):
+    n = {"St. Johns": "Saint Johns", "St. Lucie": "Saint Lucie"}.get(co, co)
+    h = [r for r in csv.DictReader(open("data/ref/tacd_sources_2025.csv", newline="", encoding="utf-8")) if re.fullmatch(rf"2025 {re.escape(n)} TACD\.[A-Za-z]+", r["file"])]
+    assert len(h) == 1, (co, len(h))
+    return h[0]["url"], h[0]["sha256"]
+def tsrc(co):
+    u, sh = _tacd(co)
+    return f" <a href='{html.escape(u)}' aria-label='Source for {html.escape(co)} County&#x27;s 2025 TACD file'>source</a> <code title='{sh}'>{sh[:8]}</code>"
 C = sources.FL_HUB_COPY
 HUB = "docs/fl/index.html"
 slug = lambda s: re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")
@@ -81,7 +90,7 @@ for r in NEW:
 ok(NEW and not bad14, f"AC14 the {len(NEW_C)} counties' pages render all {len(NEW)} new rows with rate, source link, sha256 and body-page link: missing {bad14}")
 reasons = {r["county"]: r["reason"] for r in STATUS}
 def more(v): return f"<details class=reason-more><summary>{html.escape(C['reason_more'])}</summary><p>{html.escape(v)}</p></details>"
-ok(PARTIAL and all(html.escape(C["partial_line"].format(reason=sources.plain_reason(r["county"], reasons[r["county"]]))) + "</p>" + more(reasons[r["county"]]) in county_page(r["county"])
+ok(PARTIAL and all(html.escape(C["partial_line"].format(reason=sources.plain_reason(r["county"], reasons[r["county"]]))) + tsrc(r["county"]) + "</p>" + more(reasons[r["county"]]) in county_page(r["county"])
                    and "<p>Independent special districts: not yet sourced" not in county_page(r["county"]) for r in PARTIAL),
    f"AC14 partial counties {[r['county'] for r in PARTIAL]} show the partial-coverage line (FL_HUB_COPY) and their rows, not the not-yet-sourced block")
 ok(sorted(cov["not_yet_sourced"]) == sorted(r["county"] for r in OPEN) and all("<p>Independent special districts: not yet sourced." in county_page(r["county"]) for r in OPEN)
@@ -154,7 +163,7 @@ def hub_note(c):
     return m and (html.unescape(m.group(1)), m.group(2))
 ok({"sourced", "sourced_alt", "partial", "open"} <= kinds and all(C["status_open"].format(reason=f"Note {NOTE_N[r['county']]}") in [t for _, _, t in got] for r in OPEN)
    and all(f"<a href='#note-{NOTE_N[r['county']]}'>Note {NOTE_N[r['county']]}</a>" in hm for r in STATUS)
-   and all(hub_note(r["county"]) == (f"Note {NOTE_N[r['county']]} ({r['county']}): {sources.plain_reason(r['county'], r['reason'])}", more(r["reason"])) for r in STATUS),
+   and all(hub_note(r["county"]) == (f"Note {NOTE_N[r['county']]} ({r['county']}): {sources.plain_reason(r['county'], r['reason'])}" + html.unescape(tsrc(r["county"])), more(r["reason"])) for r in STATUS),
    f"AC17 statuses present: sourced, sourced_alt (alt-source only, marked), partial, open; every status-file county's cell links its numbered note (plain reason + recorded reason verbatim) ({sorted(kinds)})")
 alt_wmd = [c for c, k, t in got if k == "sourced_alt" and C["alt_kind"]["wmd"] in t]
 ok(sorted(alt_wmd) == sorted(c for c in cov["alt_only"] if sources.alt_kinds()[c] == "wmd"), f"AC17 water-management-district-document counties are marked distinctly: {alt_wmd}")
@@ -229,7 +238,8 @@ ok("# Copy from the writing pass (Lindsay, OM-FL-COVERAGE-001 fl-hub-copy.md, sh
 rest = text(hm)
 pieces = [C["h1"], C["intro"], C["absent"], C["sections_h2"], *C["sections"].values(), C["table_h2"], C["table_caption"], C["th_county"], C["th_sd"], wr,
           sources.coverage_sentence(cov)] + [t for _, _, t in got] + [show(c) for c in labels] + [C["reason_more"]] + [r["reason"] for r in STATUS] \
-         + [f"Note {NOTE_N[r['county']]} ({r['county']}): {sources.plain_reason(r['county'], r['reason'])}" for r in STATUS]
+         + [f"Note {NOTE_N[r['county']]} ({r['county']}): {sources.plain_reason(r['county'], r['reason'])}" for r in STATUS] \
+         + [C["tacd_source"]] + [_tacd(r["county"])[1][:8] for r in STATUS]
 for p in sorted(pieces, key=len, reverse=True): rest = rest.replace(text(html.escape(p)), " ")
 ok(not re.sub(r"[\s.,:;()]", "", rest), f"AC20 every hub string in <main> comes from FL_HUB_COPY or is computed: leftover {rest[:120]!r}")
 bm = rd("build.py").split("def fl_hub():", 1)[1].split("fl_hub()", 1)[0]
@@ -252,6 +262,16 @@ ok(multi and sources.multi_labels(cov) == multi and all(k == "multi" and t == so
    and (C["status_multi"] if all(len(l.split("/")) == 2 for l in multi) else C["status_multi_more"]) in [t for _, _, t in got],
    f"A3 the hub's city rows ({', '.join(multi)}) use the status_multi string the data selects")
 # A4 reason_plain: shown only for a listed county whose recorded reason is unchanged; else the verbatim reason
+# B1 (Weatherman r1): every status-file county's TACD figures link its 2025 TACD file
+def _b1_missing(h, c):
+    u, sh = _tacd(c)
+    # the paragraph immediately preceding THIS county's reason-more details (the one holding its verbatim reason)
+    i = h.find(more(next(r["reason"] for r in STATUS if r["county"] == c)))
+    para = h[:i].rsplit("<p", 1)[-1] if i >= 0 else ""
+    return not (i >= 0 and f"<a href='{html.escape(u)}'" in para and f"<code title='{sh}'>{sh[:8]}</code>" in para
+                and any(r["url"] == u and r["sha256"] == sh for r in csvrows("data/ref/tacd_sources_2025.csv")))
+_b1 = [(c, w) for r in STATUS for c in [r["county"]] for w, h in (("hub", hm), ("page", county_page(c))) if _b1_missing(h, c)]
+ok(not _b1 and STATUS, f"B1 (Weatherman r1, Nov 17): every status-file county's TACD figures link its 2025 TACD file ({', '.join(r['county'] for r in STATUS)}) on the hub and on the county page: missing {_b1}")
 RP = C["reason_plain"]
 ok(sorted(RP) == sorted(r["county"] for r in STATUS) and all(sources.plain_reason(r["county"], r["reason"]) == RP[r["county"]]["text"]
    and RP[r["county"]]["for_sha256"] == hashlib.sha256(r["reason"].encode("utf-8")).hexdigest() for r in STATUS),
@@ -262,10 +282,10 @@ ok(all(sources.plain_reason(r["county"], r["reason"] + " (changed)") == r["reaso
 # A5/B2 the reason_more <details> (verbatim recorded reason) on the hub and on each status-file county's page
 ok(all(hm.count(more(r["reason"])) == 1 and more(r["reason"]) in county_page(r["county"]) for r in STATUS),
    f"A5/B2 <details class=reason-more> with the verbatim recorded reason on the hub and on the county pages of {[r['county'] for r in STATUS]}")
-ok(all(html.escape(sources.plain_reason(r["county"], r["reason"])) in county_page(r["county"]).split(more(r["reason"]))[0].rsplit("<p", 1)[-1] for r in STATUS)
+ok(all(html.escape(sources.plain_reason(r["county"], r["reason"])) + tsrc(r["county"]) + "</p>" in county_page(r["county"]).split(more(r["reason"]))[0].rsplit("<p", 1)[-1] for r in STATUS)
    and all(county_page(r["county"]).index("<p>Independent special districts: not yet sourced.") < county_page(r["county"]).index(more(r["reason"])) for r in OPEN),
    "B2 county pages: the plain reason sits right before its reason_more <details>; open counties keep the not-yet-sourced line before it")
-ok(all(f"<p>Independent special districts: not yet sourced.</p><p>{html.escape(C['not_yet_line'])}</p><p>{html.escape(sources.plain_reason(r['county'], r['reason']))}</p>{more(r['reason'])}" in county_page(r["county"]) for r in OPEN)
+ok(all(f"<p>Independent special districts: not yet sourced.</p><p>{html.escape(C['not_yet_line'])}</p><p>{html.escape(sources.plain_reason(r['county'], r['reason']))}{tsrc(r['county'])}</p>{more(r['reason'])}" in county_page(r["county"]) for r in OPEN)
    and not any(C["not_yet_line"] in html.unescape(county_page(r["county"])) for r in PARTIAL),
    f"B2 open county pages ({', '.join(r['county'] for r in OPEN)}): not_yet_line, then the plain reason, then the reason_more <details>; partial counties don't carry not_yet_line")
 # B1 hub county column

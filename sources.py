@@ -410,7 +410,25 @@ FL_HUB_COPY = {
     },
     "llms_line": ("- Florida hub: {url} (every Florida county page, and each county's special-district coverage: sourced, partly sourced, "
                   "or not sourced yet with the reason; absent is not zero).\n"),
+    # These two reuse the rate rows' link pattern (build.src_link: the word "source" and "Source for ..." aria-label); they are not new prose.
+    "tacd_source": "source",
+    "tacd_source_aria": "Source for {county} County's 2025 TACD file",
 }
+
+
+def tacd_source(county):
+    """(url, sha256) of the county's single 2025 TACD file, read from the path in amend3_config.json (tacd_sources_csv).
+    File names map to counties as in amend3.tacd_sources. Zero or several files, a non-https url or a bad sha256 raise DataError."""
+    path = json.load(open("amend3_config.json"))["tacd_sources_csv"]
+    hits = []
+    for r in csv.DictReader(open(path, newline="")):
+        c = re.sub(r" (County City )?TACD\..*$", "", r["file"])[5:]
+        if {"Saint Johns": "St. Johns", "Saint Lucie": "St. Lucie"}.get(c, c) == county: hits.append(r)
+    if len(hits) != 1: raise DataError(f"{county}: expected exactly one 2025 TACD file in {path}, found {len(hits)}")
+    url, sha = hits[0]["url"], hits[0]["sha256"]
+    if not url.startswith("https://"): raise DataError(f"{county}: TACD source url is not https: {url!r}")
+    if not re.fullmatch(r"[0-9a-fA-F]{64}", sha): raise DataError(f"{county}: TACD sha256 is not 64 hex chars: {sha!r}")
+    return url, sha
 
 
 def plain_reason(county, verbatim):
