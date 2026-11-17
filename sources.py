@@ -15,25 +15,27 @@ NOTE_OVERRIDES = {
     ("Orange", "fl-sfwmd-special_district"): "Shown as one combined rate. Orange County's authority list prints it in three parts: 0.0948 + 0.1026 + 0.0327 = 0.2301.",
     ("Orange", "fl-cftod-special_district"): "Formerly Reedy Creek Improvement District. Independent special district. Printed as one combined operating and debt rate, levied only in mill code 70 (Bay Lake, Lake Buena Vista and unincorporated Reedy Creek).",
 }
-# PLACEHOLDER COPY pending the writing pass (Lindsay), OM-FL-COVERAGE-001 by-eye r1 fix 3: display-only plain-words notes for the
-# district_wide water-management-district alt rows. Shown as a numbered note under the rate table ("Note N" in the cell) on the county
-# page and the body page; the row's note in the data and in every JSON output stays the pinned source note (never edited here).
+# Copy from the writing pass (Lindsay, OM-FL-COVERAGE-001 fl-hub-copy-r2.md, sha256 0e133591, section 4), wired word for word,
+# OM-FL-COVERAGE-001 by-eye r1 fix 3: display-only plain-words notes for the district_wide water-management-district alt rows.
+# Shown as a numbered note under the rate table ("Note N" in the cell) on the county page and the body page; the row's note in the
+# data and in every JSON output stays the pinned source note (never edited here).
 NOTE_UNDER_TABLE = {
     ("Calhoun", "fl-nwfwmd-special_district"): (
-        "Resolution No. 957 sets 0.0207 of a mill for the whole of Calhoun County, which it names in its county list. The meeting-packet "
-        "copy of Resolution 957 is unsigned. Its adoption is confirmed by signed Resolution No. 958 in the Northwest Florida Water "
-        "Management District's FY 2025-26 Adopted Budget, which our data cites as a second source. Florida DOR's Data Book 2025 lists "
-        "Calhoun at 0.0207 county-wide, with no rate for only part of the county."),
+        "Resolution No. 957 sets 0.0207 of a mill for all of Calhoun County, which it names in its county list. The "
+        "meeting-packet copy of Resolution 957 isn't signed. Signed Resolution No. 958, in the Northwest Florida Water "
+        "Management District's FY 2025-26 Adopted Budget, confirms it was adopted, and we cite that as a second source. Florida "
+        "DOR's Data Book 2025 also lists Calhoun at 0.0207 county-wide, with no rate for only part of the county."),
     ("Liberty", "fl-nwfwmd-special_district"): (
-        "Resolution No. 957 sets 0.0207 of a mill for the whole of Liberty County, which it names in its county list. The meeting-packet "
-        "copy of Resolution 957 is unsigned. Its adoption is confirmed by signed Resolution No. 958 in the Northwest Florida Water "
-        "Management District's FY 2025-26 Adopted Budget, which our data cites as a second source. Florida DOR's Data Book 2025 lists "
-        "Liberty at 0.0207 county-wide, with no rate for only part of the county."),
+        "Resolution No. 957 sets 0.0207 of a mill for all of Liberty County, which it names in its county list. The "
+        "meeting-packet copy of Resolution 957 isn't signed. Signed Resolution No. 958, in the Northwest Florida Water "
+        "Management District's FY 2025-26 Adopted Budget, confirms it was adopted, and we cite that as a second source. Florida "
+        "DOR's Data Book 2025 also lists Liberty at 0.0207 county-wide, with no rate for only part of the county."),
     ("Clay", "fl-sjrwmd-special_district"): (
-        "The rate applies to the whole of Clay County. Page 22 of the St. Johns River Water Management District's FY 2025-26 Final Budget says: 'This is based on maintaining the current year millage "
-        "rate of 0.1793'. Page 4 says the district's Governing Board adopted the FY 2025-26 millage rate and the final budget on September 15, 2025. "
-        "Page 6 lists Clay among the district's 18 counties without the * that marks counties only partly in the district. Florida DOR's "
-        "Data Book 2025 lists Clay at 0.1793 county-wide, with no rate for only part of the county."),
+        "This rate covers all of Clay County. Page 22 of the St. Johns River Water Management District's FY 2025-26 Final Budget "
+        "says: 'This is based on maintaining the current year millage rate of 0.1793'. Page 4 says the district's Governing "
+        "Board adopted the FY 2025-26 millage rate and the final budget on September 15, 2025. Page 6 lists Clay among the "
+        "district's 18 counties without the * that marks a county only partly inside the district. Florida DOR's Data Book 2025 "
+        "also lists Clay at 0.1793 county-wide, with no rate for only part of the county."),
 }
 HEX = re.compile(r"^[0-9a-f]{64}$")
 PARTIAL = "partial"  # status value in STATUS_FILE: some special-district rows published, others not yet sourced
@@ -315,7 +317,8 @@ def open_counties():
 # ---------- Florida hub /fl/ (OM-FL-COVERAGE-001) ----------
 FL_HUB = "fl"
 # Copy from the writing pass (Lindsay, OM-FL-COVERAGE-001 fl-hub-copy.md, sha256 4f26f9bf), wired key for key; by-eye r1 layout fixes
-# from Ann applied (numbered notes, short hub cells). Every reader-facing string of the /fl/ hub, the "partial" county line, the
+# from Ann applied (numbered notes, short hub cells). Round 3: absent, not_yet_line and the Monroe plain reason from fl-hub-copy-r2.md
+# (sha256 0e133591), wired word for word. Every reader-facing string of the /fl/ hub, the "partial" county line, the
 # plain reasons, the water-management-district alt-source wording, the big_cypress_basin levy label and the Florida breadcrumb label
 # lives here only. Counts and county names are always computed, never written here.
 FL_HUB_COPY = {
@@ -326,9 +329,7 @@ FL_HUB_COPY = {
              "Official sources only, no estimates."),
     "intro": ("Pick a county to see its 2025 millage rates, each linked to the official file it came from. The table also shows how far "
               "we've got with each county's independent special districts, and why the missing ones are missing."),
-    # STOPPED (not wired): the writer's "No row means not sourced yet, not zero." drops the line "absent is not zero" that spec AC17
-    # requires on the hub; the previous string is kept until the desk rules.
-    "absent": "A county or district with no row has not been sourced yet: absent is not zero.",
+    "absent": "No row means not sourced yet. Absent is not zero.",  # fl-hub-copy-r2.md section 1; carries the spec AC17 line "absent is not zero"
     "with_rows": ("{n} of {total} Florida counties have at least one sourced special-district row: {csv} from Florida DOR's 2025 rate file "
                   "for the county (TACD) and {alt} only from other official documents."),
     "sections_h2": "More Florida pages",
@@ -345,7 +346,7 @@ FL_HUB_COPY = {
     "status_partial": "Partly sourced ({bodies} so far). {reason}",
     "status_open": "Not sourced yet. {reason}",
     # kept per fact-check (OM-FL-COVERAGE-001 fact-check REPORT sha 1107f87d): Lindsay's line is false for all 12 counties.
-    "status_none": "no special-district rows published yet",
+    "status_none": "No special-district rows published yet",  # hub cell only; capitalised (layout-r2 nit, mechanical display change)
     "status_multi": "Covers a city in two counties. See each county's page.",  # used only when every city label spans exactly 2 counties
     "status_multi_more": "Covers a city in more than one county. See each county's page.",  # the writer's fallback otherwise
     "body": ("district", "districts"),
@@ -354,7 +355,7 @@ FL_HUB_COPY = {
     "reason_plain": {
         "Columbia": {"text": "The county's file doesn't add up: one area's printed total doesn't match the rates printed beside it.",
                      "for_sha256": "ec657109202660503db22c748599bf8637a5b311faaecabcd2c3f59efcb0fee1"},
-        "Monroe": {"text": "The county's file is a scan we can't read reliably yet: after scanning, one area's rates don't add up to its printed total.",
+        "Monroe": {"text": "The county's file is a scan we can't read reliably yet: when we read it, one area's rates don't come out to its printed total.",
                    "for_sha256": "1ced3616e2de8cdbe98f6f2c2194ab95be19edc22b355406e533e03aeed84b89"},
         "Sumter": {"text": "The county's file prints city totals but not the rates inside them, so there's nothing to check them against.",
                    "for_sha256": "00fa6d624b8deeb873f036b01b3ec6cc8e525045966c68515e5b76d5125a7777"},
@@ -362,6 +363,8 @@ FL_HUB_COPY = {
                              "aren't yet: its file prints no total to check them against."),
                     "for_sha256": "436f85e968db5fe0c00417164a538a290ca68647693011b850d2d4fb8255839d"},
     },
+    # Open (not yet sourced) county pages: this line, then the plain reason, then the reason_more <details> (fl-hub-copy-r2.md section 2).
+    "not_yet_line": "We've checked this county's official file, but we can't use it yet. Here's why:",
     "reason_more": "Full recorded reason",  # <summary> of the <details class=reason-more> holding the verbatim status-file reason
     "partial_line": "Partly sourced: some of this county's independent special districts are on this page, and others aren't yet. {reason}",
     "partial_list": "Partly sourced so far: {names}.",

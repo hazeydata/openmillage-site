@@ -75,7 +75,7 @@ def county_page(c): return rd(f"docs/fl/2025/{slug(c)}-county/index.html")
 bad14 = []
 for r in NEW:
     h = county_page(r["county"]); sd = h.split("<h2 id=special-districts>", 1)[-1]
-    if not (f"href='{html.escape(r['source_url'])}'" in sd and f"{float(r['rate']):.4f} {r['unit']}" in sd and f"<code title='{r['sha256']}'>" in sd
+    if not (f"href='{html.escape(r['source_url'])}'" in sd and r["unit"] == "mills" and "<th scope=col class=num>Rate (mills)</th>" in sd and f"<td class=num>{float(r['rate']):.4f}</td>" in sd and f"<code title='{r['sha256']}'>" in sd
             and f"/fl/special-districts/{sources.sd_slug(r['body_id'])}/" in sd):
         bad14.append((r["county"], r["body_id"], r["levy_component"]))
 ok(NEW and not bad14, f"AC14 the {len(NEW_C)} counties' pages render all {len(NEW)} new rows with rate, source link, sha256 and body-page link: missing {bad14}")
@@ -164,7 +164,22 @@ hm_own = hm
 for r in STATUS: hm_own = hm_own.replace(html.escape(r["reason"]), " ")
 ok(" mills" not in hm_own and not re.search(r"\d\.\d{3,}", hm_own) and "<svg" not in hm and "<img" not in hm and "<figure" not in hm and not re.search(r"(?i)\b(rank|estimate|total rate)\b", text(hm_own)),
    "AC17 hub shows no rate, total, rank, estimate or chart (OQ-5)")
-ok("absent is not zero" in text(hm), "AC17 hub carries 'absent is not zero'")
+ok("absent is not zero" in text(hm).lower(), "AC17 hub carries the spec line 'absent is not zero' (any case)")
+ok(C["absent"] in text(hm), f"AC17 hub visible text carries the wired absent string exactly: {C['absent']!r}")
+# AC17 (amended, Lucille 2 Nov 17 2:20 PM ET): hub cell = short status + note marker; plain note under the table; the recorded reason
+# word for word in a <details>. For every status-file county, the exact recorded reason (CSV, read here independently) must be the
+# text inside a <details class=reason-more> on the committed docs/fl/index.html and on that county's committed page.
+def reason_more_texts(h):
+    out = []
+    for d in re.findall(r"<details class=reason-more>(.*?)</details>", h, flags=re.S):
+        out.append(html.unescape(re.sub(r"<[^>]+>", "", re.sub(r"<summary>.*?</summary>", "", d, count=1, flags=re.S))))
+    return out
+_hub_rm = reason_more_texts(rd(HUB))
+_bad17 = [(r["county"], p) for r in csvrows(sources.STATUS_FILE)
+          for p in (HUB, f"docs/fl/2025/{slug(r['county'])}-county/index.html")
+          if r["reason"] not in (_hub_rm if p == HUB else reason_more_texts(rd(p)))]
+ok(STATUS and not _bad17,
+   f"AC17 (amended, Lucille 2 Nov 17 2:20 PM ET): the exact recorded reason of each status-file county ({', '.join(r['county'] for r in STATUS)}) is the text of a <details class=reason-more> on {HUB} and on the county's page: missing {_bad17}")
 
 # ---------------- AC18: head, sitemap, llms.txt ----------------
 def head(h):
@@ -206,8 +221,9 @@ ok(len(linking) == sum(counts.values()) + 1 and len(linking) >= 293, f"AC19 page
 # ---------------- AC20: copy block ----------------
 src = rd("sources.py")
 ok("# Copy from the writing pass (Lindsay, OM-FL-COVERAGE-001 fl-hub-copy.md, sha256 4f26f9bf), wired key for key; by-eye r1 layout fixes\n# from Ann applied" in src
-   and "# PLACEHOLDER COPY pending the writing pass (Lindsay), OM-FL-COVERAGE-001 by-eye r1 fix 3" in src.split("NOTE_UNDER_TABLE = {")[0],
-   "AC20 FL_HUB_COPY is marked as the writing-pass copy with Ann's r1 fixes; the display-only NOTE_UNDER_TABLE notes are marked placeholder pending Lindsay")
+   and "# Copy from the writing pass (Lindsay, OM-FL-COVERAGE-001 fl-hub-copy-r2.md, sha256 0e133591, section 4)" in src.split("NOTE_UNDER_TABLE = {")[0]
+   and "placeholder pending Lindsay" not in src.split("NOTE_UNDER_TABLE = {")[0].rsplit("\n\n", 1)[-1],
+   "AC20 FL_HUB_COPY is marked as the writing-pass copy with Ann's r1 fixes; the display-only NOTE_UNDER_TABLE notes are marked as writing-pass r2 copy (no placeholder marker)")
 # Hub visible text: remove every FL_HUB_COPY string (formatted with computed values), the computed coverage sentence and the county
 # names; what remains is punctuation only, so no reader-facing hub string lives outside the copy block.
 rest = text(hm)
@@ -249,14 +265,39 @@ ok(all(hm.count(more(r["reason"])) == 1 and more(r["reason"]) in county_page(r["
 ok(all(html.escape(sources.plain_reason(r["county"], r["reason"])) in county_page(r["county"]).split(more(r["reason"]))[0].rsplit("<p", 1)[-1] for r in STATUS)
    and all(county_page(r["county"]).index("<p>Independent special districts: not yet sourced.") < county_page(r["county"]).index(more(r["reason"])) for r in OPEN),
    "B2 county pages: the plain reason sits right before its reason_more <details>; open counties keep the not-yet-sourced line before it")
+ok(all(f"<p>Independent special districts: not yet sourced.</p><p>{html.escape(C['not_yet_line'])}</p><p>{html.escape(sources.plain_reason(r['county'], r['reason']))}</p>{more(r['reason'])}" in county_page(r["county"]) for r in OPEN)
+   and not any(C["not_yet_line"] in html.unescape(county_page(r["county"])) for r in PARTIAL),
+   f"B2 open county pages ({', '.join(r['county'] for r in OPEN)}): not_yet_line, then the plain reason, then the reason_more <details>; partial counties don't carry not_yet_line")
 # B1 hub county column
 cells = re.findall(r"<tr data-status=\w+><td[^>]*>(.*?)</td>", hm)
 ok(len(cells) == len(labels) and not any(" County, FL" in c for c in cells) and all(f">{html.escape(show(c))}</a>" in hm for c in multi) and all(" / " in show(c) for c in multi),
    "B1 hub county cells carry no ' County, FL'; two-county city rows read 'A / B' (display only)")
 css = rd("docs/style.css")
-ok(sc.FL_NOWRAP in css and "#fl-coverage td:first-child a,.sd-body a{overflow-wrap:normal}" in css
+ok(sc.FL_NOWRAP == "#fl-coverage .hub-county{white-space:nowrap}" and sc.FL_NOWRAP in css and "#fl-coverage td a,.sd-body a{overflow-wrap:normal}" in css
    and len(re.findall(r"<td class=hub-county>", hm)) == len(labels) - len(multi),
-   "B1/B4 CSS: hub county cells nowrap (not the city rows), county links and county-page body links never break mid-word, county-page Rate cells nowrap")
+   "B1/B4 CSS: hub county cells nowrap (not the city rows), county links and county-page body links never break mid-word")
+# By-eye r2 R1 (Ann, layout-r2.md): on every county page's special-district table the unit is in the header "Rate (mills)" and each rate
+# cell is the bare number, byte-identical to the data rate formatted as before minus the " mills" suffix; the body cells get the tighter
+# <= 40rem padding; the sha <code> follows the source link after a breakable space in a cell with no nowrap, so it stacks under the link
+# when the column is narrow. (Headless check at 375/390 px: tests/browser_fl_layout.py, not CI.)
+sd_pages = {p: rd(p) for p in sorted(glob.glob("docs/fl/2025/*-county/index.html")) if "<td class=sd-body>" in rd(p)}
+sd_rows_all = [r for r in rows if r["state"] == "FL" and r["year"] == "2025" and r["body_type"] == "special_district"]
+def sd_trs(h): return re.findall(r"<tr><td class=sd-body>.*?</tr>", h)
+def sd_head(h): return re.findall(r"<caption>Independent special districts in [^<]*</caption><thead><tr>(.*?)</tr></thead>", h)
+bad_r1 = []
+for p, h in sd_pages.items():
+    want = sorted(f"<td class=num>{float(r['rate']):.4f}</td>" for r in sd_rows_all if f"/{slug(r['county'])}-county/" in p)
+    got = sorted(re.search(r"<td class=num>[^<]*</td>", tr).group(0) for tr in sd_trs(h))
+    if sd_head(h) != ["<th scope=col>Taxing body</th><th scope=col>Levy</th><th scope=col class=num>Rate (mills)</th><th scope=col>Source</th>"] or not want or got != want \
+       or any(" mills" in re.sub(r"<[^>]+>", "", tr) for tr in sd_trs(h)) or not all(re.search(r">source</a> <code title='[0-9a-f]{64}'>[0-9a-f]{8}</code></td></tr>$", tr) for tr in sd_trs(h)):
+        bad_r1.append(p)
+ok(len(sd_pages) >= 3 and all(f"/{c}-county/" in " ".join(sd_pages) for c in ("collier", "levy", "liberty")) and not bad_r1 and all(r["unit"] == "mills" for r in sd_rows_all),
+   f"R1 county special-district tables ({len(sd_pages)} pages incl. Collier, Levy, Liberty): header 'Rate (mills)', each rate cell the exact bare value, no ' mills' in any row, sha after a breakable space: bad {bad_r1}")
+ok(sc.FL_SD_TIGHT == ".sd-body,.sd-body~td" and "@media (max-width:40rem){table.tx-rates th,table.tx-rates td,.sd-body,.sd-body~td{padding:.5rem .35rem}}" in css
+   and not re.search(r"(sd-body~td|sd-body~\.num|code)[^{}]*\{[^}]*nowrap", css),
+   "R1 CSS: the county special-district body cells use the tighter <= 40rem padding, and no nowrap rule reaches their Source cell or sha (the sha stacks under the link)")
+ok("details.cgroup summary,.reason-more summary{cursor:pointer;padding:.6rem 0;min-height:44px}" in css and not re.search(r"reason-more[^{}]*summary[^{}]*\{[^}]*(display|list-style)", css),
+   "r2 should-fix CSS: reason-more summaries get min-height 44px and cursor:pointer and keep display list-item (default marker)")
 # B3 display-only numbered notes for the district_wide water-management-district rows
 NU = sources.NOTE_UNDER_TABLE
 TOK = ("district_wide", "(R1)", "also_cited", "less-than-county-wide blank")

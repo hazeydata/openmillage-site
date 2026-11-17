@@ -155,7 +155,8 @@ import site_chrome as sc
 css = rd("docs/style.css")
 ok(sc.TX_RATES_NOWRAP == "table.tx-rates td.num{white-space:nowrap}" and sc.TX_RATES_NOWRAP in css and "font-variant-numeric:tabular-nums" in css.split("td.num,th.num{")[1].split("}")[0],
    "style.css keeps table.tx-rates td.num on one line (nowrap) and tabular-nums on td.num")
-mq = re.search(r"@media \(max-width:40rem\)\{table\.tx-rates th,table\.tx-rates td\{padding:([^}]*)\}\}", css)
+# OM-FL-COVERAGE-001 by-eye r2 R1 adds exactly one selector list (site_chrome.FL_SD_TIGHT, the FL county special-district cells) to this rule.
+mq = re.search(r"@media \(max-width:40rem\)\{table\.tx-rates th,table\.tx-rates td(?:," + re.escape(sc.FL_SD_TIGHT) + r")?\{padding:([^}]*)\}\}", css)
 ok(bool(mq), f"style.css tightens table.tx-rates cell padding at <= 40rem ({mq and mq.group(1)})")
 badnum = []
 for bid, b in ISDS.items():

@@ -51,7 +51,7 @@ blockquote.official{margin:1rem 0;padding:.25rem 1rem;border-left:4px solid var(
 [hidden]{display:none!important}
 .keynums{font-size:1rem}
 details.cgroup{border-bottom:1px solid var(--border);padding:.25rem 0}
-details.cgroup summary{cursor:pointer;padding:.6rem 0;min-height:44px}
+details.cgroup summary,.reason-more summary{cursor:pointer;padding:.6rem 0;min-height:44px}
 .chart img{width:100%;height:auto}
 .chart>div{overflow-x:auto}
 @media (max-width:40rem){.chart img{width:auto;max-width:none;min-width:60rem;height:auto}}
@@ -90,13 +90,21 @@ TX_HUB_CSS = "\n".join([
 ])
 # TX rate tables (ISD year table, county/city tables; Lucille 2): a rate never wraps mid-number; tighter cells at <= 40rem so the
 # 5-column ISD table fits a 375 px viewport.
+# OM-FL-COVERAGE-001 by-eye r2 R1 (Ann): the FL county-page special-district body cells share those tighter cells, so the Source link and
+# its sha fit at 375 px (the columns' min-content plus 12 px padding came to 342 px in a 335 px wrapper). Selector added to the TX rule
+# to stay under the style.css size cap.
+FL_SD_TIGHT = ".sd-body,.sd-body~td"
 TX_RATES_NOWRAP = "table.tx-rates td.num{white-space:nowrap}"
-TX_RATES_CSS = TX_RATES_NOWRAP + "@media (max-width:40rem){table.tx-rates th,table.tx-rates td{padding:.5rem .35rem}}"
+TX_RATES_CSS = TX_RATES_NOWRAP + "@media (max-width:40rem){table.tx-rates th,table.tx-rates td," + FL_SD_TIGHT + "{padding:.5rem .35rem}}"
 CSS += ISD_STYLE + ISD_DISPLAY + "\n" + TX_HUB_CSS + "\n" + TX_RATES_CSS + "\n"
 # FL hub county cells and FL county-page special-district tables (OM-FL-COVERAGE-001 by-eye r1 fixes 1 and 4): county names (not the
-# two-county city rows) and rates never wrap; county and body names never break mid-word (overrides the global a{overflow-wrap:anywhere}).
-FL_NOWRAP = "#fl-coverage .hub-county,.sd-body~.num{white-space:nowrap}"
-CSS += FL_NOWRAP + "#fl-coverage td:first-child a,.sd-body a{overflow-wrap:normal}\n"
+# two-county city rows) never wrap; county and body names never break mid-word (overrides the global a{overflow-wrap:anywhere}).
+# By-eye r2 R1: county-page rate cells now hold the bare number (unit in the "Rate (mills)" header), which has no break opportunity
+# (plain text, not a link), so their nowrap rule is dropped; the hub links rule is shortened to "td a" (the other hub cells' links are
+# short "Note N" links). Both changes keep style.css under its size cap for the r2 rules; tests/browser_fl_layout.py checks one line per rate.
+FL_NOWRAP = "#fl-coverage .hub-county{white-space:nowrap}"
+FL_WRAP_NORMAL = "#fl-coverage td a,.sd-body a{overflow-wrap:normal}"
+CSS += FL_NOWRAP + FL_WRAP_NORMAL + "\n"
 
 LABELS = {
     "county": "County", "school_district": "School district", "municipality": "Municipality", "special_district": "Special district",

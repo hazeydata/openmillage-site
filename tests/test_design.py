@@ -22,11 +22,12 @@ for needle in ("overflow-wrap:anywhere", ".tablewrap{overflow-x:auto", ":focus-v
 # cells (OM-SITE-SPECIAL-ISD-001 round 2, Lucille 2: no rate wraps mid-number at 390); nowhere else. The size cap was raised from
 # 4500 to 5800 bytes (round 3: the TX hub details rules) for the TX ISD chart style (CHART-SPEC section 9: STYLE lives in style.css once), the TX hub and those rules.
 # OM-FL-COVERAGE-001 by-eye r1 (Ann, fixes 1 and 4) adds one more allowed nowrap rule (FL hub county cells, FL county-page Rate cells)
-# and its overflow-wrap override; the cap is raised from 5800 to 5900 bytes for those 121 bytes only.
+# and its overflow-wrap override; the cap is raised from 5800 to 5900 bytes for those 121 bytes only. By-eye r2 R1 narrows that rule to the
+# hub county cells (county-page rate cells hold a bare number now) and stays under the same 5900-byte cap.
 SD_NOWRAP = "table.sd-rates td.num,table.sd-rates td.src{white-space:nowrap}"
 TX_NOWRAP = "table.tx-rates td.num{white-space:nowrap}"
-FL_NOWRAP = "#fl-coverage .hub-county,.sd-body~.num{white-space:nowrap}"
-ok("nowrap" not in css.replace(SD_NOWRAP, "", 1).replace(TX_NOWRAP, "", 1).replace(FL_NOWRAP, "", 1) and len(css.encode()) < 5900, f"style.css has no nowrap outside the FL body-page rate/source cells, TX rate-table numeric cells and the FL hub county / county-page rate cells, and stays small ({len(css.encode())} bytes)")
+FL_NOWRAP = "#fl-coverage .hub-county{white-space:nowrap}"
+ok("nowrap" not in css.replace(SD_NOWRAP, "", 1).replace(TX_NOWRAP, "", 1).replace(FL_NOWRAP, "", 1) and len(css.encode()) < 5900, f"style.css has no nowrap outside the FL body-page rate/source cells, TX rate-table numeric cells and the FL hub county cells, and stays small ({len(css.encode())} bytes)")
 
 RAW = ("'>operating_total", ">school_district<", ">dependent_special_district", ">less_than_countywide")
 def check_page(p):

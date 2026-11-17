@@ -85,9 +85,11 @@ def reason_more(verbatim):
     """Plain reason's audit trail: the status file's recorded reason, verbatim, one click away."""
     return f"<details class=reason-more><summary>{html.escape(FL_HUB_COPY['reason_more'])}</summary><p>{html.escape(verbatim)}</p></details>"
 REASONS = {c: w for c, _, w in sources.open_counties()}
+SD_RATE_HEAD = "Rate (mills)"  # county-page special-district table: unit in the header (by-eye r2 R1); cells hold the bare rate
 def sd_tr(r, nn={}):
     note = cell_note(r, nn)
-    return (f"<tr><td class=sd-body><a href='{sd_href(r['body_id'])}'>{html.escape(sc.display_name(r['taxing_body']))}</a>{note}</td><td>{html.escape(sd_levy(r))}</td><td class=num>{float(r['rate']):.4f} {r['unit']}</td>"
+    if r['unit'] != 'mills': raise SystemExit(f"build: special-district row {r['county']}/{r['body_id']} has unit {r['unit']!r}, but the table header says {SD_RATE_HEAD!r}")
+    return (f"<tr><td class=sd-body><a href='{sd_href(r['body_id'])}'>{html.escape(sc.display_name(r['taxing_body']))}</a>{note}</td><td>{html.escape(sd_levy(r))}</td><td class=num>{float(r['rate']):.4f}</td>"
             f"<td>{src_link(r)} <code title='{r['sha256']}'>{r['sha256'][:8]}</code></td></tr>")
 def base_tr(r):
     agg = r['rate_kind'] == 'aggregate_effective'
@@ -119,12 +121,15 @@ for (st, yr, co), rs in sorted(by.items()):
     for gname, cap, bts in GROUPS:
         g = [r for r in base if r['body_type'] in bts]
         if g: groups.append(f"<h2 id={slug(gname)}>{gname}</h2>" + table(f"{cap} rates in {co} County", COLS, "".join(base_tr(r) for r in g)))
-    SDCOLS = [("Taxing body", 0), ("Levy", 0), ("Rate", 1), ("Source", 0)]
+    # by-eye r2 R1 (Ann): the unit sits in the header once and each rate cell holds the bare number, so the Source column fits at 375 px.
+    SDCOLS = [("Taxing body", 0), ("Levy", 0), (SD_RATE_HEAD, 1), ("Source", 0)]
     nn = numbered_notes(sds)
     sdt = lambda: (table(f"Independent special districts in {co} County", SDCOLS, "".join(sd_tr(r, nn) for r in sds))
                    + notes_block(nn) + f"<p><a href='{PATH}/{SD_HUB}/'>{html.escape(FL_SD_COPY['county_link'])}</a></p>")
     if co in cov['not_yet_sourced']:
-        sdh = (f"<p>Independent special districts: {NYS}. The official source for this county has not been checked yet; absent is not zero.</p>"
+        # Open county: the status line (kept: AC14/B2 tests and the home badge read "not yet sourced"), then FL_HUB_COPY not_yet_line,
+        # the plain reason and the reason_more <details> with the verbatim recorded reason (fl-hub-copy-r2.md section 2).
+        sdh = (f"<p>Independent special districts: {NYS}.</p><p>{html.escape(FL_HUB_COPY['not_yet_line'])}</p>"
                + f"<p>{html.escape(sources.plain_reason(co, REASONS[co]))}</p>" + reason_more(REASONS[co]))
     elif co not in cov['counties']:
         sdh = ""
