@@ -265,8 +265,8 @@ with tempfile.TemporaryDirectory(prefix="om-sd-cov-") as tmp:
     _pp = [os.path.join(tmp, "docs/fl/special-districts/index.html"), os.path.join(tmp, "docs/fl/special-districts/cftod/index.html")]
     ok(r.returncode == 0 and all(os.path.exists(x) and _want in rd(x) and f"<li>{_drop}:" not in rd(x) for x in _pp),
        f"AC8 perturbation: dropping {_drop} from the status file re-renders hub and body pages with '{_want}' and no {_drop} not-yet-sourced line")
-# OM-FL-COVERAGE-001 close-out r2: exception wording per fl-closeout-item5-copy.md (sha 19da2450)
-_EXC = "2025 TACD file checked, but we can't use it yet"
+# OM-FL-COVERAGE-001 close-out r2: exception wording per fl-closeout-item5-copy-r2.md (sha 37354457)
+_EXC = "2025 TACD file read, but we can't use it yet"
 def _txt(p): return html.unescape(re.sub(r"<[^>]+>", "", rd(p)))
 _hits = [f"{c}: {_EXC}" for c in ("Columbia", "Monroe", "Sumter")]
 ok(sources.FL_SD_COPY["nys_reason"]["exception"] == _EXC
@@ -404,4 +404,11 @@ ok(len(_cssf.encode()) <= 5900, f"CLOSEOUT style.css {len(_cssf.encode())} bytes
 # ---------------- AC31: docs match code ----------------
 rm = rd("README.md")
 ok(all(s in rm for s in ("/fl/special-districts/", H1_FILE, "python3 tests/test_fl_special_bodies.py", "FL_SD_COPY")), "AC31 README describes the pages, the h1 override file, the copy block and the test command")
+_NYL = "We've read this county's official file, but we can't use it yet. Here's why:"
+ok(sources.FL_HUB_COPY["not_yet_line"] == _NYL
+   and all("Independent special districts: not yet sourced." + _NYL in _txt(f"docs/fl/2025/{c}-county/index.html") for c in ("columbia", "monroe", "sumter")),
+   "close-out r3: Columbia, Monroe, Sumter county pages read 'not yet sourced.' then the r2 not_yet_line; FL_HUB_COPY matches")
+_all = "".join(html.unescape(open(os.path.join(d, f), encoding="utf-8").read()) for d, _, fs in os.walk("docs") for f in fs if f.endswith(".html"))
+ok("TACD file checked, but" not in _all and "We've checked this county" not in _all and "not yet verified" not in _all,
+   "close-out r3: old r1 copy ('TACD file checked, but', 'We've checked this county', 'not yet verified') appears in no docs HTML")
 print("FAILURES", len(FAIL)); sys.exit(1 if FAIL else 0)
