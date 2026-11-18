@@ -96,9 +96,9 @@ for b, rs in BODIES.items():
         want_note = LOADED[(r["county"], r["body_id"], r["levy_component"], r["rate_kind"])]["note"]
         if (r["county"], r["body_id"]) in sources.NOTE_UNDER_TABLE:  # by-eye r1 fix 3: the cell carries "Note N"; the note sits under the table
             m = re.search(r"#note-(\d+)", " ".join(h for h, _ in c["links"]))
-            want_note = f"Note {m.group(1)}" if m and f"<p class=footnote id=note-{m.group(1)}>Note {m.group(1)}: {html.escape(body_note(r))}</p>" in rd(body_path(b)) else "(numbered note missing)"
+            want_note = "Note" if m and f"<p class=footnote id=note-{m.group(1)}>Note: {html.escape(body_note(r))}</p>" in rd(body_path(b)) else "(numbered note missing)"
         if not (c["text"].startswith(r["county"]) and c["links"][0][0] == f"{PATH}/fl/2025/{slug(r['county'])}-county/" and lv["text"] == levy(r)
-                and rt["text"] == f"{float(r['rate']):.4f} {r['unit']}" and src["links"][0][0] == r["source_url"] and src["codes"] == [r["sha256"]]
+                and rt["text"] == f"{float(r['rate']):.4f}" and src["links"][0][0] == r["source_url"] and src["codes"] == [r["sha256"]]
                 and (want_note or "") == c["text"][len(r["county"]):].strip()):
             bad2.append((b, r["county"], r["levy_component"]))
 ok(not bad2 and nrows == len(RAW), f"AC2 {nrows} table rows == {len(RAW)} CSV rows; county, levy label, rate, source_url and sha256 (title) match row by row: {bad2[:3]}")
@@ -109,29 +109,29 @@ ok(_raw_notes and all(LOADED[sources.key(r)]["note"] for r in _raw_notes), f"AC2
 CFTOD_SHA = "1f4e3b57663e35703d71d5338c0add294164c90813ef78275af7d978a9486a68"
 cf = parse("docs/fl/special-districts/cftod/index.html"); t = data_rows(cf.tables[0])
 ok(cf.h1 == "Central Florida Tourism Oversight District" and len(t) == 1 and t[0][0]["text"].startswith("Orange") and t[0][1]["text"] == "(operating + debt, combined)"
-   and t[0][2]["text"] == "12.4236 mills" and "contentFileID=416847" in t[0][3]["links"][0][0] and t[0][3]["codes"] == [CFTOD_SHA] and "formerly reedy creek" in t[0][0]["text"].lower(),
-   "AC3 golden CFTOD: H1, one Orange row, (operating + debt, combined), 12.4236 mills, OCPA contentFileID=416847, sha256, note 'formerly Reedy Creek'")
+   and t[0][2]["text"] == "12.4236" and "contentFileID=416847" in t[0][3]["links"][0][0] and t[0][3]["codes"] == [CFTOD_SHA] and "formerly reedy creek" in t[0][0]["text"].lower(),
+   "AC3 golden CFTOD: H1, one Orange row, (operating + debt, combined), 12.4236, OCPA contentFileID=416847, sha256, note 'formerly Reedy Creek'")
 SJR = ["Alachua", "Baker", "Brevard", "Clay", "Duval",  # Clay: OM-FL-COVERAGE-001 (SJRWMD FY 2025-26 Final Budget, alt row)
        "Flagler", "Indian River", "Lake", "Marion", "Orange", "Osceola", "Putnam", "Seminole", "St. Johns", "Volusia"]
 sj = [row[0]["links"][0][0] for row in data_rows(parse("docs/fl/special-districts/sjrwmd/index.html").tables[0])]
 ok(sj == [f"{PATH}/fl/2025/{slug(c)}-county/" for c in SJR], f"AC4 golden SJRWMD lists exactly the {len(SJR)} counties: {len(sj)} rows")
 ok("fl-childrens-trust-alachua-special_district" in BODIES and SLUG["fl-childrens-trust-alachua-special_district"] == "childrens-trust-alachua", "AC5 slug childrens-trust-alachua exists in the data")
 ct = data_rows(parse("docs/fl/special-districts/childrens-trust-alachua/index.html").tables[0])
-ok(len(ct) == 1 and ct[0][0]["text"] == "Alachua" and ct[0][2]["text"] == "0.4500 mills" and ct[0][3]["codes"] == ["6f6d8dfbc4466961fa1c45531cb734ae1f0863873188cf6810622827ec700861"],
-   "AC5 golden Children's Trust of Alachua County: Alachua, 0.4500 mills, sha256")
+ok(len(ct) == 1 and ct[0][0]["text"] == "Alachua" and ct[0][2]["text"] == "0.4500" and ct[0][3]["codes"] == ["6f6d8dfbc4466961fa1c45531cb734ae1f0863873188cf6810622827ec700861"],
+   "AC5 golden Children's Trust of Alachua County: Alachua, 0.4500, sha256")
 sf_h = rd("docs/fl/special-districts/sfwmd/index.html"); sf = data_rows(parse("docs/fl/special-districts/sfwmd/index.html").tables[0])
 cty = lambda row: row[0]["links"][0][0].split("/")[-2][:-len("-county")]
 bro = [r for r in sf if cty(r) == "broward"]; ora = [r for r in sf if cty(r) == "orange"]; col = [r for r in sf if cty(r) == "collier"]
 parts = {}
 for r in sf:
     if cty(r) not in ("broward", "orange", "collier"): parts.setdefault(cty(r), []).append((r[1]["text"], r[2]["text"]))
-P3 = sorted([("Operating", "0.0948 mills"), ("Okeechobee Basin", "0.1026 mills"), ("Everglades Construction", "0.0327 mills")])
+P3 = sorted([("Operating", "0.0948"), ("Okeechobee Basin", "0.1026"), ("Everglades Construction", "0.0327")])
 # Collier (OM-FL-COVERAGE-001): operating 0.0948 then big_cypress_basin 0.0978 (label from FL_HUB_COPY; data value unchanged), never summed
-ok([(r[1]["text"], r[2]["text"]) for r in col] == [("Operating", "0.0948 mills"), (sources.FL_HUB_COPY["levy_labels"]["big_cypress_basin"], "0.0978 mills")]
+ok([(r[1]["text"], r[2]["text"]) for r in col] == [("Operating", "0.0948"), (sources.FL_HUB_COPY["levy_labels"]["big_cypress_basin"], "0.0978")]
    and [r["levy_component"] for r in BODIES["fl-sfwmd-special_district"] if r["county"] == "Collier"] == ["operating", "big_cypress_basin"] and "0.1926" not in sf_h,
    "AC6/OM-FL-COVERAGE-001 AC15 SFWMD Collier: Operating 0.0948 and Big Cypress Basin 0.0978, in that order, no sum")
-ok(len(sf) == 28 == len(BODIES["fl-sfwmd-special_district"]) and len(bro) == 1 and bro[0][1]["text"] == "(operating + debt, combined)" and bro[0][2]["text"] == "0.2301 mills"
-   and len(ora) == 1 and ora[0][1]["text"] == "Operating" and ora[0][2]["text"] == "0.2301 mills" and "0.0948 + 0.1026 + 0.0327 = 0.2301" in ora[0][0]["text"]
+ok(len(sf) == 28 == len(BODIES["fl-sfwmd-special_district"]) and len(bro) == 1 and bro[0][1]["text"] == "(operating + debt, combined)" and bro[0][2]["text"] == "0.2301"
+   and len(ora) == 1 and ora[0][1]["text"] == "Operating" and ora[0][2]["text"] == "0.2301" and "0.0948 + 0.1026 + 0.0327 = 0.2301" in ora[0][0]["text"]
    and len(parts) == 8 and all(sorted(v) == P3 for v in parts.values()), "AC6 SFWMD 28 rows as published (26 + Collier 2): Broward combined 0.2301, Orange operating 0.2301 with its note, 8 counties x 3 parts")
 fn3 = re.search(r'^3\. .*?\nWording: "(.*)"\s*$', rd("data/ref/fl_special_district_footnotes.md"), re.M | re.S)
 ok(fn3 and html.escape(fn3.group(1)) in sf_h and "Note 3:" in sf_h, "AC6 footnote 3 from data/ref/fl_special_district_footnotes.md shown on the SFWMD page")
@@ -176,8 +176,8 @@ for b, rs in BODIES.items():
             and t.count("<tr") == t.count("<tr role=row>") == len(rs) + 1)
     if not good: bad_l2.append(b)
 ok(not bad_l2, f"L2 every body page: table.sd-rates role=table, thead/tbody role=rowgroup, one tbody per county, county th scope=rowgroup rowspan=n role=rowheader, roles on every row and cell: {bad_l2[:3]}")
-ok(all(row[2]["text"] == f"{float(r['rate']):.4f} {r['unit']}" for row, r in zip(sf, sf_rows)) and any(row[2]["text"] == "0.0948 mills" for row in sf),
-   "L2 rate cells keep their text with the unit (e.g. '0.0948 mills')")
+ok(all(row[2]["text"] == f"{float(r['rate']):.4f}" for row, r in zip(sf, sf_rows)) and any(row[2]["text"] == "0.0948" for row in sf),
+   "L2 rate cells hold the bare rate (e.g. '0.0948'); the unit is in the header and caption")
 import site_chrome as _sc
 _css = _sc.CSS
 ok("table.sd-rates td.num,table.sd-rates td.src{white-space:nowrap}" in _css and "table.sd-rates tbody+tbody{border-top:1px solid var(--border)}" in _css
@@ -354,6 +354,45 @@ with tempfile.TemporaryDirectory(prefix="om-sd-a-") as t1, tempfile.TemporaryDir
 src = rd("build.py") + rd("sources.py")
 ok(not re.search(r"\b(urllib|requests|http\.client|socket|subprocess)\b", src), "AC27 build code imports no network or subprocess module")
 
+# ---------------- OM-FL-COVERAGE-001 close-out ----------------
+# (a) unit in the header and caption (from the data), bare numbers in the cells
+bad_u = []
+for b, rs in BODIES.items():
+    h = rd(body_path(b)); t = h.split("<table", 1)[1].split("</table>", 1)[0]
+    heads = re.findall(r"<th scope=col role=columnheader( class=num)?>([^<]*)</th>", t)
+    cap = re.search(r"<caption>(.*?)</caption>", t).group(1)
+    cells = re.findall(r"<td class=num role=cell>([^<]*)</td>", t)
+    trs = re.findall(r"<tr role=row>.*?</tr>", t, flags=re.S)
+    if not (all(r["unit"] == "mills" for r in rs) and [x[1] for x in heads] == ["County", "Levy", "Rate (mills)", "Source"]
+            and cap.endswith(" (mills)") and cells == [f"{float(r['rate']):.4f}" for r in rs]
+            and not any(" mills" in re.sub(r"<[^>]+>", "", tr) for tr in trs)):
+        bad_u.append(b)
+ok(len(BODIES) and not bad_u, f"CLOSEOUT every body page ({len(BODIES)}): header 'Rate (mills)', caption ends ' (mills)', cells are the data rate .4f, no ' mills' in a row: {bad_u[:3]}")
+# (b) single-note pages say "Note" / "Note: "; the multi-note hub keeps "Note N"
+NOTE_P = r"<(?:p|div) class=footnote id=note-(\d+)>(?:<p>)?(Note(?: \d+)?)([: (])"
+single, bad_s = [], []
+for p in sorted(glob.glob("docs/fl/**/index.html", recursive=True)):
+    h = rd(p)
+    if p.endswith("sfwmd/index.html"): continue  # its "Note 3" is the Amendment 3 footnote, not a numbered note
+    ids = re.findall(NOTE_P, h)
+    if len(ids) == 1:
+        single.append(p.removeprefix("docs/fl/").removesuffix("/index.html"))
+        if ids[0][1] != "Note" or f"<a href='#note-{ids[0][0]}'>Note</a>" not in h.replace("<a href='#note-", "<a href='#note-") and "#note-" in h: bad_s.append(p)
+    if any(re.search(r"Note 1\b", x) for x in [re.sub(r"<[^>]+>", " ", h)]) and len(ids) == 1: bad_s.append(p)
+hub = rd("docs/fl/index.html")
+ok(single and not bad_s and all(any(k in x for x in single) for k in ("special-districts/nwfwmd", "special-districts/sjrwmd", "calhoun", "liberty", "clay")),
+   f"CLOSEOUT single-note FL pages read 'Note' / 'Note: ' (anchor ids unchanged): {single} bad {bad_s}")
+ok(all(f"<a href='#note-{n}'>Note {n}</a>" in hub and f"id=note-{n}><p>Note {n} (" in hub for n in (1, 2, 3, 4)) and "<a href='#note-1'>Note</a>" not in hub, "CLOSEOUT the hub keeps Note 1 to Note 4")
+# (c) each note paragraph's TACD link and sha are in one span matched by a white-space:nowrap rule; (d) css size
+_cssf = rd("docs/style.css")
+_nw = [m for m in re.findall(r"([^{}]*)\{white-space:nowrap\}", _cssf) if ".nw" in m.split(",")]
+SPAN = r"<span class=nw><a href='[^']+' aria-label='[^']+'>source</a> <code title='[0-9a-f]{64}'>[0-9a-f]{8}</code></span>"
+STATUS_C = [r["county"] for r in csv.DictReader(open("data/special/tacd_county_status_open.csv", newline="", encoding="utf-8"))]
+bad_nw = [c for c in STATUS_C if not re.search(SPAN + "(?:</p>)", rd(f"docs/fl/2025/{slug(c)}-county/index.html"))]
+hub_sp = re.findall(SPAN + "</p>", hub)
+ok(_nw and not bad_nw and len(hub_sp) == len(STATUS_C) and not re.search(r"<td[^>]*>[^<]*<a[^>]*>source</a> <span class=nw", hub),
+   f"CLOSEOUT TACD link and sha share one span.nw (matched by a white-space:nowrap rule) in {len(hub_sp)} hub notes and {len(STATUS_C)} county pages: {bad_nw}")
+ok(len(_cssf.encode()) <= 5900, f"CLOSEOUT style.css {len(_cssf.encode())} bytes <= 5900")
 # ---------------- AC31: docs match code ----------------
 rm = rd("README.md")
 ok(all(s in rm for s in ("/fl/special-districts/", H1_FILE, "python3 tests/test_fl_special_bodies.py", "FL_SD_COPY")), "AC31 README describes the pages, the h1 override file, the copy block and the test command")

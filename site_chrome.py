@@ -102,7 +102,7 @@ CSS += ISD_STYLE + ISD_DISPLAY + "\n" + TX_HUB_CSS + "\n" + TX_RATES_CSS + "\n"
 # By-eye r2 R1: county-page rate cells now hold the bare number (unit in the "Rate (mills)" header), which has no break opportunity
 # (plain text, not a link), so their nowrap rule is dropped; the hub links rule is shortened to "td a" (the other hub cells' links are
 # short "Note N" links). Both changes keep style.css under its size cap for the r2 rules; tests/browser_fl_layout.py checks one line per rate.
-FL_NOWRAP = "#fl-coverage .hub-county{white-space:nowrap}"
+FL_NOWRAP = "#fl-coverage .hub-county,.nw{white-space:nowrap}"  # .nw: a status-file county's TACD source link and its sha stay on one line (by-eye r5)
 FL_WRAP_NORMAL = "#fl-coverage td a,.sd-body a{overflow-wrap:normal}"
 CSS += FL_NOWRAP + FL_WRAP_NORMAL + "\n"
 

@@ -26,7 +26,7 @@ for needle in ("overflow-wrap:anywhere", ".tablewrap{overflow-x:auto", ":focus-v
 # hub county cells (county-page rate cells hold a bare number now) and stays under the same 5900-byte cap.
 SD_NOWRAP = "table.sd-rates td.num,table.sd-rates td.src{white-space:nowrap}"
 TX_NOWRAP = "table.tx-rates td.num{white-space:nowrap}"
-FL_NOWRAP = "#fl-coverage .hub-county{white-space:nowrap}"
+FL_NOWRAP = "#fl-coverage .hub-county,.nw{white-space:nowrap}"
 ok("nowrap" not in css.replace(SD_NOWRAP, "", 1).replace(TX_NOWRAP, "", 1).replace(FL_NOWRAP, "", 1) and len(css.encode()) < 5900, f"style.css has no nowrap outside the FL body-page rate/source cells, TX rate-table numeric cells and the FL hub county cells, and stays small ({len(css.encode())} bytes)")
 
 RAW = ("'>operating_total", ">school_district<", ">dependent_special_district", ">less_than_countywide")
