@@ -239,7 +239,7 @@ PARTIAL = [o["county"] for o in csvrows(sources.STATUS_FILE) if o["status"] == s
 bad8 = []
 for p in newp:
     h = rd(p); m = re.search(r"<ul class=nys>(.*?)</ul>", h)
-    lis = re.findall(r"<li>([^<]*)</li>", m.group(1)) if m else []
+    lis = [html.unescape(x) for x in re.findall(r"<li>([^<]*)</li>", m.group(1))] if m else []
     want = sorted(f"{o['county']}: " + ("no 2025 TACD file" if o["status"] == "no_file" else sources.FL_SD_COPY["nys_reason"][o["status"]]) for o in OPEN)
     cells = [c["text"] for t in parse(p).tables for row in data_rows(t) for c in row[:1]]
     if sorted(lis) != want or any(c.startswith(o["county"]) for c in cells for o in OPEN): bad8.append(p)
@@ -265,6 +265,14 @@ with tempfile.TemporaryDirectory(prefix="om-sd-cov-") as tmp:
     _pp = [os.path.join(tmp, "docs/fl/special-districts/index.html"), os.path.join(tmp, "docs/fl/special-districts/cftod/index.html")]
     ok(r.returncode == 0 and all(os.path.exists(x) and _want in rd(x) and f"<li>{_drop}:" not in rd(x) for x in _pp),
        f"AC8 perturbation: dropping {_drop} from the status file re-renders hub and body pages with '{_want}' and no {_drop} not-yet-sourced line")
+# OM-FL-COVERAGE-001 close-out r2: exception wording per fl-closeout-item5-copy.md (sha 19da2450)
+_EXC = "2025 TACD file checked, but we can't use it yet"
+def _txt(p): return html.unescape(re.sub(r"<[^>]+>", "", rd(p)))
+_hits = [f"{c}: {_EXC}" for c in ("Columbia", "Monroe", "Sumter")]
+ok(sources.FL_SD_COPY["nys_reason"]["exception"] == _EXC
+   and all(h in _txt(p) for h in _hits for p in ("docs/fl/special-districts/index.html", "docs/fl/special-districts/nwfwmd/index.html"))
+   and not any("not yet verified" in open(os.path.join(d, f), encoding="utf-8").read() for d, _, fs in os.walk("docs") for f in fs if f.endswith(".html")),
+   "AC8 exception reads exactly the approved copy for Columbia, Monroe, Sumter on hub and a body page; 'not yet verified' appears in no docs HTML")
 
 # ---------------- AC9: hub ----------------
 hub = parse(HUB); hh = rd(HUB)

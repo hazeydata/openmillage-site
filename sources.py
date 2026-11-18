@@ -272,7 +272,7 @@ FL_SD_COPY = {
                   "Rates are never added together."),  # new
     "absent_note": "A county missing from this table has no sourced row for this district. That doesn't mean the district levies nothing there: absent is not zero.",  # new
     "nys_lead": "Independent special districts in these counties are not yet sourced (absent is not zero):",  # new
-    "nys_reason": {"no_file": "no 2025 TACD file", "exception": "2025 TACD file not yet verified"},  # no_file kept (spec wording); exception new
+    "nys_reason": {"no_file": "no 2025 TACD file", "exception": "2025 TACD file checked, but we can't use it yet"},  # no_file kept (spec wording); exception per Lindsay fl-closeout-item5-copy.md sha 19da2450
     "coverage_h2": "Coverage",  # kept
     "llms_line": ("- Florida independent special-district pages, 2025: hub {hub}; one page per district at {base}/fl/special-districts/<slug>/ "
                   "(slug = body_id without the leading 'fl-' and trailing '-special_district'), with index.json beside each page holding exactly that page's rows. "
