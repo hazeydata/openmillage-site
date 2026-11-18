@@ -12,9 +12,6 @@ on:
     # (7:13 EST / 8:13 EDT drift).
     - cron: "13 7 * * *"
       timezone: "America/Toronto"
-  # TEMP (ROUTINE-WEBHOOK-001 branch test only; removed before the final head)
-  push:
-    branches: [routine-webhook-001-site-health]
   workflow_dispatch:
     inputs:
       url:
