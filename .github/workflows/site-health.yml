@@ -1,0 +1,95 @@
+# Live-site health + link check. A failed run on main (schedule runs on main's
+# latest commit) creates a failed github-actions check suite on main's HEAD.
+# That is the wake signal for a Grok Bot routine GitHub trigger
+# {type: github, repo: hazeydata/openmillage-site, events: [ci-failed], ciBranch: main}.
+# Healthy runs wake nobody.
+name: site-health
+
+on:
+  schedule:
+    # 7:13 AM America/Toronto daily (off the hour to avoid top-of-hour load delay).
+    # Without the timezone key the UTC equivalent would be "13 12 * * *"
+    # (7:13 EST / 8:13 EDT drift).
+    - cron: "13 7 * * *"
+      timezone: "America/Toronto"
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "Base URL to check (default empty = https://openmillage.com/; used for forced-failure tests)"
+        required: false
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: site-health-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      BASE_URL: ${{ inputs.url || 'https://openmillage.com/' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Home page
+        run: |
+          base="${BASE_URL%/}/"
+          code=$(curl -sS -L --retry 3 --retry-all-errors --retry-delay 10 --max-time 30 \
+            -A "openmillage-site-health (+https://github.com/hazeydata/openmillage-site)" \
+            -o home.html -w '%{http_code}' "$base") || code="curl-failed"
+          if [ "$code" != "200" ]; then
+            echo "::error::Home page $base returned HTTP $code (expected 200)"
+            exit 1
+          fi
+          if ! grep -q 'OpenMillage' home.html; then
+            echo "::error::Home page $base is missing the content marker 'OpenMillage'"
+            exit 1
+          fi
+          echo "Home page OK: $base"
+
+      - name: Live pages, API JSON, county count
+        run: python3 .github/site-health/check.py
+
+      - name: Internal link check (docs tree, offline)
+        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0 (lychee v0.24.2)
+        with:
+          # Deterministic, no network: --offline skips every remote URL (external links
+          # are covered by the warn-only step below). Absolute openmillage.com links
+          # (https, http, www) are remapped to the checked-out docs/ tree, which is what
+          # main serves; root-relative links resolve via --root-dir and directory links
+          # must contain an index.html. Live liveness is checked by check.py above.
+          # github.workspace is not user-controlled; nothing from inputs is interpolated here.
+          args: >-
+            --offline
+            --root-dir '${{ github.workspace }}/docs'
+            --index-files index.html
+            --remap '^https?://(www\.)?openmillage\.com/ file://${{ github.workspace }}/docs/'
+            --no-progress
+            'docs/**/*.html'
+          fail: true
+          jobSummary: true
+
+      - name: External source links (warn only)
+        timeout-minutes: 8
+        continue-on-error: true
+        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0 (lychee v0.24.2)
+        with:
+          # https://hazeydata.ai/api/subscribe is the newsletter form's POST-only endpoint;
+          # a GET returns 405, so it is not a broken link.
+          # 403/429 from government firewalls and rate limits count as OK (warn).
+          args: >-
+            --base-url https://openmillage.com/
+            --scheme https --scheme http
+            --exclude '^https?://(www\.)?openmillage\.com/'
+            --exclude '^https://hazeydata\.ai/api/subscribe$'
+            --max-retries 2 --timeout 20 --accept '200..=299,403,429' --max-concurrency 8 --no-progress
+            'docs/**/*.html'
+          fail: false
+          jobSummary: true
