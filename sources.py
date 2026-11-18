@@ -272,7 +272,7 @@ FL_SD_COPY = {
                   "Rates are never added together."),  # new
     "absent_note": "A county missing from this table has no sourced row for this district. That doesn't mean the district levies nothing there: absent is not zero.",  # new
     "nys_lead": "Independent special districts in these counties are not yet sourced (absent is not zero):",  # new
-    "nys_reason": {"no_file": "no 2025 TACD file", "exception": "2025 TACD file not yet verified"},  # no_file kept (spec wording); exception new
+    "nys_reason": {"no_file": "no 2025 TACD file", "exception": "2025 TACD file read, but we can't use it yet"},  # no_file kept (spec wording); exception per Lindsay fl-closeout-item5-copy-r2.md sha 37354457
     "coverage_h2": "Coverage",  # kept
     "llms_line": ("- Florida independent special-district pages, 2025: hub {hub}; one page per district at {base}/fl/special-districts/<slug>/ "
                   "(slug = body_id without the leading 'fl-' and trailing '-special_district'), with index.json beside each page holding exactly that page's rows. "
@@ -394,7 +394,8 @@ FL_HUB_COPY = {
                     "for_sha256": "436f85e968db5fe0c00417164a538a290ca68647693011b850d2d4fb8255839d"},
     },
     # Open (not yet sourced) county pages: this line, then the plain reason, then the reason_more <details> (fl-hub-copy-r2.md section 2).
-    "not_yet_line": "We've checked this county's official file, but we can't use it yet. Here's why:",
+    # not_yet_line replaced in close-out r2: fl-closeout-item5-copy-r2.md sha 37354457
+    "not_yet_line": "We've read this county's official file, but we can't use it yet. Here's why:",
     "reason_more": "Full recorded reason",  # <summary> of the <details class=reason-more> holding the verbatim status-file reason
     "partial_line": "Partly sourced: some of this county's independent special districts are on this page, and others aren't yet. {reason}",
     "partial_list": "Partly sourced so far: {names}.",

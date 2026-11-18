@@ -20,7 +20,7 @@ def _tacd(co):
     return h[0]["url"], h[0]["sha256"]
 def tsrc(co):
     u, sh = _tacd(co)
-    return f" <a href='{html.escape(u)}' aria-label='Source for {html.escape(co)} County&#x27;s 2025 TACD file'>source</a> <code title='{sh}'>{sh[:8]}</code>"
+    return f" <span class=nw><a href='{html.escape(u)}' aria-label='Source for {html.escape(co)} County&#x27;s 2025 TACD file'>source</a> <code title='{sh}'>{sh[:8]}</code></span>"
 C = sources.FL_HUB_COPY
 HUB = "docs/fl/index.html"
 slug = lambda s: re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")
@@ -293,7 +293,7 @@ cells = re.findall(r"<tr data-status=\w+><td[^>]*>(.*?)</td>", hm)
 ok(len(cells) == len(labels) and not any(" County, FL" in c for c in cells) and all(f">{html.escape(show(c))}</a>" in hm for c in multi) and all(" / " in show(c) for c in multi),
    "B1 hub county cells carry no ' County, FL'; two-county city rows read 'A / B' (display only)")
 css = rd("docs/style.css")
-ok(sc.FL_NOWRAP == "#fl-coverage .hub-county{white-space:nowrap}" and sc.FL_NOWRAP in css and "#fl-coverage td a,.sd-body a{overflow-wrap:normal}" in css
+ok(sc.FL_NOWRAP == "#fl-coverage .hub-county,.nw{white-space:nowrap}" and sc.FL_NOWRAP in css and "#fl-coverage td a,.sd-body a{overflow-wrap:normal}" in css
    and len(re.findall(r"<td class=hub-county>", hm)) == len(labels) - len(multi),
    "B1/B4 CSS: hub county cells nowrap (not the city rows), county links and county-page body links never break mid-word")
 # By-eye r2 R1 (Ann, layout-r2.md): on every county page's special-district table the unit is in the header "Rate (mills)" and each rate
@@ -329,12 +329,12 @@ for (c, bid), v in NU.items():
     for p in (f"docs/fl/2025/{slug(c)}-county/index.html", f"docs/fl/special-districts/{sources.sd_slug(bid)}/index.html"):
         h = rd(p); sec = h.split("<h2 id=special-districts>", 1)[-1].split("<h2 id=rates>", 1)[-1]  # county page: special-district section; body page: rates
         mg = sources.NOTE_MERGED.get(bid); vv = mg[1] if mg and c in mg[0] and "special-districts" in p else v  # body page of NWFWMD: the shared note
-        m = re.search(rf"<p class=footnote id=note-(\d+)>Note \1: {re.escape(html.escape(vv))}</p>", sec)
+        m = re.search(rf"<p class=footnote id=note-(\d+)>Note: {re.escape(html.escape(vv))}</p>", sec)
         tb = sec.split("<table", 1)[1].split("</table>", 1)[0]
-        if not (m and f"<small class=muted><a href='#note-{m.group(1)}'>Note {m.group(1)}</a></small>" in tb and html.escape(raw["note"]) not in h
+        if not (m and f"<small class=muted><a href='#note-{m.group(1)}'>Note</a></small>" in tb and html.escape(raw["note"]) not in h
                 and sec.index("</table>") < m.start()): bad3.append(p)
     if not (api and all(r["note"] == raw["note"] for r in api)): bad3.append(f"api {c}")
-ok(len(NU) == 3 and not bad3, f"B3 Calhoun/Liberty (NWFWMD) and Clay (SJRWMD): the cell carries only a 'Note N' link to a numbered note under the table, on the county page and the body page; JSON keeps the data note: {bad3}")
+ok(len(NU) == 3 and not bad3, f"B3 Calhoun/Liberty (NWFWMD) and Clay (SJRWMD): the cell carries only a 'Note' link (single note) to a numbered note under the table, on the county page and the body page; JSON keeps the data note: {bad3}")
 # nwfwmd_merged (Lindsay, fl-hub-copy-r3.md sha256 c50d7d1e): ONE note on the NWFWMD body page, Calhoun and Liberty both point at it;
 # the Calhoun and Liberty county pages keep their own r2 notes.
 NWFWMD_MERGED = ("Resolution No. 957 sets 0.0207 of a mill for all of Calhoun County and all of Liberty County, both named in its county "
@@ -342,9 +342,9 @@ NWFWMD_MERGED = ("Resolution No. 957 sets 0.0207 of a mill for all of Calhoun Co
                  "Management District's FY 2025-26 Adopted Budget, confirms it was adopted, and we cite that as a second source. Florida "
                  "DOR's Data Book 2025 also lists both counties at 0.0207 county-wide, with no rate for only part of either county.")
 _nb = rd("docs/fl/special-districts/nwfwmd/index.html")
-_notes = re.findall(r"<p class=footnote id=note-(\d+)>Note \1: (.*?)</p>", _nb)
-_cells = re.findall(r"<small class=muted><a href='#note-(\d+)'>Note \1</a></small>", _nb)
-_cty = {c: re.findall(rf"<p class=footnote id=note-\d+>Note \d+: (.*?)</p>", rd(f"docs/fl/2025/{slug(c)}-county/index.html")) for c in ("Calhoun", "Liberty")}
+_notes = re.findall(r"<p class=footnote id=note-(\d+)>Note: (.*?)</p>", _nb)
+_cells = re.findall(r"<small class=muted><a href='#note-(\d+)'>Note</a></small>", _nb)
+_cty = {c: re.findall(rf"<p class=footnote id=note-\d+>Note: (.*?)</p>", rd(f"docs/fl/2025/{slug(c)}-county/index.html")) for c in ("Calhoun", "Liberty")}
 ok(len(_notes) == 1 and _notes[0][1] == html.escape(NWFWMD_MERGED) and len(_cells) == 2 and set(_cells) == {_notes[0][0]}
    and sources.NOTE_MERGED["fl-nwfwmd-special_district"][1] == NWFWMD_MERGED,
    f"B3b NWFWMD body page: exactly one note with the exact nwfwmd_merged text; the Calhoun and Liberty cells both point to it: {len(_notes)} notes, cells {_cells}")

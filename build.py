@@ -66,10 +66,12 @@ def src_link(r):
 def tacd_src(co):
     url, sha = sources.tacd_source(co)
     E = html.escape
-    return f" <a href='{E(url)}' aria-label='{E(FL_HUB_COPY['tacd_source_aria'].format(county=co))}'>{E(FL_HUB_COPY['tacd_source'])}</a> <code title='{E(sha)}'>{E(sha[:8])}</code>"
+    return f" <span class=nw><a href='{E(url)}' aria-label='{E(FL_HUB_COPY['tacd_source_aria'].format(county=co))}'>{E(FL_HUB_COPY['tacd_source'])}</a> <code title='{E(sha)}'>{E(sha[:8])}</code></span>"
 def sd_levy(r): return f"({COMBINED[r['levy_component']]})" if r['levy_component'] in COMBINED else sc.label(r['levy_component'])
 NOTE_LABEL = "Note {n}"  # numbered-note label, the pattern of the Amendment 3 footnotes (SFWMD "Note 3")
-def note_ref(n): return f"<a href='#note-{n}'>{NOTE_LABEL.format(n=n)}</a>"
+NOTE_LABEL_ONE = "Note"  # the label when a page has exactly one numbered note (anchor ids stay note-N)
+def note_label(n, total): return NOTE_LABEL_ONE if total == 1 else NOTE_LABEL.format(n=n)
+def note_ref(n, total=2): return f"<a href='#note-{n}'>{note_label(n, total)}</a>"
 def numbered_notes(rs, taken=(), body_id=None):
     """{key(r): (n, text)} for rows whose note is shown as a numbered note under the table (sources.NOTE_UNDER_TABLE), in row order,
     numbered from 1 skipping numbers already used on the page (`taken`). Display only: r['note'] (the data note) is not changed.
@@ -86,9 +88,9 @@ def numbered_notes(rs, taken=(), body_id=None):
             out[k] = (n, t)
             if k in merged: shared = out[k]
     return out
-def notes_block(nn): return "".join(f"<p class=footnote id=note-{n}>{NOTE_LABEL.format(n=n)}: {html.escape(t)}</p>" for n, t in sorted(set(nn.values())))
+def notes_block(nn): return "".join(f"<p class=footnote id=note-{n}>{note_label(n, len(set(nn.values())))}: {html.escape(t)}</p>" for n, t in sorted(set(nn.values())))
 def cell_note(r, nn):
-    if sources.key(r) in nn: return f"<br><small class=muted>{note_ref(nn[sources.key(r)][0])}</small>"
+    if sources.key(r) in nn: return f"<br><small class=muted>{note_ref(nn[sources.key(r)][0], len(set(nn.values())))}</small>"
     return f"<br><small class=muted>{html.escape(r['note'])}</small>" if r['note'] else ""
 def reason_more(verbatim):
     """Plain reason's audit trail: the status file's recorded reason, verbatim, one click away."""
@@ -231,6 +233,10 @@ def county_href(co): return f"{PATH}/fl/2025/{slug(co)}-county/"
 def body_table(caption, brs, nn={}):
     """LAYOUT (b): one <tbody> per county (rows already in sources.sd_row_order), county as <th scope=rowgroup rowspan=n> on the
     group's first row; explicit ARIA roles so the table keeps its semantics when stacked at <= 40rem (CSS table.sd-rates)."""
+    units = {r["unit"] for r in brs}
+    if units != {"mills"}: raise SystemExit(f"build: body table {caption!r} has units {sorted(units)}, but the Rate header and caption say mills")
+    unit = units.pop()
+    caption = f"{caption} ({unit})"
     groups = {}
     for r in brs: groups.setdefault(r["county"], []).append(r)
     note = lambda r: cell_note(r, nn)
@@ -239,10 +245,10 @@ def body_table(caption, brs, nn={}):
         trs = []
         for i, r in enumerate(g):
             head = (f"<th scope=rowgroup rowspan={len(g)} role=rowheader><a href='{county_href(co)}'>{html.escape(co)}</a>{note(r)}</th>" if i == 0 else "")
-            trs.append(f"<tr role=row>{head}<td role=cell>{html.escape(sd_levy(r))}{'' if i == 0 else note(r)}</td><td class=num role=cell>{float(r['rate']):.4f} {r['unit']}</td>"
+            trs.append(f"<tr role=row>{head}<td role=cell>{html.escape(sd_levy(r))}{'' if i == 0 else note(r)}</td><td class=num role=cell>{float(r['rate']):.4f}</td>"
                        f"<td class=src role=cell>{src_link(r)} <code title='{r['sha256']}'>{r['sha256'][:8]}</code></td></tr>")
         tbodies.append("<tbody role=rowgroup>" + "".join(trs) + "</tbody>")
-    th = "".join(f"<th scope=col role=columnheader{' class=num' if n else ''}>{c}</th>" for c, n in [("County", 0), ("Levy", 0), ("Rate", 1), ("Source", 0)])
+    th = "".join(f"<th scope=col role=columnheader{' class=num' if n else ''}>{c}</th>" for c, n in [("County", 0), ("Levy", 0), (SD_RATE_HEAD, 1), ("Source", 0)])
     return sc.tablewrap(caption, f"<table class=sd-rates role=table><caption>{html.escape(caption)}</caption><thead role=rowgroup><tr role=row>{th}</tr></thead>{''.join(tbodies)}</table>")
 def footnote(key):
     fc = CFG["footnote_citations"][key]
@@ -314,11 +320,11 @@ def fl_hub():
     st = [(co, *sources.fl_hub_status(co, cov, rows, reason=mark)) for co in labels]
     noted = [co for co, k, t in st if mark in t]
     num = {co: i + 1 for i, co in enumerate(noted)}
-    cell = lambda co, t: html.escape(t).replace(mark, note_ref(num[co])) if co in num else html.escape(t)
+    cell = lambda co, t: html.escape(t).replace(mark, note_ref(num[co], len(num))) if co in num else html.escape(t)
     trs = "".join(f"<tr data-status={k}><td{'' if k == 'multi' else ' class=hub-county'}><a href='{county_href(co)}'>{html.escape(sources.display_label(co))}</a></td><td>{cell(co, t)}</td></tr>" for co, k, t in st)
     tbl = sc.tablewrap(C["table_caption"], f"<table id=fl-coverage><caption>{html.escape(C['table_caption'])}</caption><thead><tr><th scope=col>{html.escape(C['th_county'])}</th>"
                        f"<th scope=col>{html.escape(C['th_sd'])}</th></tr></thead><tbody>{trs}</tbody></table>")
-    tbl += "".join(f"<div class=footnote id=note-{num[co]}><p>{NOTE_LABEL.format(n=num[co])} ({html.escape(co)}): {html.escape(sources.plain_reason(co, REASONS[co]))}{tacd_src(co)}</p>{reason_more(REASONS[co])}</div>" for co in noted)
+    tbl += "".join(f"<div class=footnote id=note-{num[co]}><p>{note_label(num[co], len(num))} ({html.escape(co)}): {html.escape(sources.plain_reason(co, REASONS[co]))}{tacd_src(co)}</p>{reason_more(REASONS[co])}</div>" for co in noted)
     S = C["sections"]
     secs = (f"<h2 id=sections>{html.escape(C['sections_h2'])}</h2><ul>"
             + "".join(f"<li><a href='{PATH}/{u}/'>{html.escape(S[k])}</a></li>" for k, u in (("special_districts", SD_HUB), ("amendment_3", AMEND), ("rolled_back", "fl/rolled-back-rate"))) + "</ul>")

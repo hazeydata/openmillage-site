@@ -68,4 +68,4 @@ table.sd-rates caption{display:block}}
 #isd-groups>details.cgroup>summary:focus-visible{outline:3px solid var(--link);outline-offset:2px}
 #isd-groups>details.cgroup>ul.counties{margin:0 0 var(--s1)}
 table.tx-rates td.num{white-space:nowrap}@media (max-width:40rem){table.tx-rates th,table.tx-rates td,.sd-body,.sd-body~td{padding:.5rem .35rem}}
-#fl-coverage .hub-county{white-space:nowrap}#fl-coverage td a,.sd-body a{overflow-wrap:normal}
+#fl-coverage .hub-county,.nw{white-space:nowrap}#fl-coverage td a,.sd-body a{overflow-wrap:normal}
