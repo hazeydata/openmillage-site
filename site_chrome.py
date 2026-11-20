@@ -146,7 +146,16 @@ def api_page(slug): return f"api/v1/fl/2025/{slug.split('/')[-1]}-baseline.json"
 METHOD_PAGE = "llms.txt"  # no method page exists: llms.txt carries the fields, rate kinds and rules
 
 SKIP = "<a class=skip href='#main'>Skip to content</a>"
-def head_extra(PATH): return f"<meta name=viewport content='width=device-width, initial-scale=1'><link rel=stylesheet href='{PATH}/style.css'><link rel=stylesheet href='{PATH}/redo.css'>"
+OG_ALT = "OpenMillage: Your Florida property tax bill is a stack of rates. Here's who sets each one."
+def head_extra(PATH, base, url, title, desc=""):
+    """Shared head tags. url is the page's own absolute URL (og:url), independent of its canonical link; one og-card.png serves every page."""
+    q = lambda v: html.escape(v, quote=True)
+    img = f"{base}/og-card.png"
+    og = [("property", "og:title", title), ("property", "og:description", desc or title), ("property", "og:url", url), ("property", "og:type", "website"),
+          ("property", "og:image", img), ("property", "og:image:width", "1200"), ("property", "og:image:height", "630"), ("property", "og:image:alt", OG_ALT),
+          ("name", "twitter:card", "summary_large_image"), ("name", "twitter:image", img)]
+    return (f"<meta name=viewport content='width=device-width, initial-scale=1'><link rel=stylesheet href='{PATH}/style.css'><link rel=stylesheet href='{PATH}/redo.css'>"
+            + "".join(f'<meta {k}="{n}" content="{q(v)}">' for k, n, v in og))
 def header(PATH, current=None, slug="fl/amendment-3"):
     cur = lambda k: " aria-current=page" if current == k else ""
     return (f"<header><a class=brand href='{PATH}/'>OpenMillage</a><nav aria-label=Site><a href='{PATH}/#counties'{cur('counties')}>Counties</a> "

@@ -51,9 +51,10 @@ urls = [BASE + "/"]
 def page(path, title, body, jsonld=None, desc="", current=None, lead="", trail=None, h1=None, extra_ld=()):
     os.makedirs(os.path.dirname(os.path.join(OUT, path)) or OUT, exist_ok=True)
     ld = "".join(f'<script type="application/ld+json">{json.dumps(j)}</script>' for j in ([jsonld] if jsonld else []) + list(extra_ld))
+    url = f"{BASE}/{path[:-10] if path.endswith('index.html') else path}"
     open(os.path.join(OUT, path), "w").write(f"<!doctype html><html lang=en><head><meta charset=utf-8><title>{html.escape(title)}</title>"
-      f"<meta name=description content='{html.escape(desc, quote=True)}'><link rel=canonical href='{BASE}/{path[:-10] if path.endswith('index.html') else path}'>"
-      f"{sc.head_extra(PATH)}{ld}{GOATCOUNTER_TAG}</head>{sc.body(PATH, html.escape(h1 or title), body, current, AMEND, lead, UPDATED, trail)}</html>")
+      f"<meta name=description content='{html.escape(desc, quote=True)}'><link rel=canonical href='{url}'>"
+      f"{sc.head_extra(PATH, BASE, url, title, desc)}{ld}{GOATCOUNTER_TAG}</head>{sc.body(PATH, html.escape(h1 or title), body, current, AMEND, lead, UPDATED, trail)}</html>")
 open(f"{OUT}/style.css", "w").write(sc.CSS); redo.copy_assets(OUT)
 GROUPS = [("County", "County", ("county",)), ("School", "School", ("school_district",)), ("Municipalities", "Municipal", ("municipality",))]  # (heading, caption word, body types)  # then Special districts (below)
 COLS = [("Taxing body", 0), ("Type", 0), ("Levy", 0), ("Rate kind", 0), ("Rate", 1), ("Source", 0)]

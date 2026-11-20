@@ -35,7 +35,7 @@ def doc(path, title, desc, inner, trail, updated, canonical=None, h1=None, jsonl
     url = f"{BASE}/{path[:-10]}"
     ld = f'<script type="application/ld+json">{json.dumps(jsonld, ensure_ascii=False)}</script>' if jsonld else ""
     page = (f"<!doctype html><html lang=en><head><meta charset=utf-8><title>{E(title)}</title><meta name=description content='{E(desc)}'>"
-            f"<link rel=canonical href='{canonical or url}'>{sc.head_extra(PATH)}{GOATCOUNTER_TAG}{ld}</head>"
+            f"<link rel=canonical href='{canonical or url}'>{sc.head_extra(PATH, BASE, url, title, desc)}{GOATCOUNTER_TAG}{ld}</head>"
             + sc.body(PATH, E(h1 if h1 is not None else title.split(':')[0]), inner, updated=updated, trail=trail) + SORT_JS + FILTER_JS + "</html>")
     os.makedirs(os.path.dirname(f"{OUT}/{path}"), exist_ok=True); open(f"{OUT}/{path}", "w").write(page)
     return url
