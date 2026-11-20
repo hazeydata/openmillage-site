@@ -163,9 +163,9 @@ def render_amend3(rows, districts, ballot, counties, sd_counties=None):
       + redo.getdata(f"<a href='{PATH}/{api}.csv'>CSV</a> · <a href='{PATH}/{api}.json'>JSON</a>")
       + f"<h2>Questions</h2><dl><dt>What is millage?</dt><dd>{E(md['agency'])}: <q>{E(md['text'])}</q> {link(md['url'])}</dd>"
       f"<dt>Where do these rates come from?</dt><dd>Each value on this page links to the official document it was read from.</dd></dl>")
-    title = ballot["title"]
-    page = (f"<!doctype html><html lang=en><head><meta charset=utf-8><title>{E(title)}: Florida 2025 adopted millage baseline</title>"
-            f"<link rel=canonical href='{BASE}/{SLUG}/'>{sc.head_extra(PATH)}{GOATCOUNTER_TAG}</head>"
+    title = ballot["title"]; full_title = f"{title}: Florida 2025 adopted millage baseline"
+    page = (f"<!doctype html><html lang=en><head><meta charset=utf-8><title>{E(full_title)}</title>"
+            f"<link rel=canonical href='{BASE}/{SLUG}/'>{sc.head_extra(PATH, BASE, f'{BASE}/{SLUG}/', full_title)}{GOATCOUNTER_TAG}</head>"
             f"{sc.body(PATH, H1, body, 'amend', SLUG, '', sources.data_updated(sources.load_rows()), [(sources.FL_HUB_COPY['crumb'], f"{PATH}/{sources.FL_HUB}/"), ('2025 adopted millage baseline', None)], kicker=kicker)}</html>\n")
     return page, allrows
 

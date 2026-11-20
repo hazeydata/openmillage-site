@@ -236,7 +236,7 @@ ok(all(len(v) == 1 and v[0].startswith("https://openmillage.com/tx/") for v in c
 ok(all(k in llms_tx for k in ("2021–2025", "$100 of taxable value", "statutory_per_100", "2025 is preliminary", "Special-district rates are in the pinned data files but not listed on these pages yet", "/tx/property-tax-rates/", "/tx/<county-slug>/")),
    "AC22 llms.txt Texas line covers years, unit per $100, statutory basis, preliminary 2025, district note, hub and county URL pattern")
 ok(os.path.exists("docs/tx/index.html") and canon["docs/tx/index.html"] == ["https://openmillage.com/tx/property-tax-rates/"] and
-   re.sub(r"<link rel=canonical[^>]*>", "", TXT["docs/tx/index.html"]) == re.sub(r"<link rel=canonical[^>]*>", "", hubh) and "https://openmillage.com/tx/" not in txl,
+   (lambda t: re.sub(r"<link rel=canonical[^>]*>|<meta property=\"og:url\"[^>]*>", "", t))(TXT["docs/tx/index.html"]) == re.sub(r"<link rel=canonical[^>]*>|<meta property=\"og:url\"[^>]*>", "", hubh) and "https://openmillage.com/tx/" not in txl,
    "AC23 /tx/ exists in docs/ as the same hub, canonical on /tx/property-tax-rates/ (live 200 check is post-merge: deferred-live)")
 a_t, b_t = sandbox(), sandbox()
 def snap(t):

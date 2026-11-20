@@ -44,3 +44,8 @@ Tests: `python3 tests/test_fl_hub.py` (each check names its AC, 13-22, or its ro
 To run it by hand: Actions > site-health > Run workflow, optionally with a `url` input (base URL to check; empty means https://openmillage.com/). A bad URL is a quick way to test a forced failure.
 
 A failed run on main is the wake signal for a Grok Bot routine with a GitHub `ci-failed` trigger (`ciBranch: main`); healthy runs wake nobody. GitHub auto-disables scheduled workflows in public repos after 60 days without repo activity, so re-enable it in the Actions tab if the schedule goes quiet.
+
+## Link preview card
+Every page's head carries og:/twitter: tags (`site_chrome.head_extra`, used by `build.py`, `amend3.py` and `statepages.py`): `twitter:card=summary_large_image`, one shared image, and an `og:url` that is the page's own URL (independent of its canonical link).
+The image is `assets/og-card.png` (1200x630; the build copies it to `docs/og-card.png`, served at `https://openmillage.com/og-card.png`). To re-render it (needs Pillow; the build does not): `python3 scripts/render_og_card.py`. Its tagline is the Headline in `content/copy.md`.
+Test: `python3 tests/test_og_card.py` (CI runs it).

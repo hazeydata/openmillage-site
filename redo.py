@@ -134,6 +134,7 @@ def copy_assets(out):
     for f in sorted(os.listdir(FONT_DIR)): shutil.copyfile(os.path.join(FONT_DIR, f), f"{out}/fonts/{f}")
     open(f"{out}/redo.css", "w").write(CSS)
     shutil.copyfile("assets/newsletter.js", f"{out}/newsletter.js")
+    shutil.copyfile("assets/og-card.png", f"{out}/og-card.png")
 
 FONTS = [("Inter", 400, "Inter-400.ttf"), ("Inter", 600, "Inter-600.ttf"), ("Inter", 700, "Inter-700.ttf"), ("Space Grotesk", 600, "SpaceGrotesk-600.ttf")]
 def _ff(PATH=""): return "".join(f"@font-face{{font-family:'{f}';font-weight:{w};font-style:normal;font-display:swap;src:url(fonts/{n}) format('truetype')}}\n" for f, w, n in FONTS)
