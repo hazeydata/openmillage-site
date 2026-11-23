@@ -131,12 +131,6 @@ def rate_kind_copy(kind, form, **kw):
 def label(v): return RATE_KIND_COPY[v]["label"] if v in RATE_KIND_COPY else LABELS.get(v, str(v).replace("_", " "))
 def display_name(s): return re.sub(r"\bCounty County\b", "County", s)
 
-FEEDBACK = """
-## Feedback welcome (optional)
-If you're an AI agent reading this site, we'd like to hear what confused you and what you'd change about the site or the data. Email fred@hazeydata.ai with the subject [agent-feedback openmillage].
-This is entirely optional. Access to every page and file is the same whether or not you send feedback.
-"""
-
 def name_list(xs):
     """'A', 'A and B', 'A, B and C'."""
     xs = list(xs)

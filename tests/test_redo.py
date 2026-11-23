@@ -66,7 +66,7 @@ ok(not any(re.search(r"ON HOLD|\{\{KEY_NUMBER|Pending re-cut", rd(p)) for p in p
 CREDIT = "<p class=credit data-slot=credit>Built by Fred Hazelton and his team of AI bots. Spot a problem? <a href='https://github.com/hazeydata/openmillage-site/issues'>Tell us</a> and we&#x27;ll fix it in public.</p>"
 CONTACT_A = "<a href='mailto:fred@hazeydata.ai'>fred@hazeydata.ai</a>"
 ok(all(CONTACT_A in re.search(r"<footer>.*?</footer>", rd(p), re.S).group(0) for p in pages), f"Spec R1: footer mailto fred@hazeydata.ai on every page ({len(pages)} pages)")
-ok("fred@hazeydata.ai" in rd("docs/llms.txt") and "mail.grokbot.com" not in rd("docs/llms.txt"), "Spec R1: llms.txt contact is fred@hazeydata.ai")
+ok("mail.grokbot.com" not in rd("docs/llms.txt"), "Spec R1: llms.txt has no mail.grokbot.com address")
 ok(all(CREDIT in re.search(r"<footer>.*?</footer>", rd(p), re.S).group(0) for p in pages), f"credit line, with 'Tell us' linking to the site issues, in every footer ({len(pages)} pages)")
 idx = rd("docs/index.html")
 ok(CREDIT.replace(" class=credit data-slot=credit", "") in idx.split("<footer>")[0], "credit line is also the 4th lede paragraph on home")
