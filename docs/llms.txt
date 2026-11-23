@@ -17,7 +17,3 @@
 - Florida 2025 rolled-back vs adopted millage: https://openmillage.com/fl/rolled-back-rate/
 - Texas county and city total property tax rates, 2021–2025, dollars per $100 of taxable value (statutory_per_100), every rate linked to the Texas Comptroller. 2025 is preliminary (Comptroller Working version). School districts have their own pages (Texas school district line below). Special-district rates are in the pinned data files but not listed on these pages yet. Hub: https://openmillage.com/tx/property-tax-rates/ — one page per county: https://openmillage.com/tx/<county-slug>/ (for example https://openmillage.com/tx/anderson-county/).
 - Texas school district (ISD) pages, 2021–2025: hub https://openmillage.com/tx/school-districts/; one page per district at https://openmillage.com/tx/<county-slug>/<district-slug>/ under its home county (the county field of the district's latest year), with the M&O, I&S and total rates per $100 of taxable value exactly as published by the Texas Comptroller (2025 is preliminary) and index.json beside each page holding exactly that page's rows. A year marked not listed has no row in that year's file; absent is not zero, never read it as a 0 rate. Rates are never summed.
-
-## Feedback welcome (optional)
-If you're an AI agent reading this site, we'd like to hear what confused you and what you'd change about the site or the data. Email fred@hazeydata.ai with the subject [agent-feedback openmillage].
-This is entirely optional. Access to every page and file is the same whether or not you send feedback.

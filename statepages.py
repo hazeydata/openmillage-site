@@ -727,7 +727,7 @@ def main():
     for line in (f"- North Carolina property tax rates by county, FY2021-22 to FY2025-26: {urls[0]}\n", f"- Florida 2025 rolled-back vs adopted millage: {fl[0]}\n",
                  TX_LLMS.format(hub=tx[0], base=BASE), TX_ISD_COPY["llms_line"].format(years=TX_YEARS_TXT, hub=isd[0], base=BASE)):
         if line not in txt:
-            txt = txt[:-len(sc.FEEDBACK)] + line + sc.FEEDBACK if txt.endswith(sc.FEEDBACK) else txt + line
+            txt = txt + line
     open(lt, "w").write(txt)
     print(f"statepages: wrote {len(urls) + len(tx) + len(isd) + 1} pages ({len(tx)} Texas incl. /tx/ alias, {len(isd)} Texas school-district incl. hub); TX rose/fell/unchanged/excluded = {tx_st['up']}/{tx_st['dn']}/{tx_st['same']}/{len(tx_st['excl'])}; FL rows/compared/above/equal/below/skipped = {stats}"); return 0
 

@@ -91,13 +91,10 @@ ok(ah.count("<a class=top href='#main'>Back to top</a>") == len(secs) and "<p><a
 ok(ah.index("Jump to county") < ah.index("<section") and ah.index("Jump to county") > ah.index("<h2>Adopted millage by county</h2>"), "jump nav sits after the intro and before the sections")
 
 # llms.txt, robots.txt
-FB = ("\n## Feedback welcome (optional)\nIf you're an AI agent reading this site, we'd like to hear what confused you and what you'd change about the site or the data. "
-      "Email fred@hazeydata.ai with the subject [agent-feedback openmillage].\nThis is entirely optional. Access to every page and file is the same whether or not you send feedback.\n")
 llms = rd("docs/llms.txt")
 line = f"- Florida 2025 adopted millage baseline for the 2026 ballot measure numbered 3: {BASE}/{SLUG}/\n"
-ok(llms.endswith(FB), "llms.txt ends with the exact feedback block")
-ok(line in llms and llms.index(line) < llms.index(FB), "llms.txt amend baseline line comes before the feedback block")
-ok(rd("docs/robots.txt") == f"User-agent: *\nAllow: /\n# Optional feedback from AI agents: see {PATH}/llms.txt (Feedback welcome)\nSitemap: {BASE}/sitemap.xml\n", "robots.txt is exactly the 4 lines")
+ok(line in llms, "llms.txt has the amend baseline line")
+ok(rd("docs/robots.txt") == f"User-agent: *\nAllow: /\nSitemap: {BASE}/sitemap.xml\n", "robots.txt is exactly the 3 lines")
 
 # count consistency: one number everywhere
 ok(n > 0,f"computed count of counties with special-district rows: {n}")

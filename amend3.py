@@ -225,7 +225,7 @@ def main():
     lt = f"{OUT}/llms.txt"; line = f"- Florida 2025 adopted millage baseline for the 2026 ballot measure numbered 3: {url}\n"
     if os.path.exists(lt) and line not in open(lt).read():
         txt = open(lt).read()
-        open(lt, "w").write(txt[:-len(sc.FEEDBACK)] + line + sc.FEEDBACK if txt.endswith(sc.FEEDBACK) else txt + line)
+        open(lt, "w").write(txt + line)
     print(f"amend3: wrote {SLUG}/index.html ({len(shown)} rows)"); return 0
 
 if __name__ == "__main__": sys.exit(main())
